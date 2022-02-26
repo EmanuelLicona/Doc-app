@@ -1,0 +1,43 @@
+
+-- Preguntas a realizar
+	1. La aplicacion permitira enviar mensajes en texto?
+	2. La aplicacion ya tendria que tener una base de datos con los alumnos de la uth?
+	3. La aplicacion deberia permitir conversaciones entre compañeros o solo añadir?
+	4. Quien creara los grupos de los alumnos?, si este es el caso se tendrian que crear un nuevo usuario admin
+		o se podria administrar desde una app web?
+	5. En las dos bases de datos o solo en una.
+	6. Búsqueda de usuarios para agregar como compañeros  con que objetivos
+
+	
+		
+
+-- Posibles objetos a crear
+	1. Alumno
+	2. Usuario
+	3. mensaje: Esto debera llevar un estado para saber si eliminarlo o no
+		3.1 Texto
+		3.2 Imagen
+		3.3 Video
+		3.4 Documento 
+	4. Peticion de cuenta(Posible)
+	5. Reposicion de cuenta(Posible)
+	6. grupo
+	7. Solicitud de amistad
+	8. Solicitud de entrada a grupo
+	9. Conversacion dos personas - firebase
+	10. Apuntes/ Un crud - resapi
+
+
+	Resp Api
+	Creacion de usuario
+	...
+	
+	firebase
+	mensajes como tal
+
+
+	La mayoria de las preguntas fueron contestadas
+
+	
+
+	

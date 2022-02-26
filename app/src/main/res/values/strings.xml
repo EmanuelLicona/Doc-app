@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">PM1_PROYECTO_FINAL</string>
+    <string name="cliente_id">864018432040-41gk7l1v95js87071kl7tk4ds6ejv5ur.apps.googleusercontent.com</string>
+    <string-array name="list_courses">
+        <item>--Seleccionar--</item>
+        <item>Ingenieria Industrial</item>
+        <item>Ingenieria Computacion</item>
+        <item>Ingenieria Electronica</item>
+        <item>Lic. Mercadotecnia</item>
+        <item>Lic. Marketing</item>
+        <item>Lic. Contaduria Publica y Financiera</item>
+        <item>Lic. Turismo</item>
+        <item>Lic. Relaciones Industriales</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

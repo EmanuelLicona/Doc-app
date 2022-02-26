@@ -1,0 +1,60 @@
+package com.application.pm1_proyecto_final.utils;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+
+import com.application.pm1_proyecto_final.activities.RegisterActivity;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
+public class ResourceUtil {
+
+    public static final String EMAIL = "grupomovil7321@gmail.com";
+    public static final String PASSWORD = "Movilgrupo7321";
+
+    public static void showAlert(String title, String response, Context context, String action) {
+        if (action.equals("success")) {
+            new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+                    .setTitleText(title)
+                    .setContentText(response)
+                    .show();
+        } else {
+            new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText(title)
+                    .setContentText(response)
+                    .show();
+        }
+    }
+
+    public static SweetAlertDialog showAlertLoading(Context context) {
+        SweetAlertDialog pDialog = pDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading ...");
+            pDialog.setCancelable(true);
+
+        return pDialog;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static boolean validateDateBirth(String dateValue) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dateBirth = LocalDate.parse(dateValue, fmt);
+        LocalDate now = LocalDate.now();
+        Period result = Period.between(dateBirth, now);
+
+        if ( result.getYears() < 15 ) {
+            return false;
+        }
+
+        return true;
+    }
+
+}
