@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -168,6 +169,13 @@ public class MainActivity extends AppCompatActivity {
     private void login() {
         String email = txtEmail.getText().toString();
         String password = txtPassword.getText().toString();
+        String response = validateFieldsLogin(email, password);
+
+        if (!response.equals("OK")) {
+            ResourceUtil.showAlert("Advertencia", response, this, "error");
+            return;
+        }
+
         pDialog.show();
         mAuthProvider.login(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -182,6 +190,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private String validateFieldsLogin(String email, String password) {
+        String response = "OK";
+
+        if (email.isEmpty()) {
+            response = "Debe ingresar el correo electronico, es obligatorio";
+        } else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            response = "El correo electronico ingresado no es valido";
+        } else if(password.isEmpty()) {
+            response = "Debe ingresar el password, es obligatorio";
+        }
+
+        return response;
     }
 
 }

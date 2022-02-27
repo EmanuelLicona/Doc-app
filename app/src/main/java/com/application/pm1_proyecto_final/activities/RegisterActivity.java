@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -396,13 +397,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         spinnerListCourses.setAdapter(adapter);
     }
 
-    private boolean isEmailValid(String email) {
-        String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String validateFields() {
         String response = "";
@@ -428,7 +422,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
             response  = "Debes ingresar tu numero de telefono, es obligatorio.";
         } else if(email.isEmpty()) {
             response  = "Debes ingresar tu correo electronico, es obligatorio.";
-        } else if(!isEmailValid(email)) {
+        } else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             response  = "El correo electronico ingresado no es valido.";
         } else if (password.isEmpty()) {
             response  = "Debes ingresar la contraseña, es obligatorio.";
