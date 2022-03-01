@@ -53,6 +53,9 @@ dependencies {
     implementation files('libs/additionnal.jar')
     implementation files('libs/mail.jar')
 
+    //Rounded imageview: libreria para imagenes redondas
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+
     // FIN
 
     testImplementation 'junit:junit:4.13.2'
