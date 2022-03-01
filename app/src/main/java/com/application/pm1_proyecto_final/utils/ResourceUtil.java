@@ -5,9 +5,6 @@ import android.graphics.Color;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-
-import com.application.pm1_proyecto_final.activities.RegisterActivity;
 
 import java.time.LocalDate;
 import java.time.Period;
