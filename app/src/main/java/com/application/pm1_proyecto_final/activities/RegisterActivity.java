@@ -49,8 +49,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -379,13 +377,21 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     public void onDateSet(DatePicker datePicker, int year, int m, int dayOfMonth) {
         int month = m + 1;
         String mo = "";
+        String day = "";
+
         if (month >= 1 && month <= 9) {
             mo = "0"+month;
         } else {
             mo = String.valueOf(month);
         }
 
-        String date = dayOfMonth + "/" + mo + "/" +year;
+        if (dayOfMonth >= 1 && dayOfMonth <= 9) {
+            day = "0"+dayOfMonth;
+        } else {
+            day = String.valueOf(dayOfMonth);
+        }
+
+        String date = day + "/" + mo + "/" +year;
         txtBirthDate.setText(date);
     }
 
