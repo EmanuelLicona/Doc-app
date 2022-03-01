@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Inicio"
+        android:id="@+id/item_inicio"
+        android:icon="@drawable/ic_home"></item>
+    <item android:title="Perfil"
+        android:id="@+id/item_perfil"
+        android:icon="@drawable/ic_profile"></item>
+    <item android:title="Solicitud de Grupo"
+        android:id="@+id/item_solicitud_grupo"
+        android:icon="@drawable/ic_group"></item>
+    <item android:title="Mis Apuntes"
+        android:id="@+id/item_mis_apuntes"
+        android:icon="@drawable/ic_note"></item>
+    <item android:title="Informacion"
+        android:id="@+id/item_informacion"
+        android:icon="@drawable/ic_info"></item>
+    <item android:title="Cerrar Sesion"
+        android:id="@+id/item_cerrar_sesion"
+        android:icon="@drawable/ic_sign_off"></item>
+</menu>

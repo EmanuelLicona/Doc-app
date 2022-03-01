@@ -42,7 +42,8 @@
             android:exported="false" />
         <activity
             android:name=".activities.HomeActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"/>
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
