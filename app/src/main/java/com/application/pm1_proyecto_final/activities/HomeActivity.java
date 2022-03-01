@@ -9,6 +9,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import com.application.pm1_proyecto_final.Fragments.FragmentPerfil;
 import com.application.pm1_proyecto_final.Fragments.FrangmentApuntes;
 import com.application.pm1_proyecto_final.Fragments.FrangmentInfo;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -31,10 +33,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
+
+    private PreferencesManager preferencesManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        preferencesManager = new PreferencesManager(getApplicationContext());
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -119,6 +125,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }else if(item.getItemId() == R.id.item_informacion){
             openFragment(new FrangmentInfo());
         } else if(item.getItemId() == R.id.item_cerrar_sesion){
+
+            preferencesManager.clear();
+
+            Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
             finish();
         }
         return false;

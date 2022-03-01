@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.utils.Constants;
+import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.material.textfield.TextInputEditText;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -36,10 +38,14 @@ public class CreateGroupActivity extends AppCompatActivity {
     String encodedImage;
     RoundedImageView roundedImageView;
 
+    private PreferencesManager preferencesManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
+
+        preferencesManager = new PreferencesManager(getApplicationContext());
 
 
         init();
@@ -55,6 +61,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         txtDescription = (TextInputEditText) findViewById(R.id.txtDescriptionGroupRegister);
         roundedImageView = (RoundedImageView) findViewById(R.id.imageGroupRegister);
         btnSaveGroup = (Button) findViewById(R.id.btnSaveGroupRegister);
+
+        txtDescription.setText(preferencesManager.getString(Constants.KEY_USER_ID));
     }
 
     private void setListeners(){
@@ -69,7 +77,6 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         btnSaveGroup.setOnClickListener(v -> {
             if(isValidGroup()){
-
             }
         });
     }

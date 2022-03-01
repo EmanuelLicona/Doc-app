@@ -16,7 +16,9 @@ import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.AuthProvider;
 import com.application.pm1_proyecto_final.providers.UsersProvider;
+import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
+import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -46,10 +48,20 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private final int REQUEST_CODE_GOOGLE = 1;
 
+    private PreferencesManager preferencesManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        preferencesManager = new PreferencesManager(getApplicationContext());
+
+        if(preferencesManager.getBoolean(Constants.KEY_IS_SIGNED_IN)){
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         pDialog = ResourceUtil.showAlertLoading(MainActivity.this);
 
@@ -180,9 +192,16 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 pDialog.dismiss();
                 if(task.isSuccessful()) {
+
+                    preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                    preferencesManager.putString(Constants.KEY_USER_ID, task.getResult().getUser().getUid());
+
+
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+
+                    finish();
                 } else {
                     ResourceUtil.showAlert("Advertencia","El email y/o password ingresados son incorrectos.", MainActivity.this, "error");
                 }
