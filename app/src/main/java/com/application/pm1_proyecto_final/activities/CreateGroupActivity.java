@@ -2,6 +2,7 @@ package com.application.pm1_proyecto_final.activities;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -19,15 +20,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.models.Group;
+import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.DocumentReference;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class CreateGroupActivity extends AppCompatActivity {
 
@@ -40,13 +48,14 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     private PreferencesManager preferencesManager;
 
+    GroupsProvider groupsProvider;
+
+    SweetAlertDialog pDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
-
-        preferencesManager = new PreferencesManager(getApplicationContext());
-
 
         init();
         setListeners();
@@ -55,6 +64,15 @@ public class CreateGroupActivity extends AppCompatActivity {
 
 
     private void init(){
+
+        preferencesManager = new PreferencesManager(getApplicationContext());
+
+        groupsProvider = new GroupsProvider();
+
+        encodedImage = "";
+
+        pDialog = ResourceUtil.showAlertLoading(CreateGroupActivity.this);
+
         imageViewBack = (AppCompatImageView) findViewById(R.id.btnCreateGroupBack);
         txtAddImage = (TextView) findViewById(R.id.textAddImageRegister);
         txtTitle = (TextInputEditText) findViewById(R.id.txtTitleGroupRegister);
@@ -77,7 +95,42 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         btnSaveGroup.setOnClickListener(v -> {
             if(isValidGroup()){
+
+               saveGroup();
+
             }
+        });
+    }
+
+
+    private void saveGroup(){
+
+        pDialog.show();
+
+        Group group = new Group();
+
+        group.setTitle(txtTitle.getText().toString());
+        group.setDescription(txtDescription.getText().toString());
+        group.setUser_create(preferencesManager.getString(Constants.KEY_USER_ID));
+        group.setImage(encodedImage);
+
+        groupsProvider.create(group).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+
+                pDialog.dismiss();
+                if (task.isSuccessful()) {
+//                    ResourceUtil.showAlert("Mensaje", "El Grupo se registro correctamente.", CreateGroupActivity.this, "success");
+                    finish();
+                } else {
+                    ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", CreateGroupActivity.this, "error");
+
+                }
+
+
+            }
+
+
         });
     }
 
@@ -85,8 +138,6 @@ public class CreateGroupActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK){
-
-                    System.out.println(result.getResultCode() + "");
 
                     if(result.getData() != null){
                         Uri imageUri = result.getData().getData();

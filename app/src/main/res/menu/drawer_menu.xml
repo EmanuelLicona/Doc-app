@@ -9,6 +9,9 @@
     <item android:title="Solicitud de Grupo"
         android:id="@+id/item_solicitud_grupo"
         android:icon="@drawable/ic_group"></item>
+    <item android:title="Mis grupos"
+        android:id="@+id/item_mis_grupos"
+        android:icon="@drawable/ic_group"></item>
     <item android:title="Mis Apuntes"
         android:id="@+id/item_mis_apuntes"
         android:icon="@drawable/ic_note"></item>

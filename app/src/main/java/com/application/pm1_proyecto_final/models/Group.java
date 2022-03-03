@@ -8,16 +8,14 @@ public class Group implements Serializable {
     private String id;
     private String title;
     private String description;
-    private String type;
     private String user_create;
     private String image;
 
 
-    public Group(String id, String title, String description, String type, String user_create, String image) {
+    public Group(String id, String title, String description, String user_create, String image) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.type = type;
         this.user_create = user_create;
         this.image = image;
     }
@@ -47,14 +45,6 @@ public class Group implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getUser_create() {

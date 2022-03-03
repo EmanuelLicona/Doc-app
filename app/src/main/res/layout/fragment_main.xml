@@ -34,14 +34,14 @@
 
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnadd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="20dp"
-        android:src="@drawable/ic_add">
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/btnadd"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom|right"-->
+<!--        android:layout_margin="20dp"-->
+<!--        android:src="@drawable/ic_add">-->
 
-    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+<!--    </com.google.android.material.floatingactionbutton.FloatingActionButton>-->
 
 </FrameLayout>

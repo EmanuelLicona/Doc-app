@@ -29,7 +29,7 @@ public class FragmentMain extends Fragment {
 
         init(view);
 
-        setListeners();
+//        setListeners();
 
         return view;
     }
@@ -37,7 +37,7 @@ public class FragmentMain extends Fragment {
 
 
     private void init(View view){
-        fboton = (FloatingActionButton) view.findViewById(R.id.btnadd);
+//        fboton = (FloatingActionButton) view.findViewById(R.id.btnadd);
     }
 
     private void setListeners(){

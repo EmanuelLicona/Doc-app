@@ -120,8 +120,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         }else if(item.getItemId() == R.id.item_solicitud_grupo){
             openFragment(new FragmentGrupo());
-        }else if(item.getItemId() == R.id.item_mis_apuntes){
-            openFragment(new FrangmentApuntes());
+            
+        }else if(item.getItemId() == R.id.item_solicitud_grupo) {
+            openFragment(new FragmentGrupo());
+        }else if(item.getItemId() == R.id.item_mis_grupos){
+            openMyGroups();
         }else if(item.getItemId() == R.id.item_informacion){
             openFragment(new FrangmentInfo());
         } else if(item.getItemId() == R.id.item_cerrar_sesion){
@@ -135,5 +138,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             finish();
         }
         return false;
+    }
+
+    private void openMyGroups() {
+
+        Intent intent = new Intent(getApplicationContext(), MyGroupsActivity.class);
+        startActivity(intent);
     }
 }

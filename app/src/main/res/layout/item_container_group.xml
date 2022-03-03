@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    android:layout_marginBottom="10dp"
+    android:background="#F8F8F8">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imageProfileGroup"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:background="@drawable/background_image"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_oval="true"
+        />
+
+    <View
+        android:id="@+id/viewSuppoterGroup"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="@id/imageProfileGroup"
+        app:layout_constraintStart_toEndOf="@id/imageProfileGroup"
+        app:layout_constraintTop_toTopOf="@id/imageProfileGroup"/>
+
+    <TextView
+        android:id="@+id/textTitleGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/primary_text"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/viewSuppoterGroup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageProfileGroup"/>
+
+    <TextView
+        android:id="@+id/textDescriptionGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/primary_text"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageProfileGroup"
+        app:layout_constraintTop_toBottomOf="@id/viewSuppoterGroup"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

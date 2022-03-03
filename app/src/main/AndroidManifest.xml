@@ -28,6 +28,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PM1_PROYECTO_FINAL">
         <activity
+            android:name=".activities.MyGroupsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.CreateGroupActivity"
             android:exported="false" />
 
