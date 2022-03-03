@@ -5,14 +5,19 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
+import com.application.pm1_proyecto_final.listeners.Grouplistener;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
@@ -23,7 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyGroupsActivity extends AppCompatActivity {
+public class MyGroupsActivity extends AppCompatActivity implements Grouplistener{
 
     PreferencesManager preferencesManager;
 
@@ -33,6 +38,10 @@ public class MyGroupsActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
 
+    GroupAdapter groupAdapter;
+
+    EditText editTextSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +49,8 @@ public class MyGroupsActivity extends AppCompatActivity {
 
 
         init();
-        setListeners();
         getMyGroups();
+        setListeners();
     }
 
     private void init(){
@@ -52,10 +61,29 @@ public class MyGroupsActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.myGroupsProgressBar);
 
         recyclerView = (RecyclerView) findViewById(R.id.myGroupsRecyclerView);
+
+        editTextSearch = (EditText) findViewById(R.id.textSearchMyGroup);
      }
 
     private void setListeners(){
         btnBack.setOnClickListener(v -> onBackPressed());
+
+        editTextSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                groupAdapter.getFilter().filter(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     private void getMyGroups(){
@@ -90,7 +118,7 @@ public class MyGroupsActivity extends AppCompatActivity {
 
                         if(groups.size() > 0){
 
-                            GroupAdapter groupAdapter = new GroupAdapter(groups);
+                            groupAdapter = new GroupAdapter(groups, this);
                            recyclerView.setAdapter(groupAdapter);
 //                            recyclerView.setVisibility(View.VISIBLE);
 
@@ -115,5 +143,13 @@ public class MyGroupsActivity extends AppCompatActivity {
         }else{
             progressBar.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onClickGroup(Group group) {
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra(GroupsProvider.NAME_COLLECTION, group);
+        startActivity(intent);
+        finish();
     }
 }

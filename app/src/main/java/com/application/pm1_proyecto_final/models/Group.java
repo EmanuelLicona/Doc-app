@@ -4,20 +4,24 @@ import java.io.Serializable;
 
 public class Group implements Serializable {
 
+    public final static String STATUS_ACTIVE = "1";
+    public final static String STATUS_INACTIVE = "0";
 
     private String id;
     private String title;
     private String description;
     private String user_create;
     private String image;
+    private String status;
 
 
-    public Group(String id, String title, String description, String user_create, String image) {
+    public Group(String id, String title, String description, String user_create, String image, String status) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.user_create = user_create;
         this.image = image;
+        this.status = status;
     }
 
     public Group() {}
@@ -61,5 +65,13 @@ public class Group implements Serializable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

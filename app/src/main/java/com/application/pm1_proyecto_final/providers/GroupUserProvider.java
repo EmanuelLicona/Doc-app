@@ -1,27 +1,28 @@
 package com.application.pm1_proyecto_final.providers;
 
 import com.application.pm1_proyecto_final.models.Group;
+import com.application.pm1_proyecto_final.models.GroupUser;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GroupsProvider {
+public class GroupUserProvider {
 
     private CollectionReference collection;
 
-    public final static String NAME_COLLECTION = "Groups";
-    public final static String  KEY_USER_CREATE= "user_create";
-    public final static String  KEY_TITLE= "title";
-    public final static String  KEY_DESCRIPTION= "description";
-    public final static String  KEY_IMAGE= "image";
+    public final static String NAME_COLLECTION = "GroupUser";
+    public final static String  KEY_ID_USER = "idUser";
+    public final static String  KEY_ID_GROUP = "idGroup";
     public final static String  KEY_STATUS= "status";
+    public final static String  KEY_DATE= "date";
 
-    public GroupsProvider() {
+    public GroupUserProvider() {
         collection = FirebaseFirestore.getInstance().collection(NAME_COLLECTION);
     }
 
@@ -29,14 +30,14 @@ public class GroupsProvider {
         return collection.document(id).get();
     }
 
-    public Task<DocumentReference> create(Group group) {
+    public Task<DocumentReference> create(GroupUser groupUser) {
 
         Map<String, Object> map = new HashMap<>();
-        map.put(KEY_TITLE, group.getTitle());
-        map.put(KEY_DESCRIPTION, group.getDescription());
-        map.put(KEY_USER_CREATE, group.getUser_create());
-        map.put(KEY_IMAGE, group.getImage());
-        map.put(KEY_STATUS, group.getStatus());
+
+        map.put(KEY_ID_USER, groupUser.getIdUser());
+        map.put(KEY_ID_GROUP, groupUser.getIdGroup());
+        map.put(KEY_STATUS, groupUser.getStatus());
+        map.put(KEY_DATE, groupUser.getDate());
 
 
 

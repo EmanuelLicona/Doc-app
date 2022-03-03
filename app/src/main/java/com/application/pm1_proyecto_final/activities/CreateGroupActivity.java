@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.models.Group;
+import com.application.pm1_proyecto_final.models.GroupUser;
+import com.application.pm1_proyecto_final.providers.GroupUserProvider;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
@@ -34,6 +36,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Date;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -45,6 +48,8 @@ public class CreateGroupActivity extends AppCompatActivity {
     Button btnSaveGroup;
     String encodedImage;
     RoundedImageView roundedImageView;
+
+    boolean returnStatus;
 
     private PreferencesManager preferencesManager;
 
@@ -113,6 +118,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         group.setDescription(txtDescription.getText().toString());
         group.setUser_create(preferencesManager.getString(Constants.KEY_USER_ID));
         group.setImage(encodedImage);
+        group.setStatus(Group.STATUS_ACTIVE);
 
         groupsProvider.create(group).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
@@ -120,8 +126,11 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                 pDialog.dismiss();
                 if (task.isSuccessful()) {
-//                    ResourceUtil.showAlert("Mensaje", "El Grupo se registro correctamente.", CreateGroupActivity.this, "success");
-                    finish();
+
+                    saveInvitationAdminGroup(task);
+
+                finish();
+
                 } else {
                     ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", CreateGroupActivity.this, "error");
 
@@ -132,6 +141,32 @@ public class CreateGroupActivity extends AppCompatActivity {
 
 
         });
+    }
+
+
+
+    private boolean saveInvitationAdminGroup(Task<DocumentReference> task) {
+        GroupUser groupUser = new GroupUser();
+
+        returnStatus = false;
+
+        groupUser.setIdGroup(task.getResult().getId());
+        groupUser.setIdUser(preferencesManager.getString(Constants.KEY_USER_ID));
+        groupUser.setStatus(GroupUser.STATUS_ACCEPT);
+        groupUser.setDate(new Date());
+
+        GroupUserProvider groupUserProvider = new GroupUserProvider();
+
+        groupUserProvider.create(groupUser).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                if(task.isSuccessful())
+                    returnStatus = true;
+            }
+        });
+
+        return returnStatus;
+
     }
 
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(

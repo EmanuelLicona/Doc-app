@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Filter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,17 +15,26 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.listeners.Grouplistener;
 import com.application.pm1_proyecto_final.models.Group;
 import com.makeramen.roundedimageview.RoundedImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> {
 
-    private final List<Group> listGroup;
+    private  List<Group> listGroup;
+    private  List<Group> filterlist;
+    private  Grouplistener grouplistener;
+    private CustomFilter filter;
 
-    public GroupAdapter(List<Group> listGroup) {
+    public GroupAdapter(List<Group> listGroup, Grouplistener grouplistener) {
         this.listGroup = listGroup;
+
+        this.grouplistener = grouplistener;
+
+        this.filterlist = listGroup;
     }
 
     @NonNull
@@ -53,6 +63,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         RoundedImageView imageView;
         TextView title, description;
         ConstraintLayout card;
+        View view;
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,6 +75,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
 
             card = itemView.findViewById(R.id.cardGroup);
 
+            view = itemView;
+
         }
 
         void setData(Group group){
@@ -74,6 +87,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
 
             description.setText(group.getDescription());
 
+            view.setOnClickListener(v -> grouplistener.onClickGroup(group));
         }
 
 
@@ -83,5 +97,63 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
 
         byte[] bytes = android.util.Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+
+    //Filter
+    /**********************************************************************************/
+
+    class CustomFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+
+            FilterResults filterResults = new FilterResults();
+
+            if(charSequence != null && charSequence.length()>0){
+
+                charSequence = charSequence.toString().toUpperCase();
+
+                ArrayList<Group> filters = new ArrayList<Group>();
+
+                for(int i = 0;i < filterlist.size(); i++){
+
+                    if(filterlist.get(i).getTitle().toUpperCase().contains(charSequence)){
+
+                        filters.add(filterlist.get(i));
+                    }
+                }
+
+                filterResults.count = filters.size();
+                filterResults.values = filters;
+
+            }else {
+
+                filterResults.count = filterlist.size();
+                filterResults.values = filterlist;
+            }
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+            listGroup = (ArrayList<Group>) filterResults.values;
+            notifyDataSetChanged();
+        }
+    }
+
+    public Filter getFilter(){
+
+        if(filter == null){
+            filter = new CustomFilter();
+        }
+
+        return filter;
+    }
+
+    public ArrayList<Group> getFilterlist(){
+        return (ArrayList<Group>) filterlist;
     }
 }
