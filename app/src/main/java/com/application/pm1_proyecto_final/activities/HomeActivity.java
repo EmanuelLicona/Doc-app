@@ -21,9 +21,14 @@ import com.application.pm1_proyecto_final.Fragments.FragmentPerfil;
 import com.application.pm1_proyecto_final.Fragments.FrangmentApuntes;
 import com.application.pm1_proyecto_final.Fragments.FrangmentInfo;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.models.User;
+import com.application.pm1_proyecto_final.providers.UsersProvider;
+import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
@@ -33,6 +38,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
+
+
+    User userLog;
 
     private PreferencesManager preferencesManager;
     @Override
@@ -60,7 +68,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         seleccionado(0);
         openFragment(new FragmentMain());
+
+//        getUserLog();
+
+
+
+
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {//llamar al menu del toolbar
@@ -144,5 +160,38 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         Intent intent = new Intent(getApplicationContext(), MyGroupsActivity.class);
         startActivity(intent);
+    }
+
+
+    private void getUserLog(){
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+        database.collection(UsersProvider.NAME_COLLECTION)
+                .whereEqualTo(UsersProvider.KEY_EMAIL, preferencesManager.getString(UsersProvider.KEY_EMAIL))
+                .get()
+                .addOnCompleteListener(task -> {
+
+                    if(task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
+                        userLog = new User();
+
+                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+
+                        userLog.setId(documentSnapshot.getId());
+
+                        userLog.setEmail(documentSnapshot.getString(UsersProvider.KEY_EMAIL));
+                        userLog.setName(documentSnapshot.getString(UsersProvider.KEY_NAME));
+                        userLog.setLastname(documentSnapshot.getString(UsersProvider.KEY_LASTNAME));
+                        userLog.setImage(documentSnapshot.getString(UsersProvider.KEY_IMAGE));
+
+                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
+
+
+                    }
+
+
+                }).addOnFailureListener(error -> {
+            Toast.makeText(getApplicationContext(), "NO se pudo recuperar el usuario", Toast.LENGTH_SHORT).show();
+        });
     }
 }

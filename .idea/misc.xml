@@ -28,7 +28,10 @@
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_main.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_my_groups.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_register.xml" value="0.27355072463768115" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_temp.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/content_main.xml" value="0.3645833333333333" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/dialog_add_member.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/dialog_personalizado.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/drawer_header.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/drawer_toolbar.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/fragment_apuntes.xml" value="0.3645833333333333" />
@@ -37,7 +40,7 @@
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/fragment_perfil.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/frangement_info.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_group.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_user_group.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_user_group.xml" value="0.25" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/menu/botton_navigation_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/menu/drawer_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/menu/menu_toolbar.xml" value="0.36666666666666664" />

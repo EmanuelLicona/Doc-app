@@ -13,6 +13,13 @@ import java.util.Map;
 public class UsersProvider {
     private CollectionReference collection;
 
+    public final static String NAME_COLLECTION = "Users";
+    public final static String KEY_NAME = "name";
+    public final static String KEY_EMAIL = "email";
+    public final static String KEY_JSON = "groups";
+    public final static String KEY_LASTNAME = "lastname";
+    public final static String KEY_IMAGE = "image";
+
     public UsersProvider() {
         collection = FirebaseFirestore.getInstance().collection("Users");
     }

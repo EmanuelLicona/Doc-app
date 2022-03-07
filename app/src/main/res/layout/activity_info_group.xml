@@ -100,6 +100,45 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center"/>
 
+
+                <TextView
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+
+                    android:text="Integrantes del grupo"
+                    />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/usersGroupRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:clipToPadding="false"
+                    android:paddingTop="10dp"
+                    android:orientation="vertical"
+                    android:overScrollMode="never"
+                    android:paddingHorizontal="20dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+
+                    />
+
+
+
+                <Button
+                    android:id="@+id/btnAddMember"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Agregar Miembro"
+                    android:background="@drawable/backgroud_button"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="4dp"
+                    android:layout_gravity="center"/>
+
+
             </LinearLayout>
         </ScrollView>
     </FrameLayout>

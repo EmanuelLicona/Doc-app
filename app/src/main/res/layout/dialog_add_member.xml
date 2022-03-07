@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="Agregar usuario al grupo" />
+
+    <EditText
+        android:id="@+id/textEmailDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Correo del usuario"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:inputType="textEmailAddress"
+        android:layout_marginHorizontal="20dp"/>
+
+    <Button
+        android:id="@+id/btnAddMemberDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textColor="@color/white"
+        android:text="agregar"
+        android:layout_gravity="center"
+        android:background="@drawable/backgroud_button"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+</LinearLayout>

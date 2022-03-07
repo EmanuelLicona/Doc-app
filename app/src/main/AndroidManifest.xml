@@ -27,6 +27,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PM1_PROYECTO_FINAL">
+<!--        <activity-->
+<!--            android:name=".activities.Temp"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".activities.InfoGroupActivity"
             android:exported="false" />

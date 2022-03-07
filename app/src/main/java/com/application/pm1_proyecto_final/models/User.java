@@ -1,6 +1,8 @@
 package com.application.pm1_proyecto_final.models;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String id;
     private String name;
     private String lastname;
@@ -13,6 +15,7 @@ public class User {
     private String birthDate;
     private String image;
     private String password;
+    private String json_groups;
 
     public User() {
     }
@@ -30,7 +33,10 @@ public class User {
         this.birthDate = birthDate;
         this.image = image;
         this.password = password;
+        this.json_groups = "";
     }
+
+
 
     public String getId() {
         return id;
@@ -126,5 +132,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getJson_groups() {
+        return json_groups;
+    }
+
+    public void setJson_groups(String json_groups) {
+        this.json_groups = json_groups;
     }
 }

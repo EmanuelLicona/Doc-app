@@ -19,6 +19,7 @@ import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.listeners.Grouplistener;
 import com.application.pm1_proyecto_final.models.Group;
+import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
@@ -26,7 +27,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MyGroupsActivity extends AppCompatActivity implements Grouplistener{
 
@@ -100,6 +104,7 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
                     if(task.isSuccessful() && task.getResult()!=null){
 
                         List<Group> groups = new ArrayList<>();
+
 //                        Group grouptemp = null;
                         for(QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()){
 
@@ -110,9 +115,13 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
                             grouptemp.setDescription(queryDocumentSnapshot.getString(GroupsProvider.KEY_DESCRIPTION));
                             grouptemp.setImage(queryDocumentSnapshot.getString(GroupsProvider.KEY_IMAGE));
                             grouptemp.setUser_create(queryDocumentSnapshot.getString(GroupsProvider.KEY_USER_CREATE));
+                            grouptemp.setJson_users(queryDocumentSnapshot.getString(GroupsProvider.KEY_USERS));
+
 
                             groups.add(grouptemp);
                         }
+
+
 
                         loading(false);
 

@@ -22,20 +22,26 @@ import android.widget.Toast;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
+import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupUserProvider;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
+import com.application.pm1_proyecto_final.providers.UsersProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -57,6 +63,9 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     SweetAlertDialog pDialog;
 
+
+    User reseiverUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +73,8 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         init();
         setListeners();
+
+        loadReceiverDetails();
 
     }
 
@@ -75,6 +86,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         groupsProvider = new GroupsProvider();
 
         encodedImage = "";
+
+        reseiverUser = null;
 
         pDialog = ResourceUtil.showAlertLoading(CreateGroupActivity.this);
 
@@ -95,6 +108,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 
+
             pickImage.launch(intent);
         });
 
@@ -114,11 +128,30 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         Group group = new Group();
 
+        User usertemp = new User();
+
+        usertemp.setId(reseiverUser.getId());
+        usertemp.setName(reseiverUser.getName());
+        usertemp.setLastname(reseiverUser.getLastname());
+        usertemp.setImage(reseiverUser.getImage());
+        usertemp.setEmail(reseiverUser.getEmail());
+
+
+
         group.setTitle(txtTitle.getText().toString());
         group.setDescription(txtDescription.getText().toString());
         group.setUser_create(preferencesManager.getString(Constants.KEY_USER_ID));
         group.setImage(encodedImage);
         group.setStatus(Group.STATUS_ACTIVE);
+
+
+        Gson gson = new Gson();
+        ArrayList<User> users = new ArrayList<>();
+        users.add(usertemp);
+
+
+
+        group.setJson_users(gson.toJson(users));
 
         groupsProvider.create(group).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
@@ -128,6 +161,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
 
                     saveInvitationAdminGroup(task);
+
+                    convertListGroupsFromJson(group);
 
                 finish();
 
@@ -167,6 +202,39 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         return returnStatus;
 
+    }
+
+    private void saveUsergroup(String json){
+
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+        DocumentReference documentReference =
+                database.collection(UsersProvider.NAME_COLLECTION).document(preferencesManager.getString(Constants.KEY_USER_ID));
+
+        documentReference.update(UsersProvider.KEY_JSON, json);
+    }
+
+    private void convertListGroupsFromJson(Group group){
+        Gson gson = new Gson();
+
+        String json = "";
+
+
+        if(reseiverUser.getJson_groups() != null){
+            ArrayList<Group>  groupsTem = gson.fromJson(reseiverUser.getJson_groups(), new TypeToken<ArrayList<Group>>(){}.getType());
+            groupsTem.add(group);
+
+
+           json = gson.toJson(groupsTem);
+        }else{
+            ArrayList<Group>  groupsTem = new ArrayList<>();
+            groupsTem.add(group);
+
+
+            json = gson.toJson(groupsTem);
+        }
+
+        saveUsergroup(json);
     }
 
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
@@ -220,4 +288,12 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
 
     }
+
+    private void loadReceiverDetails(){
+        reseiverUser = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
+
+
+//        Toast.makeText(this, reseiverUser.getJson_groups(), Toast.LENGTH_SHORT).show();
+    }
+
 }

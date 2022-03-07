@@ -1,6 +1,10 @@
 package com.application.pm1_proyecto_final.models;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Group implements Serializable {
 
@@ -13,6 +17,7 @@ public class Group implements Serializable {
     private String user_create;
     private String image;
     private String status;
+    private String json_users;
 
 
     public Group(String id, String title, String description, String user_create, String image, String status) {
@@ -22,6 +27,7 @@ public class Group implements Serializable {
         this.user_create = user_create;
         this.image = image;
         this.status = status;
+        this.json_users = "";
     }
 
     public Group() {}
@@ -73,5 +79,28 @@ public class Group implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getJson_users() {
+        return json_users;
+    }
+
+    public void setJson_users(String json_users) {
+        this.json_users = json_users;
+    }
+
+
+    public static ArrayList<User> converJsonToArrayListUsers(String json){
+
+        Gson gson = new Gson();
+
+        if(json != null){
+              ArrayList<User>  users = gson.fromJson(json, new TypeToken<ArrayList<User>>(){}.getType());
+            return  users;
+        }else{
+
+            return new ArrayList<User>();
+        }
+
     }
 }
