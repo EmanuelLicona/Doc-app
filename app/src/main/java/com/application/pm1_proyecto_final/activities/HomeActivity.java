@@ -129,16 +129,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         drawerLayout.closeDrawer(GravityCompat.START);
+
         if(item.getItemId() == R.id.item_inicio){
             openFragment(new FragmentMain());
         }else if(item.getItemId() == R.id.item_perfil){
             openFragment(new FragmentPerfil());
 
-        }else if(item.getItemId() == R.id.item_solicitud_grupo){
-            openFragment(new FragmentGrupo());
-            
         }else if(item.getItemId() == R.id.item_solicitud_grupo) {
-            openFragment(new FragmentGrupo());
+
+            openMyInvitations();
         }else if(item.getItemId() == R.id.item_mis_grupos){
             openMyGroups();
         }else if(item.getItemId() == R.id.item_informacion){
@@ -159,6 +158,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void openMyGroups() {
 
         Intent intent = new Intent(getApplicationContext(), MyGroupsActivity.class);
+        startActivity(intent);
+    }
+
+    private void openMyInvitations(){
+        Intent intent = new Intent(getApplicationContext(), InvitationActivity.class);
         startActivity(intent);
     }
 

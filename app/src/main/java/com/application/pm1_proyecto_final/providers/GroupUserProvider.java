@@ -2,6 +2,7 @@ package com.application.pm1_proyecto_final.providers;
 
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
+import com.application.pm1_proyecto_final.utils.Constants;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -18,6 +19,7 @@ public class GroupUserProvider {
 
     public final static String NAME_COLLECTION = "GroupUser";
     public final static String  KEY_ID_USER = "idUser";
+    public final static String  KEY_TITLE = "title";
     public final static String  KEY_ID_GROUP = "idGroup";
     public final static String  KEY_STATUS= "status";
     public final static String  KEY_DATE= "date";
@@ -35,6 +37,7 @@ public class GroupUserProvider {
         Map<String, Object> map = new HashMap<>();
 
         map.put(KEY_ID_USER, groupUser.getIdUser());
+        map.put(KEY_TITLE, groupUser.getNameGroup());
         map.put(KEY_ID_GROUP, groupUser.getIdGroup());
         map.put(KEY_STATUS, groupUser.getStatus());
         map.put(KEY_DATE, groupUser.getDate());
@@ -44,14 +47,7 @@ public class GroupUserProvider {
         return collection.add(map);
     }
 
-    public Task<Void> update(Group group) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("title", group.getTitle());
-        map.put("description", group.getDescription());
-        map.put("user_create", group.getUser_create());
-        map.put("image", group.getImage());
 
 
-        return collection.document(group.getId()).update(map);
-    };
+
 }

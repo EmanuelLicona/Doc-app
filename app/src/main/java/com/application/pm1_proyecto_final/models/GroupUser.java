@@ -10,12 +10,15 @@ public class GroupUser implements Serializable {
     public final static String STATUS_NO_ACCEPT = "2"; // Estatus si el usuario no acepto la invitacion
     public final static String STATUS_LEFT = "3"; // Estatus si el usuario se salio del grupo
 
+    private String id;
     private String idUser;
     private String idGroup;
+    private String nameGroup;
     private String status; // Este campo alacenara los status del usuario en el grupo
     private Date date; // Este campo almacenara la fecha de de los status
 
     public GroupUser(String idUser, String idGroup, String status, Date date) {
+        this.id = "";
         this.idUser = idUser;
         this.idGroup = idGroup;
         this.status = status;
@@ -23,6 +26,14 @@ public class GroupUser implements Serializable {
     }
 
     public GroupUser() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getIdUser() {
@@ -55,5 +66,13 @@ public class GroupUser implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getNameGroup() {
+        return nameGroup;
+    }
+
+    public void setNameGroup(String nameGroup) {
+        this.nameGroup = nameGroup;
     }
 }

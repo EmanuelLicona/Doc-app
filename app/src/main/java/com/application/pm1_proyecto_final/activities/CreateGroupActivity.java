@@ -160,7 +160,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 pDialog.dismiss();
                 if (task.isSuccessful()) {
 
-                    saveInvitationAdminGroup(task);
+                    saveInvitationAdminGroup(task, group.getTitle());
 
                     convertListGroupsFromJson(group);
 
@@ -180,12 +180,13 @@ public class CreateGroupActivity extends AppCompatActivity {
 
 
 
-    private boolean saveInvitationAdminGroup(Task<DocumentReference> task) {
+    private boolean saveInvitationAdminGroup(Task<DocumentReference> task, String title) {
         GroupUser groupUser = new GroupUser();
 
         returnStatus = false;
 
         groupUser.setIdGroup(task.getResult().getId());
+        groupUser.setNameGroup(title);
         groupUser.setIdUser(preferencesManager.getString(Constants.KEY_USER_ID));
         groupUser.setStatus(GroupUser.STATUS_ACCEPT);
         groupUser.setDate(new Date());
