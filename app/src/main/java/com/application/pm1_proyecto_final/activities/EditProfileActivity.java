@@ -519,7 +519,7 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
                         name = documentSnapshot.getString("name");
                         txtName.setText(name);
                     }
-                    if (documentSnapshot.contains("name")) {
+                    if (documentSnapshot.contains("lastname")) {
                         lastname = documentSnapshot.getString("lastname");
                         txtLastname.setText(lastname);
                     }
@@ -543,10 +543,6 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
                     if (documentSnapshot.contains("birthDate")) {
                         birthDate = documentSnapshot.getString("birthDate");
                         txtBirthDate.setText(birthDate);
-                    }
-                    if (documentSnapshot.contains("address")) {
-                        address = documentSnapshot.getString("address");
-                        txtAddress.setText(address);
                     }
                     if (documentSnapshot.contains("image")){
                         mImageProfile = documentSnapshot.getString("image");

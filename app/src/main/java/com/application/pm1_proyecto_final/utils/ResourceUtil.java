@@ -54,4 +54,23 @@ public class ResourceUtil {
         return true;
     }
 
+    public static String createCodeRandom(int i) {
+        String theAlphaNumericS;
+        StringBuilder builder;
+
+        theAlphaNumericS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        builder = new StringBuilder(i);
+
+        for (int m = 0; m < i; m++) {
+            // generate numeric
+            int myindex = (int)(theAlphaNumericS.length() * Math.random());
+
+            // add the characters
+            builder.append(theAlphaNumericS.charAt(myindex));
+        }
+
+        return builder.toString();
+    }
+
 }

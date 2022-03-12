@@ -449,32 +449,13 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     }
 
     private void sendEmail(String email, String nameUser) {
-        codeGenerated = createCodeRandom(6);
+        codeGenerated = ResourceUtil.createCodeRandom(6);
         String message = "Te damos la bienvenida a DOC-APP. Para garantizar la seguridad de tu cuenta, verifica tu dirección de correo electrónico. \n" +
                 "Código Verificación: "+codeGenerated;
         String subject = nameUser + " Bienvenido a DOC-APP";
 
         JavaMailAPI javaMailAPI = new JavaMailAPI(this, email, subject, message);
         javaMailAPI.execute();
-    }
-
-    private String createCodeRandom(int i) {
-        String theAlphaNumericS;
-        StringBuilder builder;
-
-        theAlphaNumericS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-        builder = new StringBuilder(i);
-
-        for (int m = 0; m < i; m++) {
-            // generate numeric
-            int myindex = (int)(theAlphaNumericS.length() * Math.random());
-
-            // add the characters
-            builder.append(theAlphaNumericS.charAt(myindex));
-        }
-
-        return builder.toString();
     }
 
 }
