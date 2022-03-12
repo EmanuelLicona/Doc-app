@@ -162,9 +162,8 @@ public class CompleteProfileActivity extends AppCompatActivity implements DatePi
 
     private File createPhotoFile() throws IOException {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        Date now = new Date();
-        String fileName = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH).format(now);
-        File photoFile = File.createTempFile(fileName +"_PHOTO", ".jpg", storageDir);
+        String fileName = "IMG_USER_"+System.currentTimeMillis();
+        File photoFile = File.createTempFile(fileName, ".jpg", storageDir);
         mPhotoPath = "file:" + photoFile.getAbsolutePath();
         mAbsolutePhotoPath = photoFile.getAbsolutePath();
 

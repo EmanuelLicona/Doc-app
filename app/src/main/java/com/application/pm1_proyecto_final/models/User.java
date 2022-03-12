@@ -16,6 +16,7 @@ public class User implements Serializable {
     private String image;
     private String password;
     private String json_groups;
+    private String imageCover;
 
     public User() {
     }
@@ -35,8 +36,6 @@ public class User implements Serializable {
         this.password = password;
         this.json_groups = "";
     }
-
-
 
     public String getId() {
         return id;
@@ -140,5 +139,13 @@ public class User implements Serializable {
 
     public void setJson_groups(String json_groups) {
         this.json_groups = json_groups;
+    }
+
+    public String getImageCover() {
+        return imageCover;
+    }
+
+    public void setImageCover(String imageCover) {
+        this.imageCover = imageCover;
     }
 }

@@ -5,8 +5,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,11 +45,13 @@ public class UsersProvider {
         map.put("birthDate", user.getBirthDate());
         map.put("carrera", user.getCarrera());
         map.put("image", user.getImage());
+        map.put("image_cover", user.getImageCover());
         map.put("lastname", user.getLastname());
         map.put("name", user.getName());
         map.put("numberAccount", user.getNumberAccount());
         map.put("phone", user.getPhone());
         map.put("status", user.getStatus());
+        map.put("timestamp", new Date().getTime());
 
         return collection.document(user.getId()).update(map);
     };
