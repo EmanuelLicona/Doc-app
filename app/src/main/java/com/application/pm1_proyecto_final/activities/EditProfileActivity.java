@@ -250,7 +250,6 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
                 pDialog.dismiss();
                 if (task.isSuccessful()) {
                     finish();
-//                    ResourceUtil.showAlert("Confirmación", "Usuario actualizado correctamente.",EditProfileActivity.this, "success");
                 }else {
                     ResourceUtil.showAlert("Confirmación", "Error al actualizar el usuario.",EditProfileActivity.this, "error");
                 }

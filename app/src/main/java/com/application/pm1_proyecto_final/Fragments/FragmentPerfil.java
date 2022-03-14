@@ -32,6 +32,7 @@ public class FragmentPerfil extends Fragment {
     TextView txtUsername, txtPhone, txtEmail, txtPostNumber, txtCarrera;
     ImageView imageViewCover;
     CircleImageView circleImageProfile;
+    String email = "", nameUser = "";
 
 
     UsersProvider usersProvider;
@@ -82,7 +83,7 @@ public class FragmentPerfil extends Fragment {
 
                 if (documentSnapshot.exists()) {
                     if (documentSnapshot.contains("name") && documentSnapshot.contains("lastname")){
-                        String nameUser = documentSnapshot.getString("name") +" "+documentSnapshot.getString("lastname");
+                        nameUser = documentSnapshot.getString("name") +" "+documentSnapshot.getString("lastname");
                         txtUsername.setText(nameUser);
                     }
                     if (documentSnapshot.contains("phone")){
@@ -90,7 +91,7 @@ public class FragmentPerfil extends Fragment {
                         txtPhone.setText(phone);
                     }
                     if (documentSnapshot.contains("email")){
-                        String email = documentSnapshot.getString("email");
+                        email = documentSnapshot.getString("email");
                         txtEmail.setText(email);
                     }
                     if (documentSnapshot.contains("carrera")){
@@ -117,6 +118,8 @@ public class FragmentPerfil extends Fragment {
 
     private void goToEditPassword() {
         Intent intent = new Intent(getContext(), EditPasswordActivity.class);
+        intent.putExtra("email", email);
+        intent.putExtra("nameUser", nameUser);
         startActivity(intent);
     }
 

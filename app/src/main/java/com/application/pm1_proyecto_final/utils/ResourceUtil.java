@@ -1,14 +1,23 @@
 package com.application.pm1_proyecto_final.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Environment;
+import android.util.Base64;
 
 import androidx.annotation.RequiresApi;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import android.os.Environment;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -71,6 +80,13 @@ public class ResourceUtil {
         }
 
         return builder.toString();
+    }
+
+    public static String getImageBase64(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+        byte[] bytes = stream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 
 }

@@ -56,4 +56,12 @@ public class UsersProvider {
         return collection.document(user.getId()).update(map);
     };
 
+    public Task<Void> updatePassword(User user) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("password", user.getPassword());
+        map.put("timestamp", new Date().getTime());
+
+        return collection.document(user.getId()).update(map);
+    }
+
 }
