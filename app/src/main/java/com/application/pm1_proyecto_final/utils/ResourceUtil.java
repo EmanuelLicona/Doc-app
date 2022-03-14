@@ -3,6 +3,9 @@ package com.application.pm1_proyecto_final.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
@@ -87,6 +90,31 @@ public class ResourceUtil {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
         byte[] bytes = stream.toByteArray();
         return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    public static Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+
+        ExifInterface ei = new ExifInterface(selectedImage.getPath());
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
     }
 
 }

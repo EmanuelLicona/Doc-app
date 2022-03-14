@@ -277,23 +277,50 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         if (!response.equals("OK")) {
             ResourceUtil.showAlert("Advertencia", response, RegisterActivity.this, "error");
         } else {
-            String nameUser = name+" "+lastname;
-            if (codeGenerated == null) {
-                sendEmail(email, nameUser);
-                containerGeneratedCode.setVisibility(View.VISIBLE);
-                txtCodeGeneratedConfirm.requestFocus();
-            } else {
-                String codeConfirmUser = txtCodeGeneratedConfirm.getText().toString().trim();
-                if (codeConfirmUser.isEmpty()) {
-                    ResourceUtil.showAlert("Advertencia", "Debes ingresar el codigo de verificacion",RegisterActivity.this, "error");
-                } else {
-                    if (codeConfirmUser.equals(codeGenerated)) {
-                        registerUser();
-                    } else {
-                        ResourceUtil.showAlert("Advertencia", "El codigo de verificacion no es correcto.",RegisterActivity.this, "error");
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String existEmail = response.getString("data");
+
+                        if (!existEmail.equals("[]")) {
+                            ResourceUtil.showAlert("Advertencia", "El correo ingresado ya pertenece a otro usuario.", RegisterActivity.this, "error");
+                        } else {
+
+                            String nameUser = name + " " + lastname;
+                            if (codeGenerated == null) {
+                                sendEmail(email, nameUser);
+                                containerGeneratedCode.setVisibility(View.VISIBLE);
+                                txtCodeGeneratedConfirm.requestFocus();
+                            } else {
+                                String codeConfirmUser = txtCodeGeneratedConfirm.getText().toString().trim();
+                                if (codeConfirmUser.isEmpty()) {
+                                    ResourceUtil.showAlert("Advertencia", "Debes ingresar el codigo de verificacion", RegisterActivity.this, "error");
+                                } else {
+                                    if (codeConfirmUser.equals(codeGenerated)) {
+                                        registerUser();
+                                    } else {
+                                        ResourceUtil.showAlert("Advertencia", "El codigo de verificacion no es correcto.", RegisterActivity.this, "error");
+                                    }
+                                }
+                            }
+
+                        }
+
+                    } catch (JSONException e) {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", RegisterActivity.this, "error");
+                        e.printStackTrace();
                     }
                 }
-            }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(RegisterActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+            requestQueue.add(request);
         }
     }
 
@@ -314,10 +341,15 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         params.put("email", email);
         params.put("password", password);
 
-        if (image.isEmpty() || image.equals("")) {
+        if (bitmap == null) {
             params.put("image", "IMAGEN");
         } else {
-            params.put("image", image);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(20480);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60 , baos);
+            byte[] blob = baos.toByteArray();
+            String imageUser = Base64.encodeToString(blob, Base64.DEFAULT);
+
+            params.put("image", imageUser);
         }
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UserApiMethods.POST_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
@@ -333,6 +365,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
             public void onErrorResponse(VolleyError error) {
                 pDialog.dismiss();
                 ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el usuario.",RegisterActivity.this, "error");
+                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
             }
         });
         requestQueue.add(jsonObjectRequest);
@@ -347,8 +380,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
             try {
                 addImgPhotoUser.setImageURI(uri);
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                image = ResourceUtil.getImageBase64(bitmap);
-                Log.d("GALERIA", "Entrando galeria ");
             } catch (IOException e) {
                 Log.d("ERROR_PERMISOS", "onActivityResult():: "+e.getMessage());
             }
@@ -357,7 +388,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
             bitmap = BitmapFactory.decodeFile(currentPhotoPath);
             addImgPhotoUser.setImageBitmap(bitmap);
-            image = ResourceUtil.getImageBase64(bitmap);
         }
     }
 

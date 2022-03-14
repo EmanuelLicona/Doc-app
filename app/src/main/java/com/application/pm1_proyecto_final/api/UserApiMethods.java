@@ -22,8 +22,9 @@ public class UserApiMethods {
     public static final String URL = "https://dennisdomain.com/";
     public static final String GET_USER = URL + "api/users";
     public static final String POST_USER = URL + "api/users";
-    public static final String PUT_USER = URL + "api/users/{user}";
-    public static final String DELETE_USER = URL + "api/users/{user}";
+    public static final String PUT_USER = URL + "api/users/";
+    public static final String DELETE_USER = URL + "api/users/";
+    public static final String EXIST_EMAIL = URL + "api/userEmail/";
     private boolean answers = false;
 
 }
