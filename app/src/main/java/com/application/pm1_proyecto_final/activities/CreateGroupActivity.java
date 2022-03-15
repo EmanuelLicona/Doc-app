@@ -13,13 +13,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.api.GroupApiMethods;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
 import com.application.pm1_proyecto_final.models.User;
@@ -36,13 +45,18 @@ import com.google.common.reflect.TypeToken;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.makeramen.roundedimageview.RoundedImageView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -64,8 +78,6 @@ public class CreateGroupActivity extends AppCompatActivity {
     SweetAlertDialog pDialog;
 
 
-    User reseiverUser;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,8 +85,6 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         init();
         setListeners();
-
-        loadReceiverDetails();
 
     }
 
@@ -87,8 +97,6 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         encodedImage = "";
 
-        reseiverUser = null;
-
         pDialog = ResourceUtil.showAlertLoading(CreateGroupActivity.this);
 
         imageViewBack = (AppCompatImageView) findViewById(R.id.btnCreateGroupBack);
@@ -98,7 +106,6 @@ public class CreateGroupActivity extends AppCompatActivity {
         roundedImageView = (RoundedImageView) findViewById(R.id.imageGroupRegister);
         btnSaveGroup = (Button) findViewById(R.id.btnSaveGroupRegister);
 
-        txtDescription.setText(preferencesManager.getString(Constants.KEY_USER_ID));
     }
 
     private void setListeners(){
@@ -128,15 +135,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         Group group = new Group();
 
-        User usertemp = new User();
-
-        usertemp.setId(reseiverUser.getId());
-        usertemp.setName(reseiverUser.getName());
-        usertemp.setLastname(reseiverUser.getLastname());
-        usertemp.setImage(reseiverUser.getImage());
-        usertemp.setEmail(reseiverUser.getEmail());
-
-
+        encodedImage = (encodedImage.isEmpty())?"imagen":encodedImage;
 
         group.setTitle(txtTitle.getText().toString());
         group.setDescription(txtDescription.getText().toString());
@@ -144,99 +143,123 @@ public class CreateGroupActivity extends AppCompatActivity {
         group.setImage(encodedImage);
         group.setStatus(Group.STATUS_ACTIVE);
 
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        Gson gson = new Gson();
-        ArrayList<User> users = new ArrayList<>();
-        users.add(usertemp);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+        params.put("title", group.getTitle());
+        params.put("description", group.getDescription());
+        params.put("image", group.getImage());
+        params.put("status", group.getStatus());
+        params.put("user_id_created", group.getUser_create());
 
-
-
-        group.setJson_users(gson.toJson(users));
-
-        groupsProvider.create(group).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_GROUP, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-
+            public void onResponse(JSONObject response) {
                 pDialog.dismiss();
-                if (task.isSuccessful()) {
 
-                    saveInvitationAdminGroup(task, group.getTitle());
+                try {
+                    String resposeData = response.getString("data");
 
-                    convertListGroupsFromJson(group);
 
-                finish();
+                    if(!resposeData.equals("[]")){
 
-                } else {
-                    ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", CreateGroupActivity.this, "error");
+                        JSONObject jsonObject = response.getJSONObject("data");
 
+                        saveGroupUserAdmin(jsonObject.getString("id"));
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",CreateGroupActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+//                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",CreateGroupActivity.this, "error");
                 }
 
 
+//                Toast.makeText(CreateGroupActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+
             }
-
-
-        });
-    }
-
-
-
-    private boolean saveInvitationAdminGroup(Task<DocumentReference> task, String title) {
-        GroupUser groupUser = new GroupUser();
-
-        returnStatus = false;
-
-        groupUser.setIdGroup(task.getResult().getId());
-        groupUser.setNameGroup(title);
-        groupUser.setIdUser(preferencesManager.getString(Constants.KEY_USER_ID));
-        groupUser.setStatus(GroupUser.STATUS_ACCEPT);
-        groupUser.setDate(new Date());
-
-        GroupUserProvider groupUserProvider = new GroupUserProvider();
-
-        groupUserProvider.create(groupUser).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        }, new Response.ErrorListener() {
             @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-                if(task.isSuccessful())
-                    returnStatus = true;
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",CreateGroupActivity.this, "error");
+                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
+
+//                Toast.makeText(CreateGroupActivity.this, "Error: " +error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+        requestQueue.add(jsonObjectRequest);
 
-        return returnStatus;
 
     }
 
-    private void saveUsergroup(String json){
+    private void saveGroupUserAdmin(String idGroup) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", preferencesManager.getString(Constants.KEY_USER_ID));
+        params.put("group_id", idGroup);
+        params.put("status", GroupUser.STATUS_ACCEPT);
 
-        DocumentReference documentReference =
-                database.collection(UsersProvider.NAME_COLLECTION).document(preferencesManager.getString(Constants.KEY_USER_ID));
 
-        documentReference.update(UsersProvider.KEY_JSON, json);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_GROUP_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                pDialog.dismiss();
+
+                try {
+                    String resposeData = response.getString("data");
+
+
+                    if(!resposeData.equals("[]")){
+
+
+                        ResourceUtil.showAlert("Mensaje", "Grupo guardado correctamente.",CreateGroupActivity.this, "success");
+
+                        cleanComponets();
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",CreateGroupActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+//                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",CreateGroupActivity.this, "error");
+                }
+
+
+//                Toast.makeText(CreateGroupActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",CreateGroupActivity.this, "error");
+                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
+
+//                Toast.makeText(CreateGroupActivity.this, "Error: " +error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+
     }
 
-    private void convertListGroupsFromJson(Group group){
-        Gson gson = new Gson();
+    private void cleanComponets() {
 
-        String json = "";
+        txtTitle.setText(null);
+        txtDescription.setText(null);
+        txtAddImage.setVisibility(View.VISIBLE);
 
+        roundedImageView.setImageBitmap(null);
 
-        if(reseiverUser.getJson_groups() != null){
-            ArrayList<Group>  groupsTem = gson.fromJson(reseiverUser.getJson_groups(), new TypeToken<ArrayList<Group>>(){}.getType());
-            groupsTem.add(group);
+//        roundedImageView.setBackgroundResource(R.drawable.background_image);
 
+        encodedImage = "";
 
-           json = gson.toJson(groupsTem);
-        }else{
-            ArrayList<Group>  groupsTem = new ArrayList<>();
-            groupsTem.add(group);
-
-
-            json = gson.toJson(groupsTem);
-        }
-
-        saveUsergroup(json);
     }
+
 
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -288,13 +311,6 @@ public class CreateGroupActivity extends AppCompatActivity {
             return true;
         }
 
-    }
-
-    private void loadReceiverDetails(){
-        reseiverUser = (User) getIntent().getSerializableExtra(Constants.KEY_USER);
-
-
-//        Toast.makeText(this, reseiverUser.getJson_groups(), Toast.LENGTH_SHORT).show();
     }
 
 }

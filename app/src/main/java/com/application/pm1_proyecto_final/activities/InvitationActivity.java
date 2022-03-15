@@ -276,7 +276,7 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
                         userLog.setLastname(documentSnapshot.getString(UsersProvider.KEY_LASTNAME));
                         userLog.setImage(documentSnapshot.getString(UsersProvider.KEY_IMAGE));
 
-                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
+//                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
 
                     }
 
@@ -288,9 +288,9 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
     private void loadUsersGroups(){
 
-        ArrayList<Group> arrayList = User.converJsonToArrayListGroups(userLog.getJson_groups());
+//        ArrayList<Group> arrayList = User.converJsonToArrayListGroups(userLog.getJson_groups());
 
-        listGroups = arrayList;
+//        listGroups = arrayList;
 
     }
 

@@ -187,7 +187,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         userLog.setLastname(documentSnapshot.getString(UsersProvider.KEY_LASTNAME));
                         userLog.setImage(documentSnapshot.getString(UsersProvider.KEY_IMAGE));
 
-                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
+//                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
 
 
                     }

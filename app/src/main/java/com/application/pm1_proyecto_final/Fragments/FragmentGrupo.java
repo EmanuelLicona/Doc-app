@@ -62,44 +62,11 @@ public class FragmentGrupo extends Fragment {
             public void onClick(View view) {
 
 
-                getUserLog();
+                Intent intent = new Intent(getContext(), CreateGroupActivity.class);
+                startActivity(intent);
 
 
             }
-        });
-    }
-
-    private void getUserLog(){
-
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-
-        database.collection(UsersProvider.NAME_COLLECTION)
-                .whereEqualTo(UsersProvider.KEY_EMAIL, preferencesManager.getString(UsersProvider.KEY_EMAIL))
-                .get()
-                .addOnCompleteListener(task -> {
-
-                    if(task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
-                        userLog = new User();
-
-                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-
-                        userLog.setId(documentSnapshot.getId());
-
-                        userLog.setEmail(documentSnapshot.getString(UsersProvider.KEY_EMAIL));
-                        userLog.setName(documentSnapshot.getString(UsersProvider.KEY_NAME));
-                        userLog.setLastname(documentSnapshot.getString(UsersProvider.KEY_LASTNAME));
-                        userLog.setImage(documentSnapshot.getString(UsersProvider.KEY_IMAGE));
-
-                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
-
-                        Intent intent = new Intent(getContext(), CreateGroupActivity.class);
-                        intent.putExtra(Constants.KEY_USER, userLog);
-                        startActivity(intent);
-                    }
-
-
-                }).addOnFailureListener(error -> {
-            Toast.makeText(getContext(), "NO se pudo recuperar el usuario", Toast.LENGTH_SHORT).show();
         });
     }
 }

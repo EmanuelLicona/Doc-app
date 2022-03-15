@@ -19,7 +19,6 @@ public class User implements Serializable {
     private String birthDate;
     private String image;
     private String password;
-    private String json_groups;
     private String imageCover;
 
     public User() {
@@ -38,7 +37,6 @@ public class User implements Serializable {
         this.birthDate = birthDate;
         this.image = image;
         this.password = password;
-        this.json_groups = "";
     }
 
     public String getId() {
@@ -137,13 +135,13 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getJson_groups() {
-        return json_groups;
-    }
-
-    public void setJson_groups(String json_groups) {
-        this.json_groups = json_groups;
-    }
+//    public String getJson_groups() {
+//        return json_groups;
+//    }
+//
+//    public void setJson_groups(String json_groups) {
+//        this.json_groups = json_groups;
+//    }
 
     public static ArrayList<Group> converJsonToArrayListGroups(String json) {
 
