@@ -13,4 +13,6 @@ public class GroupApiMethods {
     public static final String POST_GROUP_USER = URL + "api/groupUsers";
 
     public static final String GET_GROUP_USER_CREATE = URL + "api/usersGroupCreates/";
+
+    public static final String GET_USERS_FOR_GROUP = URL + "api/usuariosDelGrupo/";
 }
