@@ -17,7 +17,7 @@ public class Group implements Serializable {
     private String user_create;
     private String image;
     private String status;
-    private String json_users;
+//    private String json_users;
 
 
     public Group(String id, String title, String description, String user_create, String image, String status) {
@@ -27,7 +27,7 @@ public class Group implements Serializable {
         this.user_create = user_create;
         this.image = image;
         this.status = status;
-        this.json_users = "";
+//        this.json_users = "";
     }
 
     public Group() {}
@@ -81,13 +81,13 @@ public class Group implements Serializable {
         this.status = status;
     }
 
-    public String getJson_users() {
-        return json_users;
-    }
-
-    public void setJson_users(String json_users) {
-        this.json_users = json_users;
-    }
+//    public String getJson_users() {
+//        return json_users;
+//    }
+//
+//    public void setJson_users(String json_users) {
+//        this.json_users = json_users;
+//    }
 
 
     public static ArrayList<User> converJsonToArrayListUsers(String json){

@@ -117,9 +117,9 @@ public class InfoGroupActivity extends AppCompatActivity {
 
     private void loadUsersGroups(){
 
-        ArrayList<User> arrayList = Group.converJsonToArrayListUsers(reseiverGroup.getJson_users());
+//        ArrayList<User> arrayList = Group.converJsonToArrayListUsers(reseiverGroup.getJson_users());
 
-        users = arrayList;
+//        users = arrayList;
 
         UsersGroupAdapter usersGroupAdapter = new UsersGroupAdapter(users, preferencesManager);
 

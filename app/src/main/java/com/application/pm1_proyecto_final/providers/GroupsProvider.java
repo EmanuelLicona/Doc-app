@@ -61,7 +61,7 @@ public class GroupsProvider {
         map.put(KEY_USER_CREATE, group.getUser_create());
         map.put(KEY_IMAGE, group.getImage());
         map.put(KEY_STATUS, group.getStatus());
-        map.put(KEY_USERS, group.getJson_users());
+//        map.put(KEY_USERS, group.getJson_users());
 
 
 //        map.put("Groups", groups);

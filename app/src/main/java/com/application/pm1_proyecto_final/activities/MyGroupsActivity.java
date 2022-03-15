@@ -9,22 +9,37 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
+import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.listeners.Grouplistener;
 import com.application.pm1_proyecto_final.models.Group;
+import com.application.pm1_proyecto_final.models.GroupUser;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,55 +108,82 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
     private void getMyGroups(){
         loading(true);
 
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-
-
-        database.collection(GroupsProvider.NAME_COLLECTION)
-                .whereEqualTo(GroupsProvider.KEY_USER_CREATE, preferencesManager.getString(Constants.KEY_USER_ID))
-                .get()
-                .addOnCompleteListener(task -> {
-
-                    if(task.isSuccessful() && task.getResult()!=null){
-
-                        List<Group> groups = new ArrayList<>();
-
-//                        Group grouptemp = null;
-                        for(QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()){
-
-                            Group grouptemp = new Group();
-
-                            grouptemp.setId(queryDocumentSnapshot.getId());
-                            grouptemp.setTitle(queryDocumentSnapshot.getString(GroupsProvider.KEY_TITLE));
-                            grouptemp.setDescription(queryDocumentSnapshot.getString(GroupsProvider.KEY_DESCRIPTION));
-                            grouptemp.setImage(queryDocumentSnapshot.getString(GroupsProvider.KEY_IMAGE));
-                            grouptemp.setUser_create(queryDocumentSnapshot.getString(GroupsProvider.KEY_USER_CREATE));
-                            grouptemp.setJson_users(queryDocumentSnapshot.getString(GroupsProvider.KEY_USERS));
-
-
-                            groups.add(grouptemp);
-                        }
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
 
 
-                        loading(false);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                (GroupApiMethods.GET_GROUP_USER_CREATE+preferencesManager.getString(Constants.KEY_USER_ID)),
+                null,
+                new com.android.volley.Response.Listener<JSONObject>(){
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                        if(groups.size() > 0){
 
-                            groupAdapter = new GroupAdapter(groups, this);
-                           recyclerView.setAdapter(groupAdapter);
+                        try {
+
+                            JSONObject  jsonObject = null;
+
+                            Group groupTemp = null;
+
+                            List<Group> groups = new ArrayList<>();
+
+
+                            if(response.getString("res").equals("true")){
+//                                t = response.getJSONObject("data").getString("name");
+
+
+                                JSONArray array = response.getJSONObject("data").getJSONArray("groups_creates");
+
+                                for (int i = 0; i < array.length(); i++) {
+                                     jsonObject = new JSONObject(array.get(i).toString());
+
+
+                                     groupTemp = new Group();
+                                     groupTemp.setId(jsonObject.getString("id"));
+                                     groupTemp.setTitle(jsonObject.getString("title"));
+                                     groupTemp.setDescription(jsonObject.getString("description"));
+                                     groupTemp.setImage(jsonObject.getString("image"));
+                                     groupTemp.setStatus(jsonObject.getString("status"));
+                                     groupTemp.setUser_create(jsonObject.getString("user_id_created"));
+
+                                     groups.add(groupTemp);
+
+                                }
+
+                                loading(false);
+
+                                if(groups.size() > 0){
+
+                                    groupAdapter = new GroupAdapter(groups, MyGroupsActivity.this);
+                                    recyclerView.setAdapter(groupAdapter);
 //                            recyclerView.setVisibility(View.VISIBLE);
 
-                        }else{
-                            Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (JSONException e) {
+                            Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
-                    }else{
-                        loading(false);
-                        Toast.makeText(getApplicationContext(), "Error: No se pudieron obtener los datos", Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(error ->{
-                        Toast.makeText(getApplicationContext(), "Error: "+error.toString(), Toast.LENGTH_SHORT).show();
-                    });
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: "+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+        );
+
+        requestQueue.add(request);
 
     }
 
