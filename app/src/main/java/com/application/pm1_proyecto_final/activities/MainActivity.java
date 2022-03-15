@@ -10,14 +10,26 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.material.textfield.TextInputEditText;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -66,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void login() {
-        String email = txtEmail.getText().toString();
+        String email = txtEmail.getText().toString().trim();
         String password = txtPassword.getText().toString();
         String response = validateFieldsLogin(email, password);
 
@@ -76,27 +88,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         pDialog.show();
-//        mAuthProvider.login(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<AuthResult> task) {
-//                pDialog.dismiss();
-//                if(task.isSuccessful()) {
-//
-//                    preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-//                    preferencesManager.putString(Constants.KEY_USER_ID, task.getResult().getUser().getUid());
-//                    preferencesManager.putString(UsersProvider.KEY_EMAIL, txtEmail.getText().toString());
-//
-//
-//                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent);
-//
-//                    finish();
-//                } else {
-//                    ResourceUtil.showAlert("Advertencia","El email y/o password ingresados son incorrectos.", MainActivity.this, "error");
-//                }
-//            }
-//        });
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray userJson = response.getJSONArray("data");
+                    JSONObject dataUser = userJson.getJSONObject(0);
+                    String emailUser = dataUser.getString("email");
+                    String passwordUser = dataUser.getString("password");
+
+                    pDialog.dismiss();
+                    if (email.equals(emailUser) && password.equals(passwordUser)) {
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } else {
+                        ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+                    pDialog.dismiss();
+                    ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+        requestQueue.add(request);
+
     }
 
     private String validateFieldsLogin(String email, String password) {
