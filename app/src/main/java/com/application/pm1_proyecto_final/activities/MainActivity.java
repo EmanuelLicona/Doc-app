@@ -49,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         preferencesManager = new PreferencesManager(getApplicationContext());
-
-        User user = new User();
-
-        //Usuario temporal emulando un inicion de sesion
-        user.setId(2+"");
-        user.setName("Abdiel");
-        user.setLastname("Licona");
-        user.setEmail("alicoescobar@gmail.com");
+//
+//        User user = new User();
+//
+//        //Usuario temporal emulando un inicion de sesion
+//        user.setId(2+"");
+//        user.setName("Abdiel");
+//        user.setLastname("Licona");
+//        user.setEmail("alicoescobar@gmail.com");
 
 
         if(preferencesManager.getBoolean(Constants.KEY_IS_SIGNED_IN)){
@@ -64,11 +64,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
 
-        }else{
-            preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-            preferencesManager.putString(Constants.KEY_USER_ID, user.getId()+"");
-            preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
         }
+        
+//        else{
+//            preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+//            preferencesManager.putString(Constants.KEY_USER_ID, user.getId()+"");
+//            preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
+//        }
 
         pDialog = ResourceUtil.showAlertLoading(MainActivity.this);
 
