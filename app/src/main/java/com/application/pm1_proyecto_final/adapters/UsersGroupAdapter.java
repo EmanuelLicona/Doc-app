@@ -1,5 +1,8 @@
 package com.application.pm1_proyecto_final.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +78,14 @@ public class UsersGroupAdapter extends RecyclerView.Adapter<UsersGroupAdapter.Us
                 description.setText("Miembro");
             }
 
+            imageView.setImageBitmap(decodeImage(user.getImage()));
+
+        }
+
+        private Bitmap decodeImage(String encodedImage){
+
+            byte[] bytes = android.util.Base64.decode(encodedImage, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         }
     }
 }

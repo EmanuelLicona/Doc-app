@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -30,6 +32,7 @@ import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.UsersGroupAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
 import com.application.pm1_proyecto_final.models.User;
@@ -127,22 +130,14 @@ public class InfoGroupActivity extends AppCompatActivity {
 
     //En este metodo solo deberian cargar los usuarios que estan aceptados
     private void loadUsersGroups(){
-
         ArrayList<User> arrayList = new ArrayList<>();
-
-
-
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                (GroupApiMethods.GET_USERS_FOR_GROUP+reseiverGroup.getId()),
+                (GroupApiMethods.GET_USERS_FOR_GROUP_ACTIVE+reseiverGroup.getId()),
                 null,
                 new com.android.volley.Response.Listener<JSONObject>(){
                     @Override
                     public void onResponse(JSONObject response) {
-
 
                         try {
 
@@ -157,7 +152,8 @@ public class InfoGroupActivity extends AppCompatActivity {
 //                                t = response.getJSONObject("data").getString("name");
 
 
-                                JSONArray array = response.getJSONObject("data").getJSONArray("users");
+//                                JSONArray array = response.getJSONObject("data").getJSONArray("users");
+                                JSONArray array = response.getJSONArray("data");
 
                                 for (int i = 0; i < array.length(); i++) {
                                     jsonObject = new JSONObject(array.get(i).toString());
@@ -168,14 +164,14 @@ public class InfoGroupActivity extends AppCompatActivity {
                                     usertemp.setName(jsonObject.getString("name"));
                                     usertemp.setLastname(jsonObject.getString("lastname"));
                                     usertemp.setNumberAccount(jsonObject.getString("numberAccount"));
-                                    usertemp.setPhone(jsonObject.getString("phone"));
-                                    usertemp.setStatus(jsonObject.getString("status"));
+//                                    usertemp.setPhone(jsonObject.getString("phone"));
+                                    usertemp.setStatus(jsonObject.getString("status_user"));
                                     usertemp.setImage(jsonObject.getString("image"));
-                                    usertemp.setAddress(jsonObject.getString("address"));
-                                    usertemp.setBirthDate(jsonObject.getString("birthDate"));
-                                    usertemp.setCarrera(jsonObject.getString("carrera"));
+//                                    usertemp.setAddress(jsonObject.getString("address"));
+//                                    usertemp.setBirthDate(jsonObject.getString("birthDate"));
+//                                    usertemp.setCarrera(jsonObject.getString("carrera"));
                                     usertemp.setEmail(jsonObject.getString("email"));
-                                    usertemp.setPassword(jsonObject.getString("password"));
+//                                    usertemp.setPassword(jsonObject.getString("password"));
 
 
 
@@ -215,18 +211,6 @@ public class InfoGroupActivity extends AppCompatActivity {
         );
 
         requestQueue.add(request);
-
-
-
-
-
-
-//
-//        users = arrayList;
-//
-//        UsersGroupAdapter usersGroupAdapter = new UsersGroupAdapter(users, preferencesManager);
-//
-//        recyclerViewUsuarios.setAdapter(usersGroupAdapter);
 
     }
 
@@ -269,108 +253,209 @@ public class InfoGroupActivity extends AppCompatActivity {
 
     private void searhEmail(String email) {
 
-        FirebaseFirestore database=FirebaseFirestore.getInstance();
+        if(email.equals(preferencesManager.getString(UsersProvider.KEY_EMAIL))){
+            ResourceUtil.showAlert("Advertencia", "No se puede enviar la invitacion a usted mismo.", InfoGroupActivity.this, "error");
+            return;
+        }
 
-        database.collection(UsersProvider.NAME_COLLECTION)
-                .whereEqualTo(UsersProvider.KEY_EMAIL, email)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful() && task.getResult() != null){
-                       if( task.getResult().getDocuments().size() > 0){
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String existEmail = response.getString("data");
 
-                           DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                    if (existEmail.equals("[]")) {
+                        ResourceUtil.showAlert("Advertencia", "El correo ingresado no pertenece a ningun usuario.", InfoGroupActivity.this, "error");
+                    } else {
 
-                           User user = new User();
+                        User usertemp = new User();
 
-                           user.setEmail(documentSnapshot.getString(UsersProvider.KEY_EMAIL));
-                           user.setId(documentSnapshot.getId());
+                        JSONArray array = response.getJSONArray("data");
 
-                           sendInvitation(user);
-                       }else{
-                           ResourceUtil.showAlert("Advertencia", "El correo escrito no existe", InfoGroupActivity.this, "error");
-                       }
+                        JSONObject jsonObject = array.getJSONObject(0);
+
+
+                        usertemp = new User();
+                        usertemp.setId(jsonObject.getString("id"));
+                        usertemp.setName(jsonObject.getString("name"));
+                        usertemp.setLastname(jsonObject.getString("lastname"));
+                        usertemp.setNumberAccount(jsonObject.getString("numberAccount"));
+//                                    usertemp.setPhone(jsonObject.getString("phone"));
+                        usertemp.setStatus(jsonObject.getString("status"));
+                        usertemp.setImage(jsonObject.getString("image"));
+//                                    usertemp.setAddress(jsonObject.getString("address"));
+//                                    usertemp.setBirthDate(jsonObject.getString("birthDate"));
+//                                    usertemp.setCarrera(jsonObject.getString("carrera"));
+                        usertemp.setEmail(jsonObject.getString("email"));
+//                                    usertemp.setPassword(jsonObject.getString("password"));
+
+
+//                        Toast.makeText(InfoGroupActivity.this, usertemp.getId(), Toast.LENGTH_SHORT).show();
+                        statusInvitation(usertemp);
                     }
-
-
-                }).addOnFailureListener(error -> {
-                    Toast.makeText(getApplicationContext(), "Error al enviar invitacion", Toast.LENGTH_SHORT).show();
-                });
-
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(InfoGroupActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+        requestQueue.add(request);
 
     }
 
-    private void sendInvitation(User user) {
+    private void statusInvitation(User user) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        FirebaseFirestore database=FirebaseFirestore.getInstance();
-
-        database.collection(GroupUserProvider.NAME_COLLECTION)
-                .whereEqualTo(GroupUserProvider.KEY_ID_GROUP, reseiverGroup.getId())
-                .whereEqualTo(GroupUserProvider.KEY_ID_USER, user.getId())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful() && task.getResult() != null){
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", user.getId());
+        params.put("group_id", reseiverGroup.getId());
 
 
-
-                        GroupUser groupUser = new GroupUser();
-
-                        groupUser.setIdGroup(reseiverGroup.getId());
-                        groupUser.setNameGroup(reseiverGroup.getTitle());
-                        groupUser.setIdUser(user.getId());
-                        groupUser.setStatus(GroupUser.STATUS_INVITED);
-                        groupUser.setNameGroup(reseiverGroup.getTitle());
-                        groupUser.setDate(new Date());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_STATUS_USER_GROUP, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
 
 
+                try {
+                    String resposeData = response.getString("data");
 
-                        if( task.getResult().getDocuments().size() > 0){
+                    JSONArray array = response.getJSONArray("data");
 
-                            DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                    JSONObject jsonObject = array.getJSONObject(0);
 
-                            HashMap<String, Object> map = new HashMap<>();
+                    if(!resposeData.equals("[]")){
 
-                            map.put(GroupUserProvider.KEY_STATUS, GroupUser.STATUS_INVITED);
-                            map.put(GroupUserProvider.KEY_TITLE, groupUser.getNameGroup());
-                            map.put(GroupUserProvider.KEY_DATE, new Date());
+//                        UpdateInvitation();
 
-                            database.collection(GroupUserProvider.NAME_COLLECTION).
-                                    document(documentSnapshot.getId())
-                                    .update(map)
-                                    .addOnCompleteListener(task1 -> {
+                        if(jsonObject.getString("status").equals(GroupUser.STATUS_INVITED)){
 
-                                        if(task1.isSuccessful()){
-                                            ResourceUtil.showAlert("Mensaje", "Invitacion Enviada", InfoGroupActivity.this, "success");
-                                        }else{
-                                            ResourceUtil.showAlert("Oops", "No se pudo enviar la invitacion", InfoGroupActivity.this, "error");
-                                        }
+                            ResourceUtil.showAlert("Mensaje", "El usuario ya a sido invitado", InfoGroupActivity.this, "info");
+                        }else if(jsonObject.getString("status").equals(GroupUser.STATUS_ACCEPT)){
 
-                                    });
+                            ResourceUtil.showAlert("Mensaje", "El usuario ya a sido agregado al grupo", InfoGroupActivity.this, "info");
 
                         }else{
-                            GroupUserProvider groupUserProvider = new GroupUserProvider();
-                            groupUserProvider.create(groupUser).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                    if(task.isSuccessful()){
-                                        ResourceUtil.showAlert("Mensaje", "Invitacion Enviada", InfoGroupActivity.this, "success");
-                                    }else{
-                                        ResourceUtil.showAlert("Oops", "No se pudo enviar la invitacion", InfoGroupActivity.this, "error");
-                                    }
-                                }
-                            });
+                            updateInvitation(user.getId(), reseiverGroup.getId(), GroupUser.STATUS_INVITED);
                         }
+
+                    }else {
+                        sendInvitation(user.getId(), reseiverGroup.getId());
                     }
 
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    e.printStackTrace();
+                }
 
-                }).addOnFailureListener(error -> {
-                         Toast.makeText(getApplicationContext(), "Error al enviar invitacion", Toast.LENGTH_SHORT).show();
-                  });
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InfoGroupActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+
+    }
+
+    private void sendInvitation(String idUser, String idGroup) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", idUser);
+        params.put("group_id", idGroup);
+        params.put("status", GroupUser.STATUS_INVITED);
 
 
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_GROUP_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
 
 
+                try {
+                    String resposeData = response.getString("data");
+
+                    if(!resposeData.equals("[]")){
+
+                        ResourceUtil.showAlert("Mensaje", "Invitacion enviada correctamente", InfoGroupActivity.this, "success");
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion", InfoGroupActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InfoGroupActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private void updateInvitation(String idUser, String idGroup, String status) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", idUser);
+        params.put("group_id", idGroup);
+        params.put("status", status);
 
 
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_USER_GROUP_UPDATE, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    String resposeData = response.getString("data");
+
+                    if(!resposeData.equals("[]")){
+
+                        ResourceUtil.showAlert("Mensaje", "Invitacion enviada correctamente", InfoGroupActivity.this, "success");
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion", InfoGroupActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InfoGroupActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
     }
 
 

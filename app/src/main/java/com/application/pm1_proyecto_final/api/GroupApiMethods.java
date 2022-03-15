@@ -15,4 +15,21 @@ public class GroupApiMethods {
     public static final String GET_GROUP_USER_CREATE = URL + "api/usersGroupCreates/";
 
     public static final String GET_USERS_FOR_GROUP = URL + "api/usuariosDelGrupo/";
+
+
+    public static final String GET_USERS_FOR_GROUP_ACTIVE = URL + "api/usuariosDelGrupoActivos/";
+
+
+
+
+    //Metodos de la relacion muchos a muchos entre grupos y usuarios
+
+    public static final String POST_STATUS_USER_GROUP = URL + "api/getStatusUserGroup/";
+
+    public static final String POST_USER_GROUP = URL + "api/groupUsers/";
+
+    public static final String POST_USER_GROUP_UPDATE = URL + "api/updateUserGroup/";
+
+
+
 }
