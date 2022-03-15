@@ -1,6 +1,10 @@
 package com.application.pm1_proyecto_final.models;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class User implements Serializable {
     private String id;
@@ -140,5 +144,19 @@ public class User implements Serializable {
 
     public void setJson_groups(String json_groups) {
         this.json_groups = json_groups;
+    }
+
+    public static ArrayList<Group> converJsonToArrayListGroups(String json){
+
+        Gson gson = new Gson();
+
+        if(json != null){
+            ArrayList<Group>  groups = gson.fromJson(json, new TypeToken<ArrayList<Group>>(){}.getType());
+            return  groups;
+        }else{
+
+            return new ArrayList<Group>();
+        }
+
     }
 }

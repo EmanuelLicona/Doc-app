@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.listeners.Invitationlistener;
 import com.application.pm1_proyecto_final.models.GroupUser;
 
 import java.util.ArrayList;
@@ -18,10 +19,12 @@ public class InvitationAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<GroupUser> listItem;
+    private Invitationlistener invitationlistener;
 
-    public InvitationAdapter(Context context, ArrayList<GroupUser> listItem) {
+    public InvitationAdapter(Context context, ArrayList<GroupUser> listItem, Invitationlistener invitationlistener) {
         this.context = context;
         this.listItem = listItem;
+        this.invitationlistener = invitationlistener;
     }
 
     @Override
@@ -52,6 +55,8 @@ public class InvitationAdapter extends BaseAdapter {
 
         title.setText(item.getNameGroup());
         date.setText(item.getDate().toString());
+
+        view.setOnClickListener(v -> invitationlistener.OnClickInvitation(item));
 
 
         return view;

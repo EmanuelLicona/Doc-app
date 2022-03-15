@@ -198,8 +198,6 @@ public class InfoGroupActivity extends AppCompatActivity {
 
     private void sendInvitation(User user) {
 
-
-
         FirebaseFirestore database=FirebaseFirestore.getInstance();
 
         database.collection(GroupUserProvider.NAME_COLLECTION)
