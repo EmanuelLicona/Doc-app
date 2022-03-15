@@ -20,6 +20,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
+import com.application.pm1_proyecto_final.providers.UsersProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
@@ -100,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
 
                     pDialog.dismiss();
                     if (email.equals(emailUser) && password.equals(passwordUser)) {
+                        preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                        preferencesManager.putString(Constants.KEY_USER_ID, dataUser.getString("id"));
+                        preferencesManager.putString(UsersProvider.KEY_EMAIL, emailUser);
+
                         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
