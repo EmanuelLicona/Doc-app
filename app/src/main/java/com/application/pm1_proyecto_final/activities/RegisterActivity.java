@@ -4,18 +4,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -25,8 +31,16 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.AuthProvider;
 import com.application.pm1_proyecto_final.providers.ImageProvider;
@@ -43,11 +57,18 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -58,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
 
     Spinner spinnerListCourses;
     TextInputEditText txtBirthDate, txtName, txtLastname, txtNumberAccount, txtPhone, txtEmail, txtPassword, txtConfirmPassword, txtAddress, txtCodeGeneratedConfirm;
-    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", email = "", password = "", confirmPassword = "", address = "", course = "";
+    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", email = "", password = "", confirmPassword = "", address = "", course = "", image = "";
     ImageView btnShowDialogDate, addImgPhotoUser;
     File imageFile;
     Button btnRegister;
@@ -74,12 +95,16 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     CharSequence options[];
     private final int GALLERY_REQUEST_CODE = 100;
     private final int PHOTO_REQUEST_CODE = 200;
+    static final int REQUEST_ACCESS_CAM = 201;
     private String codeGenerated;
 
     // Variables tomar foto
     String mAbsolutePhotoPath;
     String mPhotoPath;
     File mPhotoFile;
+
+    Bitmap bitmap;
+    String currentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,11 +155,13 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
+
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
                 clickSaveUser();
             }
+
         });
 
         circleImageViewBack.setOnClickListener(new View.OnClickListener() {
@@ -162,40 +189,86 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     }
 
     private void takePhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createPhotoFile();
-            } catch (Exception e) {
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error con el archivo de imagen.", this, "error");
-                Log.d("ERROR_PHOTOIMAGE", "takePhoto()::RegisterActivity "+e.getMessage());
-            }
-
-            if (photoFile != null) {
-                Uri photoUri = FileProvider.getUriForFile(this, "com.application.pm1_proyecto_final.activities.fileprovider", photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                startActivityForResult(takePictureIntent, PHOTO_REQUEST_CODE);
-            }
-
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_ACCESS_CAM);
+        } else {
+            dispatchTakePictureIntent();
         }
     }
 
-    private File createPhotoFile() throws IOException {
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); //timeStamp = marca de tiempo
+        String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        Date now = new Date();
-        String fileName = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH).format(now);
-        File photoFile = File.createTempFile(fileName +"_PHOTO", ".jpg", storageDir);
-        mPhotoPath = "file:" + photoFile.getAbsolutePath();
-        mAbsolutePhotoPath = photoFile.getAbsolutePath();
+        //createTempFile = crear archivo temporal
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
 
-        return photoFile;
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        image = "";
+//        addImgPhotoUser.setImageBitmap(null);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                ex.toString();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                try {
+                    Uri photoURI = FileProvider.getUriForFile(this,
+                            "com.application.pm1_proyecto_final.activities.fileprovider",
+                            photoFile);
+
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, PHOTO_REQUEST_CODE);
+                } catch (Exception ex) {
+                    Log.i("ERROR", "dispatchTakePictureIntent():: "+ex.toString());
+                }
+            }
+        }
     }
 
     private void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GALLERY_REQUEST_CODE);
+        } else {
+            selectImage();
+        }
+    }
+
+    private void selectImage() {
+        // SOLO ACEPTA IMAGENES JPEG
+        image = "";
+//        addImgPhotoUser.setImageBitmap(null);
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("image/jpeg");
+        startActivityForResult(Intent.createChooser(galleryIntent, "Seleccione la imagen"), GALLERY_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == GALLERY_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            selectImage();
+        }
+        if(requestCode == REQUEST_ACCESS_CAM && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            dispatchTakePictureIntent();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -204,171 +277,140 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         if (!response.equals("OK")) {
             ResourceUtil.showAlert("Advertencia", response, RegisterActivity.this, "error");
         } else {
-            usersProvider.getUserByField(email, "email").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
                 @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> taskValidateEmail) {
-                    if (taskValidateEmail.isSuccessful()) {
+                public void onResponse(JSONObject response) {
+                    try {
+                        String existEmail = response.getString("data");
 
-                        if (taskValidateEmail.getResult().size() >= 1) {
-                            ResourceUtil.showAlert("Advertencia", "El correo electronico ingresado pertenece a otro estudiante", RegisterActivity.this, "error");
+                        if (!existEmail.equals("[]")) {
+                            ResourceUtil.showAlert("Advertencia", "El correo ingresado ya pertenece a otro usuario.", RegisterActivity.this, "error");
                         } else {
-                            usersProvider.getUserByField(numberAccount, "numberAccount").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> taskValidateAccount) {
-                                    if (taskValidateAccount.isSuccessful()) {
 
-                                        if (taskValidateAccount.getResult().size() >= 1) {
-                                            ResourceUtil.showAlert("Advertencia", "El numero de cuenta UTH ingresado pertenece a otro estudiante", RegisterActivity.this, "error");
-                                        }else {
-                                            if (codeGenerated == null) {
-                                                String nameUser = name+ " "+lastname;
-                                                sendEmail(email, nameUser);
-                                                containerGeneratedCode.setVisibility(View.VISIBLE);
-                                                txtCodeGeneratedConfirm.requestFocus();
-                                            } else {
-                                                String codeEntered = txtCodeGeneratedConfirm.getText().toString().trim();
-                                                if (codeGenerated.isEmpty()) {
-                                                    ResourceUtil.showAlert("Advertencia", "Debe ingresar el código de verificación", RegisterActivity.this, "error");
-                                                } else {
-                                                    if (codeGenerated.equals(codeEntered)) {
-                                                        if (imageFile == null) { //Tomo la foto
-                                                            saveUser(mPhotoFile);
-                                                        } else if (mPhotoPath == null) { // De galeria
-                                                            saveUser(imageFile);
-                                                        }
-                                                    } else {
-                                                        ResourceUtil.showAlert("Advertencia", "Código de verificación incorrecto.", RegisterActivity.this, "error");
-                                                    }
-                                                }
-                                            }
-                                        }
+                            String nameUser = name + " " + lastname;
+                            if (codeGenerated == null) {
+                                sendEmail(email, nameUser);
+                                containerGeneratedCode.setVisibility(View.VISIBLE);
+                                txtCodeGeneratedConfirm.requestFocus();
+                            } else {
+                                String codeConfirmUser = txtCodeGeneratedConfirm.getText().toString().trim();
+                                if (codeConfirmUser.isEmpty()) {
+                                    ResourceUtil.showAlert("Advertencia", "Debes ingresar el codigo de verificacion", RegisterActivity.this, "error");
+                                } else {
+                                    if (codeConfirmUser.equals(codeGenerated)) {
+                                        registerUser();
                                     } else {
-                                        Log.d("ERROR_VERIFY_ACCOUNT", "Error getting documents by numberAccount: ", taskValidateAccount.getException());
+                                        ResourceUtil.showAlert("Advertencia", "El codigo de verificacion no es correcto.", RegisterActivity.this, "error");
                                     }
                                 }
-                            });
+                            }
+
                         }
-                    } else {
-                        Log.d("ERROR_VERIFY_EMAIL", "Error getting documents by email: ", taskValidateEmail.getException());
+
+                    } catch (JSONException e) {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", RegisterActivity.this, "error");
+                        e.printStackTrace();
                     }
                 }
+            }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(RegisterActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
             });
+            requestQueue.add(request);
         }
     }
 
-    private void saveUser(File imgFile) {
+    private void registerUser() {
         pDialog.show();
-        authProvider.register(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+        params.put("name", name);
+        params.put("lastname", lastname);
+        params.put("numberAccount", numberAccount);
+        params.put("phone", phone);
+        params.put("status", "ACTIVO");
+        params.put("address", address);
+        params.put("birthDate", birthDate);
+        params.put("carrera", course);
+        params.put("email", email);
+        params.put("password", password);
+
+        if (bitmap == null) {
+            params.put("image", "IMAGEN");
+        } else {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(20480);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60 , baos);
+            byte[] blob = baos.toByteArray();
+            String imageUser = Base64.encodeToString(blob, Base64.DEFAULT);
+
+            params.put("image", imageUser);
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UserApiMethods.POST_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    User user = new User();
-                    user.setId(authProvider.getUid());
-                    user.setName(name);
-                    user.setLastname(lastname);
-                    user.setEmail(email);
-                    user.setCarrera(course);
-                    user.setPhone(phone);
-                    user.setNumberAccount(numberAccount);
-                    user.setAddress(address);
-                    user.setStatus("ACTIVO");
-                    user.setBirthDate(birthDate);
-                    user.setPassword(password);
-
-                    if ( imgFile == null ) {
-                        user.setImage("");
-
-                        usersProvider.create(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-
-                            @Override
-                            public void onComplete(@NonNull Task<Void> taskUser) {
-                                pDialog.dismiss();
-                                if (taskUser.isSuccessful()) {
-                                    codeGenerated = null;
-                                    Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                } else {
-                                    ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", RegisterActivity.this, "error");
-                                }
-                            }
-                        });
-
-                    } else {
-
-                        imageProvider.save(RegisterActivity.this, imgFile).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> taskImage) {
-                                if(taskImage.isSuccessful()) {
-                                    imageProvider.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            String urlImage = uri.toString();
-                                            user.setImage(urlImage);
-
-                                            //GUARDANDO EN BD
-                                            usersProvider.create(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> taskUser) {
-                                                    pDialog.dismiss();
-                                                    if (taskUser.isSuccessful()) {
-                                                        codeGenerated = null;
-                                                        Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
-                                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                        startActivity(intent);
-                                                    }else {
-                                                        ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", RegisterActivity.this, "error");
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    pDialog.dismiss();
-                                    ResourceUtil.showAlert("Advertencia", "No se pudo registrar el usuario, error al insertar la imagen.", RegisterActivity.this, "error");
-                                }
-                            }
-                        });
-                    }
-                } else {
-                    pDialog.dismiss();
-                    ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", RegisterActivity.this, "error");
-                }
+            public void onResponse(JSONObject response) {
+                pDialog.dismiss();
+                Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el usuario.",RegisterActivity.this, "error");
+                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
             }
         });
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // SELECCIONANDO IMG GALERIA
-        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
             try {
-                mPhotoFile = null;
-                imageFile = FileUtil.from(this, data.getData());
-                addImgPhotoUser.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath())); // Imprimiendo IMG
-            } catch (Exception e) {
-                Log.d("IMG_ERROR", "Se produjo un error: "+e.getMessage());
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar la imagen: "+e.getMessage(), RegisterActivity.this, "error");
+                addImgPhotoUser.setImageURI(uri);
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            } catch (IOException e) {
+                Log.d("ERROR_PERMISOS", "onActivityResult():: "+e.getMessage());
             }
         }
 
-        // SELECCIONANDO TOMAR FOTO
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            imageFile = null;
-            mPhotoFile = new File(mAbsolutePhotoPath);
-            Picasso.with(RegisterActivity.this).load(mPhotoPath).into(addImgPhotoUser);
+            bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+            addImgPhotoUser.setImageBitmap(bitmap);
         }
     }
 
     private void showDatePickerDialog() {
+        String date = txtBirthDate.getText().toString();
+        Calendar c = Calendar.getInstance();
+        Date dateUserSelected = null;
+
+        if (!date.isEmpty() && date != null) {
+            try {
+                dateUserSelected = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+            } catch (ParseException e) {
+                Log.d("ERR_PARSE_DATE", "Error: "+e.getMessage());
+            }
+            c.setTime(dateUserSelected);
+        }
+
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 this,
-                Calendar.getInstance().get(Calendar.YEAR),
-                Calendar.getInstance().get(Calendar.MONTH),
-                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+                c.get(Calendar.YEAR),
+                c.get(Calendar.MONTH),
+                c.get(Calendar.DAY_OF_MONTH)
         );
         datePickerDialog.show();
     }
@@ -450,32 +492,13 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     }
 
     private void sendEmail(String email, String nameUser) {
-        codeGenerated = createCodeRandom(6);
+        codeGenerated = ResourceUtil.createCodeRandom(6);
         String message = "Te damos la bienvenida a DOC-APP. Para garantizar la seguridad de tu cuenta, verifica tu dirección de correo electrónico. \n" +
                 "Código Verificación: "+codeGenerated;
         String subject = nameUser + " Bienvenido a DOC-APP";
 
         JavaMailAPI javaMailAPI = new JavaMailAPI(this, email, subject, message);
         javaMailAPI.execute();
-    }
-
-    private String createCodeRandom(int i) {
-        String theAlphaNumericS;
-        StringBuilder builder;
-
-        theAlphaNumericS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-        builder = new StringBuilder(i);
-
-        for (int m = 0; m < i; m++) {
-            // generate numeric
-            int myindex = (int)(theAlphaNumericS.length() * Math.random());
-
-            // add the characters
-            builder.append(theAlphaNumericS.charAt(myindex));
-        }
-
-        return builder.toString();
     }
 
 }

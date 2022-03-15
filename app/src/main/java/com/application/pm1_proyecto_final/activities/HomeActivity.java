@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.Fragments.FragmentGrupo;
@@ -35,10 +36,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
+    TextView txtNameUserMenu;
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
-
 
     User userLog;
 
@@ -65,15 +66,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
+        txtNameUserMenu = (TextView) findViewById(R.id.txtNameUserMenu);
+//        txtNameUserMenu.setText("Information");
 
         seleccionado(0);
         openFragment(new FragmentMain());
 
 //        getUserLog();
-
-
-
-
     }
 
 

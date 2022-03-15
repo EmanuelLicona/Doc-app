@@ -20,6 +20,7 @@ public class User implements Serializable {
     private String image;
     private String password;
     private String json_groups;
+    private String imageCover;
 
     public User() {
     }
@@ -39,8 +40,6 @@ public class User implements Serializable {
         this.password = password;
         this.json_groups = "";
     }
-
-
 
     public String getId() {
         return id;
@@ -146,17 +145,24 @@ public class User implements Serializable {
         this.json_groups = json_groups;
     }
 
-    public static ArrayList<Group> converJsonToArrayListGroups(String json){
+    public static ArrayList<Group> converJsonToArrayListGroups(String json) {
 
         Gson gson = new Gson();
 
-        if(json != null){
-            ArrayList<Group>  groups = gson.fromJson(json, new TypeToken<ArrayList<Group>>(){}.getType());
-            return  groups;
-        }else{
+        if (json != null) {
+            ArrayList<Group> groups = gson.fromJson(json, new TypeToken<ArrayList<Group>>() {
+            }.getType());
+            return groups;
+        } else {
 
             return new ArrayList<Group>();
         }
+    }
+    public String getImageCover() {
+        return imageCover;
+    }
 
+    public void setImageCover(String imageCover) {
+        this.imageCover = imageCover;
     }
 }

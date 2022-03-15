@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.activities.CreateGroupActivity;
@@ -15,22 +16,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FragmentMain extends Fragment {
 
+    TextView txtNameUserMenu;
 
 
     FloatingActionButton fboton;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_main,container,false);
-
-
-
+        View view = inflater.inflate(R.layout.fragment_main, container,false);
 
         init(view);
-
 //        setListeners();
-
         return view;
     }
 

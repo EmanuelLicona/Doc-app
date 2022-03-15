@@ -6,7 +6,9 @@
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.HomeActivity">
+    tools:context=".activities.HomeActivity"
+    android:fitsSystemWindows="true"
+    >
 
     <include
         android:layout_width="match_parent"
