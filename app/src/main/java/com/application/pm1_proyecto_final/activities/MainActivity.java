@@ -12,26 +12,25 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.models.User;
-import com.application.pm1_proyecto_final.providers.AuthProvider;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.providers.UsersProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.firestore.DocumentSnapshot;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -40,13 +39,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtViewRegister;
     TextInputEditText txtEmail, txtPassword;
     Button btnLogin;
-    SignInButton btnLoginGoogle;
-    AuthProvider mAuthProvider;
-    UsersProvider mUsersProvider;
     SweetAlertDialog pDialog;
-
-    private GoogleSignInClient mGoogleSignInClient;
-    private final int REQUEST_CODE_GOOGLE = 1;
 
     private PreferencesManager preferencesManager;
 
@@ -84,16 +77,6 @@ public class MainActivity extends AppCompatActivity {
         txtPassword = findViewById(R.id.txtPasswordMain);
 
         btnLogin = (Button) findViewById(R.id.btnLogin);
-        btnLoginGoogle = findViewById(R.id.btnLoginGoogle);
-
-        mAuthProvider = new AuthProvider();
-        mUsersProvider = new UsersProvider();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.cliente_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         txtViewRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,91 +90,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) { login(); }
         });
-
-        btnLoginGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInGoogle();
-            }
-        });
-
-    }
-
-    private void signInGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, REQUEST_CODE_GOOGLE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == REQUEST_CODE_GOOGLE) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-            } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-                Log.w("ERROR", "Google sign in failed", e);
-            }
-        }
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        pDialog.show();
-        mAuthProvider.googleLogin(acct)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            String id = mAuthProvider.getUid();
-                            checkUserExist(id);
-                        } else {
-                            pDialog.dismiss();
-                            // If sign in fails, display a message to the user.
-                            Log.w("ERROR", "signInWithCredential:failure", task.getException());
-                            ResourceUtil.showAlert("Advertencia","No se pudo iniciar sesion con google.", MainActivity.this, "error");
-                        }
-                    }
-                });
-    }
-
-    private void checkUserExist(final String id) {
-        mUsersProvider.getUser(id).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists() && documentSnapshot.get("numberAccount") != null) {
-                    pDialog.dismiss();
-                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                } else {
-                    User user = new User();
-                    String email = mAuthProvider.getEmail();
-                    user.setEmail(email);
-                    user.setId(id);
-
-                    mUsersProvider.create(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            pDialog.dismiss();
-                            if (task.isSuccessful()) {
-                                Intent intent = new Intent(MainActivity.this, CompleteProfileActivity.class);
-                                startActivity(intent);
-                            } else {
-                                ResourceUtil.showAlert("Advertencia","No se pudo almacenar la informacion del estudiante.", MainActivity.this, "error");
-                            }
-                        }
-                    });
-                }
-            }
-        });
     }
 
     private void login() {
-        String email = txtEmail.getText().toString();
+        String email = txtEmail.getText().toString().trim();
         String password = txtPassword.getText().toString();
         String response = validateFieldsLogin(email, password);
 
@@ -201,27 +103,44 @@ public class MainActivity extends AppCompatActivity {
         }
 
         pDialog.show();
-        mAuthProvider.login(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                pDialog.dismiss();
-                if(task.isSuccessful()) {
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray userJson = response.getJSONArray("data");
+                    JSONObject dataUser = userJson.getJSONObject(0);
+                    String emailUser = dataUser.getString("email");
+                    String passwordUser = dataUser.getString("password");
 
-                    preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-                    preferencesManager.putString(Constants.KEY_USER_ID, task.getResult().getUser().getUid());
-                    preferencesManager.putString(UsersProvider.KEY_EMAIL, txtEmail.getText().toString());
+                    pDialog.dismiss();
+                    if (email.equals(emailUser) && password.equals(passwordUser)) {
+                        preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                        preferencesManager.putString(Constants.KEY_USER_ID, dataUser.getString("id"));
+                        preferencesManager.putString(UsersProvider.KEY_EMAIL, emailUser);
 
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } else {
+                        ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
+                    }
 
-                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-
-                    finish();
-                } else {
-                    ResourceUtil.showAlert("Advertencia","El email y/o password ingresados son incorrectos.", MainActivity.this, "error");
+                } catch (JSONException e) {
+                    pDialog.dismiss();
+                    ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
+                    e.printStackTrace();
                 }
             }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
+        requestQueue.add(request);
+
     }
 
     private String validateFieldsLogin(String email, String password) {

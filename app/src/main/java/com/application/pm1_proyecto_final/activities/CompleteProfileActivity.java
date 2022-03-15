@@ -1,371 +1,267 @@
 package com.application.pm1_proyecto_final.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.models.User;
-import com.application.pm1_proyecto_final.providers.AuthProvider;
-import com.application.pm1_proyecto_final.providers.ImageProvider;
-import com.application.pm1_proyecto_final.providers.UsersProvider;
-import com.application.pm1_proyecto_final.utils.FileUtil;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
+import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class CompleteProfileActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class CompleteProfileActivity extends AppCompatActivity {
 
-    TextInputEditText txtName, txtLastname, txtNumberAccount, txtPhone, txtCourse, txtBirthDate, txtAddress;
-    Spinner spinnerListCourses;
-    ImageView btnShowDialogDate, addImgPhotoUser;
-    File imageFile;
-    Button btnRegister;
-
-    ImageProvider imageProvider;
-    UsersProvider usersProvider;
-    AuthProvider authProvider;
     SweetAlertDialog pDialog;
-    AlertDialog.Builder pBuilderSelector;
-
-    CharSequence options[];
-    private final int GALLERY_REQUEST_CODE = 100;
-    private final int PHOTO_REQUEST_CODE = 200;
-    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", address = "", course = "";
-
-    // Variables tomar foto
-    String mAbsolutePhotoPath;
-    String mPhotoPath;
-    File mPhotoFile;
+    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", address = "", course = "", email = "", password = "", codeGenerated = "", nameUser = "";
+    Button btnCodeVerify;
+    EditText txtEmail, txtCode1, txtCode2, txtCode3, txtCode4, txtCode5, txtCode6;
+    TextView txtChangeEmail, btnSendCode;
+    boolean submittedCode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_profile);
 
-        imageProvider = new ImageProvider();
-        usersProvider = new UsersProvider();
-        authProvider = new AuthProvider();
+        btnCodeVerify = (Button) findViewById(R.id.btnCodeVerify);
+        txtEmail = (EditText) findViewById(R.id.txtEmail);
+        txtCode1 = (EditText) findViewById(R.id.txtCode1Complete);
+        txtCode2 = (EditText) findViewById(R.id.txtCode2Complete);
+        txtCode3 = (EditText) findViewById(R.id.txtCode3Complete);
+        txtCode4 = (EditText) findViewById(R.id.txtCode4Complete);
+        txtCode5 = (EditText) findViewById(R.id.txtCode5Complete);
+        txtCode6 = (EditText) findViewById(R.id.txtCode6Complete);
+
+        txtChangeEmail = (TextView) findViewById(R.id.txtChangeEmail);
+        btnSendCode = (TextView) findViewById(R.id.btnSendCodeComplete);
+
         pDialog = ResourceUtil.showAlertLoading(CompleteProfileActivity.this);
-        pBuilderSelector = new AlertDialog.Builder(this);
-        pBuilderSelector.setTitle("Seleccione una opción");
-        options = new CharSequence[]{"Imagen de galería", "Tomar foto"};
 
-        spinnerListCourses = (Spinner) findViewById(R.id.spinnerListCourses);
-        btnShowDialogDate = (ImageView) findViewById(R.id.btnShowDialogDate);
-        addImgPhotoUser = (ImageView) findViewById(R.id.addImgPhotoUser);
+        Bundle bundleData = getIntent().getExtras();
+        String[] data = bundleData.getStringArray("DATA_USER");
+        loadDataUser(data);
 
-        txtName = (TextInputEditText) findViewById(R.id.txtName);
-        txtLastname = (TextInputEditText) findViewById(R.id.txtLastname);
-        txtNumberAccount = (TextInputEditText) findViewById(R.id.txtNumberCount);
-        txtPhone = (TextInputEditText) findViewById(R.id.txtPhone);
-        txtAddress = (TextInputEditText) findViewById(R.id.txtAddress);
-        txtBirthDate = (TextInputEditText) findViewById(R.id.txtBirthDate);
-
-        btnRegister = (Button) findViewById(R.id.btnRegister);
-
-        loadConfiguration();
-
-        btnShowDialogDate.setOnClickListener(new View.OnClickListener() {
+        btnSendCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDatePickerDialog();
-            }
-        });
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(CompleteProfileActivity.this);
+                builder1.setMessage("¿Enviar el código de verificación nuevamente?");
+                builder1.setCancelable(true);
 
-        addImgPhotoUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectOptionImage();
-            }
-        });
-
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View view) {
-                clickRegisterUser();
-            }
-        });
-    }
-
-    private void selectOptionImage() {
-
-        pBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (i == 0) { // Imagen Galeria
-                    openGallery();
-                } else if(i == 1) { // Tomar fotografia
-                    takePhoto();
-                }
-            }
-        });
-
-        pBuilderSelector.show();
-    }
-
-    private void takePhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createPhotoFile();
-            } catch (Exception e) {
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error con el archivo de imagen.", this, "error");
-                Log.d("ERROR_PHOTOIMAGE", "takePhoto()::RegisterActivity "+e.getMessage());
-            }
-
-            if (photoFile != null) {
-                Uri photoUri = FileProvider.getUriForFile(this, "com.application.pm1_proyecto_final.activities.fileprovider", photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                startActivityForResult(takePictureIntent, PHOTO_REQUEST_CODE);
-            }
-
-        }
-    }
-
-    private File createPhotoFile() throws IOException {
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        String fileName = "IMG_USER_"+System.currentTimeMillis();
-        File photoFile = File.createTempFile(fileName, ".jpg", storageDir);
-        mPhotoPath = "file:" + photoFile.getAbsolutePath();
-        mAbsolutePhotoPath = photoFile.getAbsolutePath();
-
-        return photoFile;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void clickRegisterUser() {
-        String response = validateFields();
-        if (!response.equals("OK")) {
-            ResourceUtil.showAlert("Advertencia", response, CompleteProfileActivity.this, "error");
-        } else {
-            usersProvider.getUserByField(numberAccount, "numberAccount").addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> taskValidateAccount) {
-                    if (taskValidateAccount.isSuccessful()) {
-                        if (taskValidateAccount.getResult().size() >= 1) {
-                            ResourceUtil.showAlert("Advertencia", "El numero de cuenta UTH ingresado pertenece a otro estudiante", CompleteProfileActivity.this, "error");
-                        }else {
-                            if (imageFile == null) { //Tomo la foto
-                                update(mPhotoFile);
-                            } else if (mPhotoPath == null) { // De galeria
-                                update(imageFile);
-                            }
-
-                        }
-                    } else {
-                        Log.d("ERROR_VERIFY_ACCOUNT", "Error getting documents by numberAccount: ", taskValidateAccount.getException());
-                    }
-                }
-            });
-        }
-
-    }
-
-    private void update(File imgFile) {
-        pDialog.show();
-
-        User user = new User();
-        user.setId(authProvider.getUid());
-        user.setName(name);
-        user.setLastname(lastname);
-        user.setCarrera(course);
-        user.setPhone(phone);
-        user.setNumberAccount(numberAccount);
-        user.setAddress(address);
-        user.setStatus("ACTIVO");
-        user.setBirthDate(birthDate);
-
-        if ( imgFile == null ) {
-            user.setImage("");
-
-            usersProvider.update(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> taskUser) {
-                    pDialog.dismiss();
-                    if (taskUser.isSuccessful()) {
-                        Intent intent = new Intent(CompleteProfileActivity.this, HomeActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    } else {
-                        ResourceUtil.showAlert("Advertencia", "El usuario no se pudo registrar.", CompleteProfileActivity.this, "error");
-                    }
-                }
-
-            });
-        } else {
-            imageProvider.save(CompleteProfileActivity.this, imgFile).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> taskImage) {
-                    if(taskImage.isSuccessful()) {
-                        imageProvider.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                String urlImage = uri.toString();
-                                user.setImage(urlImage);
-
-                                //GUARDANDO EN BD
-                                usersProvider.update(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> taskUser) {
-                                        pDialog.dismiss();
-                                        if (taskUser.isSuccessful()) {
-                                            Intent intent = new Intent(CompleteProfileActivity.this, HomeActivity.class);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(intent);
-                                        }else {
-                                            ResourceUtil.showAlert("Advertencia", "No se pudo completar la informacion del estudiante.", CompleteProfileActivity.this, "error");
-                                        }
-                                    }
-                                });
+                builder1.setPositiveButton(
+                        "Si",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                sendEmail(email, nameUser);
+                                dialog.cancel();
                             }
                         });
-                    } else {
-                        pDialog.dismiss();
-                        ResourceUtil.showAlert("Advertencia", "No se pudo completar la informacion del estudiante, error al insertar la imagen.", CompleteProfileActivity.this, "error");
-                    }
-                }
-            });
-        }
-    }
 
-    private void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
-    }
+                builder1.setNegativeButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK) {
-            try {
-                mPhotoFile = null;
-                imageFile = FileUtil.from(this, data.getData());
-                addImgPhotoUser.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath())); // Imprimiendo IMG
-            } catch (Exception e) {
-                Log.d("IMG_ERROR", "Se produjo un error: "+e.getMessage());
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar la imagen: "+e.getMessage(), CompleteProfileActivity.this, "error");
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
             }
-        }
+        });
 
-        // SELECCIONANDO TOMAR FOTO
-        if (requestCode == PHOTO_REQUEST_CODE && resultCode == RESULT_OK) {
-            imageFile = null;
-            mPhotoFile = new File(mAbsolutePhotoPath);
-            Picasso.with(CompleteProfileActivity.this).load(mPhotoPath).into(addImgPhotoUser);
-        }
+        txtChangeEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(CompleteProfileActivity.this);
+                builder1.setMessage("¿Quiere cambiar el correo electrónico?");
+                builder1.setCancelable(true);
+
+                builder1.setPositiveButton(
+                        "Si",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                submittedCode = true;
+                                txtEmail.setEnabled(true);
+                                btnCodeVerify.setText("Enviar Código");
+                                dialog.cancel();
+                            }
+                        });
+
+                builder1.setNegativeButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = builder1.create();
+                alert.show();
+            }
+        });
+
+
+        btnCodeVerify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (submittedCode) {
+                    sendCodeAgain();
+                }else {
+                    verifyCodeGenerated();
+                }
+
+            }
+        });
     }
 
-    private void showDatePickerDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                this,
-                Calendar.getInstance().get(Calendar.YEAR),
-                Calendar.getInstance().get(Calendar.MONTH),
-                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-        );
-        datePickerDialog.show();
-    }
+    private void verifyCodeGenerated() {
+        String codeVerify = "";
+        String code1 = txtCode1.getText().toString();
+        String code2 = txtCode2.getText().toString();
+        String code3 = txtCode3.getText().toString();
+        String code4 = txtCode4.getText().toString();
+        String code5 = txtCode5.getText().toString();
+        String code6 = txtCode6.getText().toString();
 
-    @Override
-    public void onDateSet(DatePicker datePicker, int year, int m, int dayOfMonth) {
-        int month = m + 1;
-        String mo = "";
-        String day = "";
+        if (code1.isEmpty() || code2.isEmpty() || code3.isEmpty() || code4.isEmpty() || code5.isEmpty() || code6.isEmpty()) {
+            ResourceUtil.showAlert("Advertencia", "Debes ingresar todos los digitos del código de verificación.", this, "error");
+            return;
+        }
 
-        if (month >= 1 && month <= 9) {
-            mo = "0"+month;
+        codeVerify = code1.concat(code2).concat(code3).concat(code4).concat(code5).concat(code6);
+        if (codeVerify.equals(codeGenerated)) {
+            registerUser();
         } else {
-            mo = String.valueOf(month);
+            ResourceUtil.showAlert("Advertencia", "El código de verificación no es correcto.", this, "error");
         }
-
-        if (dayOfMonth >= 1 && dayOfMonth <= 9) {
-            day = "0"+dayOfMonth;
-        } else {
-            day = String.valueOf(dayOfMonth);
-        }
-
-        String date = day + "/" + mo + "/" +year;
-        txtBirthDate.setText(date);
     }
 
-    private void loadConfiguration() {
-        txtBirthDate.setEnabled(false);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.list_courses , android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_list_item_activated_1);
-        spinnerListCourses.setAdapter(adapter);
+    private void registerUser() {
+        pDialog.show();
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+        params.put("name", name);
+        params.put("lastname", lastname);
+        params.put("numberAccount", numberAccount);
+        params.put("phone", phone);
+        params.put("status", "ACTIVO");
+        params.put("address", address);
+        params.put("birthDate", birthDate);
+        params.put("carrera", course);
+        params.put("image", "IMAGE");
+        params.put("email", email);
+        params.put("password", password);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UserApiMethods.POST_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                pDialog.dismiss();
+                Intent intent = new Intent(CompleteProfileActivity.this, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el usuario.",CompleteProfileActivity.this, "error");
+                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private String validateFields() {
-        String response = "";
+    private void sendCodeAgain() {
+        email = txtEmail.getText().toString().trim();
 
-        name = txtName.getText().toString();
-        lastname = txtLastname.getText().toString();
-        numberAccount = txtNumberAccount.getText().toString();
-        phone = txtPhone.getText().toString();
-        address = txtAddress.getText().toString();
-        birthDate = txtBirthDate.getText().toString();
-        course = spinnerListCourses.getSelectedItem().toString();
-
-        if (name.isEmpty()) {
-            response  = "Debes ingresar tu nombre, es obligatorio.";
-        } else if(lastname.isEmpty()) {
-            response  = "Debes ingresar tu apellido, es obligatorio.";
-        } else if(numberAccount.isEmpty()) {
-            response  = "Debes ingresar tu numero de cuenta UTH, es obligatorio.";
-        } else if(phone.isEmpty()) {
-            response  = "Debes ingresar tu numero de telefono, es obligatorio.";
-        }  else if(course.equals("--Seleccionar--")) {
-            response  = "Debes seleccionar la carrera que está cursando, es obligatorio.";
-        } else if (birthDate.isEmpty()) {
-            response  = "Debes ingresar tu fecha de nacimiento, es obligatorio.";
-        } else if (!ResourceUtil.validateDateBirth(birthDate)) {
-            response  = "Debes ser mayor de 15 años para poder registrarte.";
-        } else {
-            response = "OK";
+        if (email.isEmpty()) {
+            ResourceUtil.showAlert("Advertencia", "Debe ingresar el correo electrónico", this, "error");
+            return;
         }
 
-        return response;
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String existEmail = response.getString("data");
+
+                    if (!existEmail.equals("[]")) {
+                        ResourceUtil.showAlert("Advertencia", "El correo electrónico ingresado ya pertenece a otro usuario.", CompleteProfileActivity.this, "error");
+                    } else {
+                        sendEmail(email, nameUser);
+                        btnCodeVerify.setText("Verificar");
+                        txtEmail.setEnabled(false);
+                        submittedCode = false;
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", CompleteProfileActivity.this, "error");
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(CompleteProfileActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+        requestQueue.add(request);
+
+
+    }
+
+    private void loadDataUser(String[] data) {
+        this.name = data[0];
+        this.lastname = data[1];
+        this.numberAccount = data[2];
+        this.phone = data[3];
+        this.email = data[4];
+        this.password = data[5];
+        this.address = data[6];
+        this.course = data[7];
+        this.birthDate = data[8];
+        this.codeGenerated = data[9];
+        this.nameUser = name + " "+ lastname;
+        txtEmail.setText(email);
+        txtEmail.setEnabled(false);
+    }
+
+    private void sendEmail(String email, String nameUser) {
+        codeGenerated = "";
+        codeGenerated = ResourceUtil.createCodeRandom(6);
+        String message = "Te damos la bienvenida a DOC-APP. Para garantizar la seguridad de tu cuenta, verifica tu dirección de correo electrónico. \n" + "Código Verificación: "+codeGenerated;
+        String subject = nameUser + " Bienvenido a DOC-APP";
+
+        JavaMailAPI javaMailAPI = new JavaMailAPI(this, email, subject, message);
+        javaMailAPI.execute();
     }
 }

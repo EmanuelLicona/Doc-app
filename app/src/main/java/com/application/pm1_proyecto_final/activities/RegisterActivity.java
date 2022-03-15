@@ -21,7 +21,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -41,27 +40,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
-import com.application.pm1_proyecto_final.models.User;
-import com.application.pm1_proyecto_final.providers.AuthProvider;
-import com.application.pm1_proyecto_final.providers.ImageProvider;
-import com.application.pm1_proyecto_final.providers.UsersProvider;
-import com.application.pm1_proyecto_final.utils.FileUtil;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -69,7 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -78,17 +61,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class RegisterActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     Spinner spinnerListCourses;
-    TextInputEditText txtBirthDate, txtName, txtLastname, txtNumberAccount, txtPhone, txtEmail, txtPassword, txtConfirmPassword, txtAddress, txtCodeGeneratedConfirm;
-    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", email = "", password = "", confirmPassword = "", address = "", course = "", image = "";
+    TextInputEditText txtBirthDate, txtName, txtLastname, txtNumberAccount, txtPhone, txtEmail, txtPassword, txtConfirmPassword, txtAddress;
+    private String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", email = "", password = "", confirmPassword = "", address = "", course = "", image = "";
+    private String codeGenerated = "";
+
     ImageView btnShowDialogDate, addImgPhotoUser;
-    File imageFile;
     Button btnRegister;
     CircleImageView circleImageViewBack;
-    LinearLayout containerGeneratedCode;
 
-    ImageProvider imageProvider;
-    UsersProvider usersProvider;
-    AuthProvider authProvider;
     SweetAlertDialog pDialog;
     AlertDialog.Builder pBuilderSelector;
 
@@ -96,12 +76,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     private final int GALLERY_REQUEST_CODE = 100;
     private final int PHOTO_REQUEST_CODE = 200;
     static final int REQUEST_ACCESS_CAM = 201;
-    private String codeGenerated;
-
-    // Variables tomar foto
-    String mAbsolutePhotoPath;
-    String mPhotoPath;
-    File mPhotoFile;
 
     Bitmap bitmap;
     String currentPhotoPath;
@@ -111,9 +85,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        imageProvider = new ImageProvider();
-        usersProvider = new UsersProvider();
-        authProvider = new AuthProvider();
         pDialog = ResourceUtil.showAlertLoading(this);
         pBuilderSelector = new AlertDialog.Builder(this);
         pBuilderSelector.setTitle("Seleccione una opción");
@@ -121,9 +92,8 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
 
         spinnerListCourses = (Spinner) findViewById(R.id.spinnerListCoursesRegister);
         btnShowDialogDate = (ImageView) findViewById(R.id.btnShowDialogDateRegister);
-        addImgPhotoUser = (ImageView) findViewById(R.id.addImgPhotoUserRegister);
+//        addImgPhotoUser = (ImageView) findViewById(R.id.addImgPhotoUserRegister);
         circleImageViewBack = findViewById(R.id.circleImageBack);
-        containerGeneratedCode = (LinearLayout)  findViewById(R.id.containerGeneratedCode);
 
         txtName = (TextInputEditText) findViewById(R.id.txtNameRegister);
         txtLastname = (TextInputEditText) findViewById(R.id.txtLastnameRegister);
@@ -134,7 +104,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         txtConfirmPassword = (TextInputEditText) findViewById(R.id.txtConfirmPasswordRegister);
         txtAddress = (TextInputEditText) findViewById(R.id.txtAddressRegister);
         txtBirthDate = (TextInputEditText) findViewById(R.id.txtBirthDateRegister);
-        txtCodeGeneratedConfirm = (TextInputEditText) findViewById(R.id.txtCodeGeneratedConfirm);
 
         btnRegister = (Button) findViewById(R.id.btnRegisterRegister);
 
@@ -147,12 +116,12 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
             }
         });
 
-        addImgPhotoUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectOptionImage();
-            }
-        });
+//        addImgPhotoUser.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                selectOptionImage();
+//            }
+//        });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
 
@@ -213,8 +182,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     }
 
     private void dispatchTakePictureIntent() {
-        image = "";
-//        addImgPhotoUser.setImageBitmap(null);
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -251,9 +218,6 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     }
 
     private void selectImage() {
-        // SOLO ACEPTA IMAGENES JPEG
-        image = "";
-//        addImgPhotoUser.setImageBitmap(null);
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryIntent.setType("image/jpeg");
         startActivityForResult(Intent.createChooser(galleryIntent, "Seleccione la imagen"), GALLERY_REQUEST_CODE);
@@ -288,27 +252,20 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
                         if (!existEmail.equals("[]")) {
                             ResourceUtil.showAlert("Advertencia", "El correo ingresado ya pertenece a otro usuario.", RegisterActivity.this, "error");
                         } else {
-
                             String nameUser = name + " " + lastname;
-                            if (codeGenerated == null) {
-                                sendEmail(email, nameUser);
-                                containerGeneratedCode.setVisibility(View.VISIBLE);
-                                txtCodeGeneratedConfirm.requestFocus();
-                            } else {
-                                String codeConfirmUser = txtCodeGeneratedConfirm.getText().toString().trim();
-                                if (codeConfirmUser.isEmpty()) {
-                                    ResourceUtil.showAlert("Advertencia", "Debes ingresar el codigo de verificacion", RegisterActivity.this, "error");
+                            if (codeGenerated.isEmpty()) {
+                                String resp = sendEmail(email, nameUser);
+
+                                if (resp.equals("OK")) {
+                                    loadDataUser();
                                 } else {
-                                    if (codeConfirmUser.equals(codeGenerated)) {
-                                        registerUser();
-                                    } else {
-                                        ResourceUtil.showAlert("Advertencia", "El codigo de verificacion no es correcto.", RegisterActivity.this, "error");
-                                    }
+                                    ResourceUtil.showAlert("Advertencia", "Error al enviar la verificacion por correo electronico.", RegisterActivity.this, "error");
                                 }
+
+                            } else {
+                                loadDataUser();
                             }
-
                         }
-
                     } catch (JSONException e) {
                         ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", RegisterActivity.this, "error");
                         e.printStackTrace();
@@ -324,52 +281,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         }
     }
 
-    private void registerUser() {
-        pDialog.show();
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        HashMap<String, String> params = new HashMap<>();
-        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
-        params.put("name", name);
-        params.put("lastname", lastname);
-        params.put("numberAccount", numberAccount);
-        params.put("phone", phone);
-        params.put("status", "ACTIVO");
-        params.put("address", address);
-        params.put("birthDate", birthDate);
-        params.put("carrera", course);
-        params.put("email", email);
-        params.put("password", password);
-
-        if (bitmap == null) {
-            params.put("image", "IMAGEN");
-        } else {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(20480);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 60 , baos);
-            byte[] blob = baos.toByteArray();
-            String imageUser = Base64.encodeToString(blob, Base64.DEFAULT);
-
-            params.put("image", imageUser);
-        }
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UserApiMethods.POST_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                pDialog.dismiss();
-                Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                pDialog.dismiss();
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el usuario.",RegisterActivity.this, "error");
-                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
-            }
-        });
-        requestQueue.add(jsonObjectRequest);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -453,7 +365,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         lastname = txtLastname.getText().toString();
         numberAccount = txtNumberAccount.getText().toString();
         phone = txtPhone.getText().toString();
-        email = txtEmail.getText().toString();
+        email = txtEmail.getText().toString().trim();
         password = txtPassword.getText().toString();
         confirmPassword = txtConfirmPassword.getText().toString();
         address = txtAddress.getText().toString();
@@ -491,14 +403,25 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         return response;
     }
 
-    private void sendEmail(String email, String nameUser) {
+    private String sendEmail(String email, String nameUser) {
         codeGenerated = ResourceUtil.createCodeRandom(6);
-        String message = "Te damos la bienvenida a DOC-APP. Para garantizar la seguridad de tu cuenta, verifica tu dirección de correo electrónico. \n" +
-                "Código Verificación: "+codeGenerated;
+        String message = "Te damos la bienvenida a DOC-APP. Para garantizar la seguridad de tu cuenta, verifica tu dirección de correo electrónico. \n" + "Código Verificación: "+codeGenerated;
         String subject = nameUser + " Bienvenido a DOC-APP";
 
         JavaMailAPI javaMailAPI = new JavaMailAPI(this, email, subject, message);
         javaMailAPI.execute();
+
+        return "OK";
+    }
+
+    private void loadDataUser() {
+        String[] data = new String[]{name, lastname, numberAccount, phone, email, password, address, course, birthDate, codeGenerated};
+        Bundle bundle = new Bundle();
+        bundle.putStringArray("DATA_USER", data);
+
+        Intent intent = new Intent(RegisterActivity.this, CompleteProfileActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
 }

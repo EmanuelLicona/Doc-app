@@ -63,17 +63,17 @@
         </provider>
 
         <activity
-            android:name=".activities.CompleteProfileActivity"
+            android:name=".activities.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.HomeActivity"
+            android:name=".activities.CompleteProfileActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
