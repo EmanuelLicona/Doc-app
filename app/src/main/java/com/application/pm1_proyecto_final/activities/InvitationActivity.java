@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -55,8 +56,6 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
     PreferencesManager preferencesManager;
 
     AppCompatImageView btnBack;
-
-    InvitationAdapter adapterInvitation;
 
     ArrayList<GroupUser> listUsersGroupsTemp;
 
@@ -138,15 +137,15 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
                                 }
 
-                                if(listUsersGroupsTemp.size() > 0){
+//                                if(listUsersGroupsTemp.size() > 0){
 
-                                    adapterInvitation = new InvitationAdapter(getApplicationContext(), listUsersGroupsTemp, InvitationActivity.this);
+                                    InvitationAdapter adapterInvitation = new InvitationAdapter(getApplicationContext(), listUsersGroupsTemp, InvitationActivity.this);
 
                                     listView.setAdapter(adapterInvitation);
 
-                                }else{
-                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
-                                }
+//                                }else{
+//                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+//                                }
 
                             }else{
                                 Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
@@ -209,99 +208,66 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
     private void NoAgreeInvitation(GroupUser groupUser, AlertDialog dialog) {
 
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        map.put(GroupUserProvider.KEY_STATUS, GroupUser.STATUS_NO_ACCEPT);
-        map.put(GroupUserProvider.KEY_TITLE, groupUser.getNameGroup());
-        map.put(GroupUserProvider.KEY_DATE, new Date());
-
-        database.collection(GroupUserProvider.NAME_COLLECTION).
-                document(groupUser.getId())
-                .update(map)
-                .addOnCompleteListener(task1 -> {
-
-                    if(task1.isSuccessful()){
-
-                        updateUser(database);
-
-//                        ResourceUtil.showAlert("Mensaje", "Invitacion rechazada", InvitationActivity.this, "success");
-                    }else{
-                        ResourceUtil.showAlert("Oops", "A ocurrido un error", InvitationActivity.this, "error");
-                    }
-
-                });
-
-
-
+        updateInvitation(groupUser.getIdUser(), groupUser.getIdGroup(), GroupUser.STATUS_NO_ACCEPT);
 
         dialog.dismiss();
-    }
 
-    private void updateUser(FirebaseFirestore database) {
-
-//        HashMap<String, Object> map = new HashMap<>();
-//
-//        map.put(UsersProvider.KEY_JSON, GroupUser.STATUS_NO_ACCEPT);
-//
-//        database.collection(GroupUserProvider.NAME_COLLECTION).
-//                document(groupUser.getId())
-//                .update(map)
-//                .addOnCompleteListener(task1 -> {
-//
-//                    if(task1.isSuccessful()){
-//
-//                        updateUser(database);
-//
-////                        ResourceUtil.showAlert("Mensaje", "Invitacion rechazada", InvitationActivity.this, "success");
-//                    }else{
-//                        ResourceUtil.showAlert("Oops", "A ocurrido un error", InvitationActivity.this, "error");
-//                    }
-//
-//                });
-
-
-
+        getInvitationsUser();
     }
 
     private void AgreeInvitation(GroupUser groupUser, AlertDialog dialog) {
 
-
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        map.put(GroupUserProvider.KEY_STATUS, GroupUser.STATUS_ACCEPT);
-        map.put(GroupUserProvider.KEY_TITLE, groupUser.getNameGroup());
-        map.put(GroupUserProvider.KEY_DATE, new Date());
-
-
-
-        database.collection(GroupUserProvider.NAME_COLLECTION).
-                document(groupUser.getId())
-                .update(map)
-                .addOnCompleteListener(task1 -> {
-
-                    if(task1.isSuccessful()){
-                        getInvitationsUser();
-                        ResourceUtil.showAlert("Mensaje", "Invitacion rechazada", InvitationActivity.this, "success");
-                    }else{
-                        ResourceUtil.showAlert("Oops", "A ocurrido un error", InvitationActivity.this, "error");
-                    }
-
-                });
-
-
-
+        updateInvitation(groupUser.getIdUser(), groupUser.getIdGroup(), GroupUser.STATUS_ACCEPT);
 
         dialog.dismiss();
+
+        getInvitationsUser();
     }
 
-    private void loadInvitatios(){
 
-//        InvitationAdapter adapter = new InvitationAdapter();
+    private void updateInvitation(String idUser, String idGroup, String status) {
 
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", idUser);
+        params.put("group_id", idGroup);
+        params.put("status", status);
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_USER_GROUP_UPDATE, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    String resposeData = response.getString("data");
+
+                    if(!resposeData.equals("[]")){
+
+                        ResourceUtil.showAlert("Mensaje", "Invitacion contestada correctamente", InvitationActivity.this, "success");
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al contestar la invitacion", InvitationActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al contestar la invitacion", InvitationActivity.this, "error");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InvitationActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override
