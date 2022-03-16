@@ -152,6 +152,10 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    private void deleteMessage(){
+
+    }
+
 
 
     private Bitmap getBitmapFromEndodedString(String encodedImage){
