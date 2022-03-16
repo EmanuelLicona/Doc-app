@@ -37,7 +37,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class CompleteProfileActivity extends AppCompatActivity {
 
     SweetAlertDialog pDialog;
-    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", address = "", course = "", email = "", password = "", codeGenerated = "", nameUser = "";
+    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", address = "", course = "", email = "", password = "", codeGenerated = "", nameUser = "", image = "";
     Button btnCodeVerify;
     EditText txtEmail, txtCode1, txtCode2, txtCode3, txtCode4, txtCode5, txtCode6;
     TextView txtChangeEmail, btnSendCode;
@@ -176,7 +176,8 @@ public class CompleteProfileActivity extends AppCompatActivity {
         params.put("address", address);
         params.put("birthDate", birthDate);
         params.put("carrera", course);
-        params.put("image", "IMAGE");
+        params.put("image", image);
+        params.put("imageCover", "IMAGE");
         params.put("email", email);
         params.put("password", password);
 
@@ -250,7 +251,9 @@ public class CompleteProfileActivity extends AppCompatActivity {
         this.course = data[7];
         this.birthDate = data[8];
         this.codeGenerated = data[9];
+        this.image = data[10];
         this.nameUser = name + " "+ lastname;
+
         txtEmail.setText(email);
         txtEmail.setEnabled(false);
     }

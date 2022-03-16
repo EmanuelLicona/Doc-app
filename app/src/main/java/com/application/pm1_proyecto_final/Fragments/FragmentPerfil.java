@@ -1,6 +1,7 @@
 package com.application.pm1_proyecto_final.Fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,14 +14,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.activities.EditPasswordActivity;
 import com.application.pm1_proyecto_final.activities.EditProfileActivity;
-import com.application.pm1_proyecto_final.providers.AuthProvider;
-import com.application.pm1_proyecto_final.providers.UsersProvider;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.squareup.picasso.Picasso;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
+import com.application.pm1_proyecto_final.utils.Constants;
+import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.ResourceUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -33,10 +42,8 @@ public class FragmentPerfil extends Fragment {
     ImageView imageViewCover;
     CircleImageView circleImageProfile;
     String email = "", nameUser = "";
+    PreferencesManager preferencesManager;
 
-
-    UsersProvider usersProvider;
-    AuthProvider authProvider;
 
     public FragmentPerfil() {
     }
@@ -56,8 +63,7 @@ public class FragmentPerfil extends Fragment {
         txtPostNumber = view.findViewById(R.id.textViewPostNumber);
         txtCarrera = view.findViewById(R.id.textViewCarrera);
 
-        usersProvider = new UsersProvider();
-        authProvider = new AuthProvider();
+        preferencesManager = new PreferencesManager(getContext());
 
         linearLayoutEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,43 +83,57 @@ public class FragmentPerfil extends Fragment {
     }
 
     private void getInfoUserLogged() {
-        usersProvider.getUser(authProvider.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.GET_USER_ID + preferencesManager.getString(Constants.KEY_USER_ID),
+                null, new Response.Listener<JSONObject>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            public void onResponse(JSONObject response) {
+                try {
 
-                if (documentSnapshot.exists()) {
-                    if (documentSnapshot.contains("name") && documentSnapshot.contains("lastname")){
-                        nameUser = documentSnapshot.getString("name") +" "+documentSnapshot.getString("lastname");
+                    String name = response.getJSONObject("data").getString("name");
+                    String lastname = response.getJSONObject("data").getString("lastname");
+                    String phone = response.getJSONObject("data").getString("phone");
+                    email = response.getJSONObject("data").getString("email");
+                    String course = response.getJSONObject("data").getString("carrera");
+                    String image = response.getJSONObject("data").getString("image");
+                    String imageCover = response.getJSONObject("data").getString("imageCover");
+
+
+                    if (!name.isEmpty() && !lastname.isEmpty()) {
+                        nameUser = name +" "+ lastname;
                         txtUsername.setText(nameUser);
                     }
-                    if (documentSnapshot.contains("phone")){
-                        String phone = documentSnapshot.getString("phone");
+                    if (!phone.isEmpty()) {
                         txtPhone.setText(phone);
                     }
-                    if (documentSnapshot.contains("email")){
-                        email = documentSnapshot.getString("email");
+                    if (!email.isEmpty()) {
                         txtEmail.setText(email);
                     }
-                    if (documentSnapshot.contains("carrera")){
-                        String carrera = documentSnapshot.getString("carrera");
-                        txtCarrera.setText(carrera);
+                    if (!course.isEmpty()) {
+                        txtCarrera.setText(course);
                     }
-                    if (documentSnapshot.contains("image")){
-                        String imageProfile = documentSnapshot.getString("image");
-                        if (imageProfile != null && !imageProfile.isEmpty()) {
-                            Picasso.with(getContext()).load(imageProfile).into(circleImageProfile);
-                        }
+                    if (!image.isEmpty() && !image.equals("IMAGE")) {
+                        Bitmap bitmap = ResourceUtil.decodeImage(image);
+                        circleImageProfile.setImageBitmap(bitmap);
                     }
-                    if (documentSnapshot.contains("image_cover")){
-                        String imageCover = documentSnapshot.getString("image_cover");
-                        if (imageCover != null && !imageCover.isEmpty()) {
-                            Picasso.with(getContext()).load(imageCover).into(imageViewCover);
-                        }
+                    if (!imageCover.isEmpty() && !imageCover.equals("IMAGE")) {
+                        Bitmap bitmap = ResourceUtil.decodeImage(imageCover);
+                        imageViewCover.setImageBitmap(bitmap);
                     }
-                }
 
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar el usuario.", getContext(), "error");
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+        requestQueue.add(request);
     }
 
     private void goToEditPassword() {

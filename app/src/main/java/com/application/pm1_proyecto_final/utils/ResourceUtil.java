@@ -2,6 +2,7 @@ package com.application.pm1_proyecto_final.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
@@ -86,10 +87,18 @@ public class ResourceUtil {
     }
 
     public static String getImageBase64(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream(20480);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
+        int previewWidth = 150;
+        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
+
+        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] bytes = stream.toByteArray();
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 
+    public static Bitmap decodeImage(String encodedImage){
+        byte[] bytes = android.util.Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
 }

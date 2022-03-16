@@ -92,7 +92,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
 
         spinnerListCourses = (Spinner) findViewById(R.id.spinnerListCoursesRegister);
         btnShowDialogDate = (ImageView) findViewById(R.id.btnShowDialogDateRegister);
-//        addImgPhotoUser = (ImageView) findViewById(R.id.addImgPhotoUserRegister);
+        addImgPhotoUser = (ImageView) findViewById(R.id.addImgPhotoUserRegister);
         circleImageViewBack = findViewById(R.id.circleImageBack);
 
         txtName = (TextInputEditText) findViewById(R.id.txtNameRegister);
@@ -116,12 +116,12 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
             }
         });
 
-//        addImgPhotoUser.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                selectOptionImage();
-//            }
-//        });
+        addImgPhotoUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectOptionImage();
+            }
+        });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
 
@@ -415,7 +415,12 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     }
 
     private void loadDataUser() {
-        String[] data = new String[]{name, lastname, numberAccount, phone, email, password, address, course, birthDate, codeGenerated};
+        if (bitmap != null) {
+            image = ResourceUtil.getImageBase64(bitmap);
+        }else {
+            image = "IMAGE";
+        }
+        String[] data = new String[]{name, lastname, numberAccount, phone, email, password, address, course, birthDate, codeGenerated, image};
         Bundle bundle = new Bundle();
         bundle.putStringArray("DATA_USER", data);
 

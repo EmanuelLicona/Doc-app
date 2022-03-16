@@ -40,12 +40,22 @@
                     android:layout_marginTop="20dp"
                     android:textSize="22dp" />
 
-                <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:src="@drawable/ic_person"
+                <androidx.cardview.widget.CardView
+                    android:layout_width="165dp"
+                    android:layout_height="125dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="10dp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="40dp" />
+                    android:layout_marginTop="15dp">
+
+                    <ImageView
+                        android:id="@+id/addImgPhotoUserRegister"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/upload_image"
+                        android:scaleType="centerCrop" />
+
+                </androidx.cardview.widget.CardView>
 
             </io.github.florent37.shapeofview.shapes.ArcView>
 
