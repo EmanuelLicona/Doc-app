@@ -73,8 +73,6 @@ public class InfoGroupActivity extends AppCompatActivity {
 
     List<User> users;
 
-    UsersGroupAdapter usersGroupAdapter;
-
     RecyclerView recyclerViewUsuarios;
 
     Button btnAddMember;
@@ -131,8 +129,11 @@ public class InfoGroupActivity extends AppCompatActivity {
     //En este metodo solo deberian cargar los usuarios que estan aceptados
     private void loadUsersGroups(){
         ArrayList<User> arrayList = new ArrayList<>();
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+
+        RequestQueue requestQueue = Volley.newRequestQueue(InfoGroupActivity.this);
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
                 (GroupApiMethods.GET_USERS_FOR_GROUP_ACTIVE+reseiverGroup.getId()),
                 null,
                 new com.android.volley.Response.Listener<JSONObject>(){
@@ -183,7 +184,7 @@ public class InfoGroupActivity extends AppCompatActivity {
                                 if(arrayList.size() > 0){
                                     users = arrayList;
 
-                                    UsersGroupAdapter usersGroupAdapter = new UsersGroupAdapter(users, preferencesManager);
+                                    UsersGroupAdapter usersGroupAdapter = new UsersGroupAdapter(users, reseiverGroup, preferencesManager);
 
                                     recyclerViewUsuarios.setAdapter(usersGroupAdapter);
                                 }else{

@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
@@ -25,10 +26,12 @@ public class UsersGroupAdapter extends RecyclerView.Adapter<UsersGroupAdapter.Us
     private List<User> users;
 
     PreferencesManager preferencesManager;
+    Group group;
 
-    public UsersGroupAdapter(List<User> users, PreferencesManager preferencesManager) {
+    public UsersGroupAdapter(List<User> users, Group group, PreferencesManager preferencesManager) {
         this.users = users;
         this.preferencesManager = preferencesManager;
+        this.group = group;
     }
 
     @NonNull
@@ -72,7 +75,7 @@ public class UsersGroupAdapter extends RecyclerView.Adapter<UsersGroupAdapter.Us
             //Falta ingresar la imagen
             name.setText(user.getName() +" "+ user.getLastname());
 
-            if(user.getId().equals(preferencesManager.getString(Constants.KEY_USER_ID))){
+            if(user.getId().equals(group.getUser_create())){
                 description.setText("Administrador");
             }else {
                 description.setText("Miembro");
@@ -84,8 +87,13 @@ public class UsersGroupAdapter extends RecyclerView.Adapter<UsersGroupAdapter.Us
 
         private Bitmap decodeImage(String encodedImage){
 
-            byte[] bytes = android.util.Base64.decode(encodedImage, Base64.DEFAULT);
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+           try{
+               byte[] bytes = android.util.Base64.decode(encodedImage, Base64.DEFAULT);
+               return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+           }catch (Exception e){
+
+               return null;
+           }
         }
     }
 }
