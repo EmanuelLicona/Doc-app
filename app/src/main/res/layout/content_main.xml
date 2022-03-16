@@ -16,9 +16,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="#009035"
-            app:itemIconTint="@color/white"
-            app:itemTextColor="@color/white"
+            android:background="#FFFFFF"
+            app:itemIconTint="@color/purple_500"
+            app:itemTextColor="@color/purple_500"
             app:menu="@menu/botton_navigation_menu" />
 
     </FrameLayout>

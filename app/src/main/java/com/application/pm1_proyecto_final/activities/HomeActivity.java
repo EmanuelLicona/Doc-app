@@ -43,6 +43,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     User userLog;
 
+    FragmentGrupo fragmentGrupo;
+    FragmentMain fragmentMain;
+    FrangmentInfo frangmentInfo;
+
     private PreferencesManager preferencesManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +74,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 //        txtNameUserMenu.setText("Information");
 
         seleccionado(0);
-        openFragment(new FragmentMain());
+
 
 //        getUserLog();
+
+        fragmentGrupo = new FragmentGrupo();
+        fragmentMain = new FragmentMain();
+        frangmentInfo = new FrangmentInfo();
+
+        openFragment(fragmentMain);
     }
 
 
@@ -117,9 +127,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     if(item.getItemId() == R.id.botton_home){
-                        openFragment(new FragmentMain());
+                        openFragment(fragmentMain);
                     }else if(item.getItemId() == R.id.botton_grupos){
-                        openFragment(new FragmentGrupo());
+                        openFragment(fragmentGrupo);
                     }
                     return true;
                 }
@@ -130,7 +140,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.closeDrawer(GravityCompat.START);
 
         if(item.getItemId() == R.id.item_inicio){
-            openFragment(new FragmentMain());
+            openFragment(fragmentMain);
         }else if(item.getItemId() == R.id.item_perfil){
             openFragment(new FragmentPerfil());
 
@@ -140,7 +150,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }else if(item.getItemId() == R.id.item_mis_grupos){
             openMyGroups();
         }else if(item.getItemId() == R.id.item_informacion){
-            openFragment(new FrangmentInfo());
+            openFragment(frangmentInfo);
         } else if(item.getItemId() == R.id.item_cerrar_sesion){
 
             preferencesManager.clear();

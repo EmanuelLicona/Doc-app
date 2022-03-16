@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.HomeActivity"
+
     android:fitsSystemWindows="true"
     >
 
@@ -14,6 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         layout="@layout/drawer_toolbar"></include>
+
+
     <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

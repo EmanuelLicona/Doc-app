@@ -33,6 +33,8 @@ public class GroupApiMethods {
 
     public static final String GET_USER_INVITATION = URL + "api/invitacionesPorUsuario/";
 
+    public static final String GET_GROUPS_FOR_USER_ACTIVE = URL + "api/gruposDelUsuario/";
+
 
 
 
