@@ -104,7 +104,7 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                groupAdapter.getFilter().filter(charSequence);
+//                groupAdapter.getFilter().filter(charSequence);
             }
 
             @Override

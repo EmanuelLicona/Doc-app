@@ -36,6 +36,8 @@
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/menu/menu_toolbar.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Proyecto/Doc-app/app/src/main/res/layout/activity_register.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Proyecto/Doc-app/app/src/main/res/layout/fragment_register.xml" value="0.3458333333333333" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable-v24/backgroud_sent_message.xml" value="0.2435" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable-v24/background_item_received_message.xml" value="0.2435" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/backgroud_border_button.xml" value="0.2435" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/backgroud_button.xml" value="0.222" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/backgroud_white.xml" value="0.222" />
@@ -66,6 +68,9 @@
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/fragment_perfil.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/frangement_info.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_group.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_recent_conversion.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_reseive_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_send_message.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_container_user_group.xml" value="0.25" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/item_invitation.xml" value="0.33" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/menu/botton_navigation_menu.xml" value="0.36666666666666664" />
