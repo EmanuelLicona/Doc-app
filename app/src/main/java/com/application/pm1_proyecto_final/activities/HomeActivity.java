@@ -166,35 +166,4 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    private void getUserLog(){
-
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-
-        database.collection(UsersProvider.NAME_COLLECTION)
-                .whereEqualTo(UsersProvider.KEY_EMAIL, preferencesManager.getString(UsersProvider.KEY_EMAIL))
-                .get()
-                .addOnCompleteListener(task -> {
-
-                    if(task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
-                        userLog = new User();
-
-                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-
-                        userLog.setId(documentSnapshot.getId());
-
-                        userLog.setEmail(documentSnapshot.getString(UsersProvider.KEY_EMAIL));
-                        userLog.setName(documentSnapshot.getString(UsersProvider.KEY_NAME));
-                        userLog.setLastname(documentSnapshot.getString(UsersProvider.KEY_LASTNAME));
-                        userLog.setImage(documentSnapshot.getString(UsersProvider.KEY_IMAGE));
-
-//                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
-
-
-                    }
-
-
-                }).addOnFailureListener(error -> {
-            Toast.makeText(getApplicationContext(), "NO se pudo recuperar el usuario", Toast.LENGTH_SHORT).show();
-        });
-    }
 }

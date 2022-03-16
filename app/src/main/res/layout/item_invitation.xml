@@ -25,12 +25,34 @@
             android:text="Titulo del grupo"/>
 
         <TextView
-            android:id="@+id/timeGroupInvitation"
+            android:id="@+id/descriptionGroupInvitation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:text="time"/>
+            android:text="description"/>
 
     </LinearLayout>
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imageInvitationGroup"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/background_image"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_oval="true"
+        />
+
+    <LinearLayout
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/backgroud_border_button"
+        app:layout_constraintTop_toBottomOf="@+id/imageInvitationGroup"
+        >
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

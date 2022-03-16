@@ -14,15 +14,19 @@ public class GroupUser implements Serializable {
     private String idUser;
     private String idGroup;
     private String nameGroup;
+    private String descriptionGroup;
+    private String image;
     private String status; // Este campo alacenara los status del usuario en el grupo
     private Date date; // Este campo almacenara la fecha de de los status
 
-    public GroupUser(String idUser, String idGroup, String status, Date date) {
+    public GroupUser(String idUser, String idGroup, String status, Date date, String descriptionGroup, String image) {
         this.id = "";
         this.idUser = idUser;
         this.idGroup = idGroup;
         this.status = status;
         this.date = date;
+        this.descriptionGroup = descriptionGroup;
+        this.image = image;
     }
 
     public GroupUser() {
@@ -74,5 +78,21 @@ public class GroupUser implements Serializable {
 
     public void setNameGroup(String nameGroup) {
         this.nameGroup = nameGroup;
+    }
+
+    public String getDescriptionGroup() {
+        return descriptionGroup;
+    }
+
+    public void setDescriptionGroup(String descriptionGroup) {
+        this.descriptionGroup = descriptionGroup;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
             finish();
-
         }
         
 //        else{
@@ -118,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
                     pDialog.dismiss();
                     if (email.equals(emailUser) && password.equals(passwordUser) && status.equals("ACTIVO")) {
+
                         preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
                         preferencesManager.putString(Constants.KEY_USER_ID, dataUser.getString("id"));
                         preferencesManager.putString(UsersProvider.KEY_EMAIL, emailUser);

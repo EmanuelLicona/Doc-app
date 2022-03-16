@@ -31,5 +31,9 @@ public class GroupApiMethods {
     public static final String POST_USER_GROUP_UPDATE = URL + "api/updateUserGroup/";
 
 
+    public static final String GET_USER_INVITATION = URL + "api/invitacionesPorUsuario/";
+
+
+
 
 }

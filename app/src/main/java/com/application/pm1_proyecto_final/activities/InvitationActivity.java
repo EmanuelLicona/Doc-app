@@ -15,10 +15,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.InvitationAdapter;
 import com.application.pm1_proyecto_final.adapters.UsersGroupAdapter;
+import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.listeners.Invitationlistener;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
@@ -33,6 +39,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,9 +56,9 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
     AppCompatImageView btnBack;
 
-    User userLog;
+    InvitationAdapter adapterInvitation;
 
-    ArrayList<Group> listGroups;
+    ArrayList<GroupUser> listUsersGroupsTemp;
 
 
     @Override
@@ -72,60 +82,93 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
         btnBack = (AppCompatImageView) findViewById(R.id.btnInvitationBack);
 
+
+
+
     }
 
     private void setListeners(){
         btnBack.setOnClickListener(v -> onBackPressed());
     }
 
+
     private void getInvitationsUser(){
 
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                (GroupApiMethods.GET_USER_INVITATION+preferencesManager.getString(Constants.KEY_USER_ID)),
+                null,
+                new com.android.volley.Response.Listener<JSONObject>(){
+                    @Override
+                    public void onResponse(JSONObject response) {
 
 
-        database.collection(GroupUserProvider.NAME_COLLECTION)
-                .whereEqualTo(GroupUserProvider.KEY_ID_USER, preferencesManager.getString(Constants.KEY_USER_ID))
-                .whereEqualTo(GroupsProvider.KEY_STATUS, GroupUser.STATUS_INVITED)
-                .get()
-                .addOnCompleteListener(task -> {
+                        try {
 
-                    if(task.isSuccessful() && task.getResult()!=null){
+                            JSONObject  jsonObject = null;
 
-                        ArrayList<GroupUser> groups = new ArrayList<>();
+                            GroupUser groupTemp = null;
 
-//                        Group grouptemp = null;
-                        for(QueryDocumentSnapshot queryDocumentSnapshot: task.getResult()){
-
-                            GroupUser grouptemp = new GroupUser();
-
-                            grouptemp.setId(queryDocumentSnapshot.getId());
-                            grouptemp.setNameGroup(queryDocumentSnapshot.getString(GroupUserProvider.KEY_TITLE));
-                            grouptemp.setDate(queryDocumentSnapshot.getDate(GroupUserProvider.KEY_DATE));
+                           listUsersGroupsTemp = new ArrayList<>();
 
 
-                            groups.add(grouptemp);
+                            if(response.getString("res").equals("true")){
+//                                t = response.getJSONObject("data").getString("name");
+
+
+                                JSONArray array = response.getJSONArray("data");
+
+                                for (int i = 0; i < array.length(); i++) {
+                                    jsonObject = new JSONObject(array.get(i).toString());
+
+
+                                    groupTemp = new GroupUser();
+
+//                                    groupTemp.setId(jsonObject.getString("id"));
+                                    groupTemp.setNameGroup(jsonObject.getString("title"));
+                                    groupTemp.setIdGroup(jsonObject.getString("id"));
+                                    groupTemp.setIdUser(preferencesManager.getString(Constants.KEY_USER_ID));
+                                    groupTemp.setStatus(jsonObject.getString("status_user_group"));
+                                    groupTemp.setDescriptionGroup(jsonObject.getString("description"));
+                                    groupTemp.setImage(jsonObject.getString("image"));
+
+
+                                    listUsersGroupsTemp.add(groupTemp);
+
+                                }
+
+                                if(listUsersGroupsTemp.size() > 0){
+
+                                    adapterInvitation = new InvitationAdapter(getApplicationContext(), listUsersGroupsTemp, InvitationActivity.this);
+
+                                    listView.setAdapter(adapterInvitation);
+
+                                }else{
+                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (JSONException e) {
+                            Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
-
-
-//                        loading(false);
-
-                        if(groups.size() > 0){
-
-                           InvitationAdapter adapter = new InvitationAdapter(getApplicationContext(), groups, this);
-                            listView.setAdapter(adapter);
-
-                        }else{
-                            Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }else{
-//                        loading(false);
-                        Toast.makeText(getApplicationContext(), "Error: No se pudieron obtener los datos", Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(error ->{
-            Toast.makeText(getApplicationContext(), "Error: "+error.toString(), Toast.LENGTH_SHORT).show();
-        });
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: "+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+        );
+
+        requestQueue.add(request);
 
     }
 
@@ -255,42 +298,9 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         dialog.dismiss();
     }
 
-    private void getUserLog(){
+    private void loadInvitatios(){
 
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-
-        database.collection(UsersProvider.NAME_COLLECTION)
-                .whereEqualTo(UsersProvider.KEY_EMAIL, preferencesManager.getString(UsersProvider.KEY_EMAIL))
-                .get()
-                .addOnCompleteListener(task -> {
-
-                    if(task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
-                        userLog = new User();
-
-                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-
-                        userLog.setId(documentSnapshot.getId());
-
-                        userLog.setEmail(documentSnapshot.getString(UsersProvider.KEY_EMAIL));
-                        userLog.setName(documentSnapshot.getString(UsersProvider.KEY_NAME));
-                        userLog.setLastname(documentSnapshot.getString(UsersProvider.KEY_LASTNAME));
-                        userLog.setImage(documentSnapshot.getString(UsersProvider.KEY_IMAGE));
-
-//                        userLog.setJson_groups(documentSnapshot.getString(UsersProvider.KEY_JSON));
-
-                    }
-
-
-                }).addOnFailureListener(error -> {
-            Toast.makeText(this, "NO se pudo recuperar el usuario", Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void loadUsersGroups(){
-
-//        ArrayList<Group> arrayList = User.converJsonToArrayListGroups(userLog.getJson_groups());
-
-//        listGroups = arrayList;
+//        InvitationAdapter adapter = new InvitationAdapter();
 
     }
 
