@@ -5,5 +5,5 @@ import com.application.pm1_proyecto_final.models.Group;
 
 public interface Chatlistener {
 
-    void onClickGroup(ChatMessage chatMessage);
+    void onClickChat(ChatMessage chatMessage, int position);
 }

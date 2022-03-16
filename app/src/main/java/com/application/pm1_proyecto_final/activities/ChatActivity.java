@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.ChatAdapter;
+import com.application.pm1_proyecto_final.listeners.Chatlistener;
 import com.application.pm1_proyecto_final.models.ChatMessage;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
@@ -36,7 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
     Group reseiverGroup;
 
@@ -56,6 +57,8 @@ public class ChatActivity extends AppCompatActivity {
 
     RecyclerView chatRecyclerView;
 
+    int positionGeneral;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +74,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private void init(){
         reseiverGroup = null;
+
+        positionGeneral = -1;
 
         preferencesManager = new PreferencesManager(getApplicationContext());
 
@@ -92,7 +97,8 @@ public class ChatActivity extends AppCompatActivity {
         chatAdapter = new ChatAdapter(
                 chatMessages,
                 getBitmapFromEndodedString(""),
-                preferencesManager.getString(Constants.KEY_USER_ID)
+                preferencesManager.getString(Constants.KEY_USER_ID),
+                this
         );
 
         chatRecyclerView.setAdapter(chatAdapter);
@@ -135,6 +141,7 @@ public class ChatActivity extends AppCompatActivity {
         mensaje.put(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID));
         mensaje.put(Constants.KEY_GROUP_ID, reseiverGroup.getId());
         mensaje.put(Constants.KEY_MESSAGE, "Mensage: " + value);
+        mensaje.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_SENT);
         mensaje.put(Constants.KEY_TIMESTAMP, new Date());
 
         database.collection(Constants.KEY_COLLECTION_CHAT).add(mensaje)
@@ -152,8 +159,27 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    private void deleteMessage(){
+    private void deleteMessage(ChatMessage chatMessage, int position){
 
+        HashMap<String, Object> mensaje = new HashMap<>();
+
+
+        mensaje.put(Constants.KEY_MESSAGE, "Mensage eliminado");
+        mensaje.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_DELETE);
+
+        positionGeneral = position;
+
+        database.collection(Constants.KEY_COLLECTION_CHAT).document(chatMessage.idFirebase)
+                .update(mensaje)
+                .addOnCompleteListener(task -> {
+                        Toast.makeText(this, "Si", Toast.LENGTH_SHORT).show();
+
+
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "No"+ e.getMessage(), Toast.LENGTH_SHORT).show();
+                    positionGeneral=-1;
+                });
     }
 
 
@@ -190,13 +216,31 @@ public class ChatActivity extends AppCompatActivity {
                 if(documentChange.getType() == DocumentChange.Type.ADDED){
                     ChatMessage chatMessage = new ChatMessage();
 
+                    chatMessage.idFirebase = documentChange.getDocument().getId();
                     chatMessage.senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
                     chatMessage.groupId = documentChange.getDocument().getString(Constants.KEY_GROUP_ID);
-                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
                     chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
+                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
+                    chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
                     chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
 
                     chatMessages.add(chatMessage);
+                }
+
+                if(documentChange.getType() == DocumentChange.Type.MODIFIED){
+
+//                    Toast.makeText(this, documentChange.getDocument().getString(""), Toast.LENGTH_SHORT).show();
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.idFirebase = documentChange.getDocument().getId();
+                    chatMessage.senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
+                    chatMessage.groupId = documentChange.getDocument().getString(Constants.KEY_GROUP_ID);
+                    chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
+                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
+                    chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
+                    chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
+
+                    chatMessages.set(positionGeneral, chatMessage);
+                    count = -1;
                 }
 
             }
@@ -205,11 +249,20 @@ public class ChatActivity extends AppCompatActivity {
 
             if(count == 0){
                 chatAdapter.notifyDataSetChanged();
+
+            }else if(count == -1){
+
+                chatAdapter.notifyItemRangeChanged(positionGeneral, chatMessages.size());
+
+
+
             }else{
                 chatAdapter.notifyItemRangeInserted(chatMessages.size(), chatMessages.size());
 
                 chatRecyclerView.smoothScrollToPosition(chatMessages.size()-1);
             }
+
+//            chatAdapter.notifyAll();
 
             chatRecyclerView.setVisibility(View.VISIBLE);
 
@@ -223,4 +276,10 @@ public class ChatActivity extends AppCompatActivity {
     };
 
 
+    @Override
+    public void onClickChat(ChatMessage chatMessage, int position) {
+        Toast.makeText(this, chatMessage.message + " position: "+position, Toast.LENGTH_SHORT).show();
+
+        deleteMessage(chatMessage, position);
+    }
 }

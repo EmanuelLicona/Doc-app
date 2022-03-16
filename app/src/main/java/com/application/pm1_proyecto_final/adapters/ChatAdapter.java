@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.listeners.Chatlistener;
 import com.application.pm1_proyecto_final.models.ChatMessage;
 import com.makeramen.roundedimageview.RoundedImageView;
 
@@ -22,14 +23,17 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private final Bitmap reseiverProfileImage;
     private final String senderId;
 
+    private Chatlistener chatlistener;
+
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
 
-    public ChatAdapter(List<ChatMessage> chatMessages, Bitmap reseiverProfileImage, String senderId) {
+    public ChatAdapter(List<ChatMessage> chatMessages, Bitmap reseiverProfileImage, String senderId, Chatlistener chatlistener) {
         this.chatMessages = chatMessages;
         this.reseiverProfileImage = reseiverProfileImage;
         this.senderId = senderId;
+        this.chatlistener = chatlistener;
     }
 
     @NonNull
@@ -76,7 +80,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
     }
 
-    static class SendMessageViewHolder extends RecyclerView.ViewHolder{
+
+
+    class SendMessageViewHolder extends RecyclerView.ViewHolder{
 
 
         TextView textMessage;
@@ -89,17 +95,28 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             textMessage = itemView.findViewById(R.id.textMessageSend);
             textDateTime = itemView.findViewById(R.id.textDateTimeSend);
 
+            view = itemView;
         }
 
         void setData(ChatMessage chatMessage){
 
             textMessage.setText(chatMessage.message);
             textDateTime.setText(chatMessage.datatime);
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+                    chatlistener.onClickChat(chatMessage, getLayoutPosition());
+
+                    return false;
+                }
+            });
         }
 
     }
 
-    static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder{
+    class ReceivedMessageViewHolder extends RecyclerView.ViewHolder{
 
         TextView textMessage;
         TextView textDateTime;
@@ -115,6 +132,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
             view = itemView;
 
+
         }
 
         void setData(ChatMessage chatMessage, Bitmap receiverProfileImage){
@@ -124,6 +142,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
             imageProfile.setImageBitmap(receiverProfileImage);
 
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+                    chatlistener.onClickChat(chatMessage, getLayoutPosition());
+
+                    return false;
+                }
+            });
         }
     }
 

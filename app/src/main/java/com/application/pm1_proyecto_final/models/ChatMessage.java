@@ -4,6 +4,10 @@ import java.util.Date;
 
 public class ChatMessage {
 
-    public String senderId, groupId, message, datatime;
+    public static final String STATUS_SENT = "1";
+    public static final String STATUS_DELETE = "2";
+
+
+    public String idFirebase, senderId, groupId, message, datatime, status;
     public Date dateObject;
 }
