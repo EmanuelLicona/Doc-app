@@ -8,6 +8,6 @@ public class ChatMessage {
     public static final String STATUS_DELETE = "2";
 
 
-    public String idFirebase, senderId, groupId, message, datatime, status;
+    public String idFirebase, senderId, groupId, message, datatime, status, position;
     public Date dateObject;
 }

@@ -61,7 +61,6 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
     RecyclerView chatRecyclerView;
 
-    int positionGeneral;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
     private void init(){
         reseiverGroup = null;
 
-        positionGeneral = -1;
+//        positionGeneral = -1;
 
         preferencesManager = new PreferencesManager(getApplicationContext());
 
@@ -142,10 +141,13 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
         HashMap<String, Object> mensaje = new HashMap<>();
 
+        int position = (chatMessages.size()==0)?0:chatMessages.size();
+
         mensaje.put(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID));
         mensaje.put(Constants.KEY_GROUP_ID, reseiverGroup.getId());
         mensaje.put(Constants.KEY_MESSAGE, "Mensage: " + value);
         mensaje.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_SENT);
+        mensaje.put(Constants.KEY_POSITION_MESSAGE, position+"");
         mensaje.put(Constants.KEY_TIMESTAMP, new Date());
 
         database.collection(Constants.KEY_COLLECTION_CHAT).add(mensaje)
@@ -171,7 +173,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
         mensaje.put(Constants.KEY_MESSAGE, "Mensage eliminado");
         mensaje.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_DELETE);
 
-        positionGeneral = position;
+//        positionGeneral = position;
 
         database.collection(Constants.KEY_COLLECTION_CHAT).document(chatMessage.idFirebase)
                 .update(mensaje)
@@ -187,7 +189,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                 })
                 .addOnFailureListener(e -> {
                     ResourceUtil.showAlert("Error", "El mensaje no se pudo eliminar", ChatActivity.this, "error");
-                    positionGeneral=-1;
+//                    positionGeneral=-1;
                 });
     }
 
@@ -220,6 +222,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
         if(value != null){
             int count = chatMessages.size();
+            int position = -1;
 
             for (DocumentChange documentChange: value.getDocumentChanges()){
                 if(documentChange.getType() == DocumentChange.Type.ADDED){
@@ -231,6 +234,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                     chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
                     chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
                     chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
+                    chatMessage.position = documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE);
                     chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
 
                     chatMessages.add(chatMessage);
@@ -246,9 +250,13 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                     chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
                     chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
                     chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
+                    chatMessage.position = documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE);
                     chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
 
-                    chatMessages.set(positionGeneral, chatMessage);
+                    position = Integer.parseInt(chatMessage.position);
+
+                    chatMessages.set(position, chatMessage);
+
                     count = -1;
                 }
 
@@ -261,7 +269,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
             }else if(count == -1){
 
-                chatAdapter.notifyItemRangeChanged(positionGeneral, chatMessages.size());
+                chatAdapter.notifyItemRangeChanged(position, chatMessages.size());
 
 
 

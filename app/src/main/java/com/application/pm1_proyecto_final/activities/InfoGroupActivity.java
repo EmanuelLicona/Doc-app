@@ -315,6 +315,7 @@ public class InfoGroupActivity extends AppCompatActivity {
         HashMap<String, String> params = new HashMap<>();
         params.put("user_id", user.getId());
         params.put("group_id", reseiverGroup.getId());
+//        params.put("status", "-6");
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_STATUS_USER_GROUP, new JSONObject(params), new Response.Listener<JSONObject>() {
@@ -325,13 +326,14 @@ public class InfoGroupActivity extends AppCompatActivity {
                 try {
                     String resposeData = response.getString("data");
 
-                    JSONArray array = response.getJSONArray("data");
 
-                    JSONObject jsonObject = array.getJSONObject(0);
 
                     if(!resposeData.equals("[]")){
 
 //                        UpdateInvitation();
+
+                        JSONArray array = response.getJSONArray("data");
+                        JSONObject jsonObject = array.getJSONObject(0);
 
                         if(jsonObject.getString("status").equals(GroupUser.STATUS_INVITED)){
 
@@ -349,7 +351,7 @@ public class InfoGroupActivity extends AppCompatActivity {
                     }
 
                 } catch (JSONException e) {
-                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el status", InfoGroupActivity.this, "error");
                     e.printStackTrace();
                 }
 
@@ -358,7 +360,7 @@ public class InfoGroupActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InfoGroupActivity.this, "error");
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el status.",InfoGroupActivity.this, "error");
                 error.printStackTrace();
 
             }
@@ -395,7 +397,7 @@ public class InfoGroupActivity extends AppCompatActivity {
                     }
 
                 } catch (JSONException e) {
-                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion", InfoGroupActivity.this, "error");
                     e.printStackTrace();
                 }
 
@@ -436,11 +438,11 @@ public class InfoGroupActivity extends AppCompatActivity {
                         ResourceUtil.showAlert("Mensaje", "Invitacion enviada correctamente", InfoGroupActivity.this, "success");
 
                     }else {
-                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion", InfoGroupActivity.this, "error");
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion (U)", InfoGroupActivity.this, "error");
                     }
 
                 } catch (JSONException e) {
-                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el email", InfoGroupActivity.this, "error");
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion (U)", InfoGroupActivity.this, "error");
                     e.printStackTrace();
                 }
 

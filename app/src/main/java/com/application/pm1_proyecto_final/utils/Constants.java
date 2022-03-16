@@ -19,6 +19,7 @@ public class Constants {
     public static final String KEY_TIMESTAMP = "timestamp";
     public static final String KEY_MESSAGE = "message";
     public static final String KEY_STATUS_MESSAGE = "status";
+    public static final String KEY_POSITION_MESSAGE = "position";
     public static final String KEY_SENDER_NAME = "senderName";
     public static final String KEY_SENDER_IMAGE = "senderImage";
     public static final String KEY_GROUP_NAME = "groupName";
