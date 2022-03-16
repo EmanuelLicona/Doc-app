@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -36,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
@@ -147,9 +151,9 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
         database.collection(Constants.KEY_COLLECTION_CHAT).add(mensaje)
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
-                        Toast.makeText(this, "Si", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "Si", Toast.LENGTH_SHORT).show();
                     }else{
-                        Toast.makeText(this, "No", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "No", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -172,12 +176,17 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
         database.collection(Constants.KEY_COLLECTION_CHAT).document(chatMessage.idFirebase)
                 .update(mensaje)
                 .addOnCompleteListener(task -> {
-                        Toast.makeText(this, "Si", Toast.LENGTH_SHORT).show();
+
+                    if(task.isSuccessful()){
+                        ResourceUtil.showAlert("Mensaje", "Publicacion eliminado correctamente", ChatActivity.this, "success");
+                    }else{
+                        ResourceUtil.showAlert("Error", "La publicacion no se pudo eliminar", ChatActivity.this, "error");
+                    }
 
 
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "No"+ e.getMessage(), Toast.LENGTH_SHORT).show();
+                    ResourceUtil.showAlert("Error", "El mensaje no se pudo eliminar", ChatActivity.this, "error");
                     positionGeneral=-1;
                 });
     }
@@ -198,7 +207,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
     private void listenMessages(){
         database.collection(Constants.KEY_COLLECTION_CHAT)
-//                .whereEqualTo(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID))
+//                .whereEqualTo(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_SENT)
                 .whereEqualTo(Constants.KEY_GROUP_ID, reseiverGroup.getId())
                 .addSnapshotListener(eventListener);
     }
@@ -262,24 +271,41 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                 chatRecyclerView.smoothScrollToPosition(chatMessages.size()-1);
             }
 
-//            chatAdapter.notifyAll();
 
             chatRecyclerView.setVisibility(View.VISIBLE);
 
         }
-
-//        binding.progressBar.setVisibility(View.GONE);
-
-//        if(conversationId == null){
-//            checkForConversion();
-//        }
     };
 
 
     @Override
     public void onClickChat(ChatMessage chatMessage, int position) {
-        Toast.makeText(this, chatMessage.message + " position: "+position, Toast.LENGTH_SHORT).show();
 
-        deleteMessage(chatMessage, position);
+        if(chatMessage.status.equals(ChatMessage.STATUS_DELETE)){
+            ResourceUtil.showAlert("Error", "Esta publicacion ya ha sido eliminada", ChatActivity.this, "error");
+            return;
+        }
+
+        if(chatMessage.senderId.equals(preferencesManager.getString(Constants.KEY_USER_ID))){
+            showAlertMessage("Mensaje", "¿Desea eliminar esta publicacion?", ChatActivity.this, chatMessage, position);
+        }else{
+            ResourceUtil.showAlert("Error", "Solo puede eliminar publicaciones propias", ChatActivity.this, "error");
+        }
+
+
     }
+
+    public void showAlertMessage(String title, String response, Context context, ChatMessage chatMessage, int position) {
+
+            new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                    .setTitleText(title)
+                    .setContentText(response)
+                    .setConfirmText("NO")
+                    .setCancelButton("SI",v->{
+                        deleteMessage(chatMessage, position);
+                        v.dismiss();
+                    })
+                    .show();
+    }
+
 }
