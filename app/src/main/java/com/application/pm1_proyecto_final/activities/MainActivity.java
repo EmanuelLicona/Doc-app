@@ -114,9 +114,10 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject dataUser = userJson.getJSONObject(0);
                     String emailUser = dataUser.getString("email");
                     String passwordUser = dataUser.getString("password");
+                    String status = dataUser.getString("status");
 
                     pDialog.dismiss();
-                    if (email.equals(emailUser) && password.equals(passwordUser)) {
+                    if (email.equals(emailUser) && password.equals(passwordUser) && status.equals("ACTIVO")) {
                         preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
                         preferencesManager.putString(Constants.KEY_USER_ID, dataUser.getString("id"));
                         preferencesManager.putString(UsersProvider.KEY_EMAIL, emailUser);
