@@ -3,7 +3,7 @@ package com.application.pm1_proyecto_final.api;
 public class GroupApiMethods {
 
 
-    public static final String URL = "https://dennisdomain.com/";
+    public static final String URL = "https://dennisdomain.com/api_rest/";
     public static final String URL_LOCAL = "https://localhost:8000/";
 
 
