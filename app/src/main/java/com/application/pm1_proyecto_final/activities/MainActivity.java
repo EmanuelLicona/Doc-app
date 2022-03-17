@@ -36,7 +36,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView txtViewRegister;
+    TextView txtViewRegister, txtChangePassword;
     TextInputEditText txtEmail, txtPassword;
     Button btnLogin;
     SweetAlertDialog pDialog;
@@ -74,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
         pDialog = ResourceUtil.showAlertLoading(MainActivity.this);
 
         txtViewRegister = (TextView) findViewById(R.id.textViewRegister);
-        txtEmail = findViewById(R.id.txtEmailMain);
-        txtPassword = findViewById(R.id.txtPasswordMain);
+        txtChangePassword = (TextView) findViewById(R.id.txtChangePassword);
+        txtEmail = (TextInputEditText) findViewById(R.id.txtEmailMain);
+        txtPassword = (TextInputEditText) findViewById(R.id.txtPasswordMain);
 
         btnLogin = (Button) findViewById(R.id.btnLogin);
 
@@ -83,6 +84,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        txtChangePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), RecoverPassword.class);
                 startActivity(intent);
             }
         });

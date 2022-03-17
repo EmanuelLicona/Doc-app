@@ -64,7 +64,7 @@ public class EditPasswordActivity extends AppCompatActivity {
         txtCode6 = (EditText) findViewById(R.id.txtCode6);
         txtEmailSend = (TextView) findViewById(R.id.txtEmailSend);
         btnSendCodeEditPassword = (TextView) findViewById(R.id.btnSendCodeEditPassword);
-        btnBackEditPass = (CircleImageView) findViewById(R.id.btnBackEditPass);
+        btnBackEditPass = (CircleImageView) findViewById(R.id.btnBackEditPassB);
 
         getInfoUser();
 

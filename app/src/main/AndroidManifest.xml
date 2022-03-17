@@ -29,6 +29,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PM1_PROYECTO_FINAL">
         <activity
+            android:name=".activities.RecoverPassword"
+            android:exported="false" />
+        <activity
             android:name=".activities.EditPasswordActivity"
             android:exported="false" />
         <activity
@@ -72,7 +75,6 @@
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
-
         <activity
             android:name=".activities.MainActivity"
             android:exported="true">

@@ -112,6 +112,23 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_gravity="bottom"
+        android:layout_marginBottom="50dp">
+
+        <TextView
+            android:id="@+id/txtChangePassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Olvidaste tu contraseña?"
+            android:textSize="17sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_gravity="bottom"
         android:layout_marginBottom="20dp"
         android:layout_marginTop="10dp">
 
