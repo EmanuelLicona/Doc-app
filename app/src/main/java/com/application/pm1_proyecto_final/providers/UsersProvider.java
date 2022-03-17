@@ -34,34 +34,4 @@ public class UsersProvider {
         return collection.document(user.getId()).set(user);
     }
 
-    public Task<QuerySnapshot> getUserByField(String value, String filter) {
-        String field = filter.equals("email") ? "email" : "numberAccount";
-        return collection.whereEqualTo(field, value).get();
-    }
-
-    public Task<Void> update(User user) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("address", user.getAddress());
-        map.put("birthDate", user.getBirthDate());
-        map.put("carrera", user.getCarrera());
-        map.put("image", user.getImage());
-        map.put("image_cover", user.getImageCover());
-        map.put("lastname", user.getLastname());
-        map.put("name", user.getName());
-        map.put("numberAccount", user.getNumberAccount());
-        map.put("phone", user.getPhone());
-        map.put("status", user.getStatus());
-        map.put("timestamp", new Date().getTime());
-
-        return collection.document(user.getId()).update(map);
-    };
-
-    public Task<Void> updatePassword(User user) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("password", user.getPassword());
-        map.put("timestamp", new Date().getTime());
-
-        return collection.document(user.getId()).update(map);
-    }
-
 }
