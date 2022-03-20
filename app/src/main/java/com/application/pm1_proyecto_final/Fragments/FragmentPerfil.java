@@ -28,6 +28,7 @@ import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.activities.CompleteProfileActivity;
 import com.application.pm1_proyecto_final.activities.EditPasswordActivity;
 import com.application.pm1_proyecto_final.activities.EditProfileActivity;
+import com.application.pm1_proyecto_final.activities.HomeActivity;
 import com.application.pm1_proyecto_final.activities.MainActivity;
 import com.application.pm1_proyecto_final.activities.RecoverPassword;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
@@ -146,6 +147,7 @@ public class FragmentPerfil extends Fragment {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER+user.getId(), new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+                preferencesManager.clear();
                 Intent intent = new Intent(getContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
