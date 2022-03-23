@@ -10,33 +10,48 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.Fragments.FragmentGrupo;
 import com.application.pm1_proyecto_final.Fragments.FragmentMain;
 import com.application.pm1_proyecto_final.Fragments.FragmentPerfil;
 import com.application.pm1_proyecto_final.Fragments.FrangmentApuntes;
 import com.application.pm1_proyecto_final.Fragments.FrangmentInfo;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.UsersProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
-    TextView txtNameUserMenu;
+    TextView txtNameUserMenu, txtEmailUserMenu;
+    ImageView imgViewProfile;
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
@@ -71,12 +86,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
         txtNameUserMenu = (TextView) findViewById(R.id.txtNameUserMenu);
-//        txtNameUserMenu.setText("Information");
+        txtEmailUserMenu = (TextView) findViewById(R.id.txtEmailMenu);
+        imgViewProfile = (ImageView) findViewById(R.id.imgViewProfile);
 
         seleccionado(0);
-
-
-//        getUserLog();
+//        getInfoUserLogged();
 
         fragmentGrupo = new FragmentGrupo();
         fragmentMain = new FragmentMain();
@@ -85,6 +99,43 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         openFragment(fragmentMain);
     }
 
+    private void getInfoUserLogged() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.GET_USER_ID + preferencesManager.getString(Constants.KEY_USER_ID),
+                null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String name = response.getJSONObject("data").getString("name");
+                    String lastname = response.getJSONObject("data").getString("lastname");
+                    String email = response.getJSONObject("data").getString("email");
+                    String imageProfile = response.getJSONObject("data").getString("image");
+
+                    if (!name.isEmpty() && !lastname.isEmpty()) {
+                        String nameUser = name +" "+ lastname;
+                        txtNameUserMenu.setText(nameUser);
+                    }
+                    if (!imageProfile.isEmpty() && !imageProfile.equals("IMAGE")) {
+                        Bitmap bitmap = ResourceUtil.decodeImage(imageProfile);
+                        imgViewProfile.setImageBitmap(bitmap);
+                    }
+                    if (!email.isEmpty()) {
+                        txtEmailUserMenu.setText(email);
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar el usuario.", HomeActivity.this, "error");
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(HomeActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+        requestQueue.add(request);
+    }
 
 
     @Override

@@ -33,5 +33,4 @@
         app:itemTextColor="@drawable/drawer_selector"
         android:fitsSystemWindows="true"/>
 
-
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -69,9 +69,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
         init();
         setListeners();
-
         loadReceiverDetails();
-
         listenMessages();
     }
 
@@ -92,16 +90,14 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
         btnNewFile = (FloatingActionButton) findViewById(R.id.btnNewFile);
 
-
-
-
         chatMessages = new ArrayList<>();
 
         chatAdapter = new ChatAdapter(
                 chatMessages,
                 getBitmapFromEndodedString(""),
                 preferencesManager.getString(Constants.KEY_USER_ID),
-                this
+                this,
+                ChatActivity.this
         );
 
         chatRecyclerView.setAdapter(chatAdapter);
@@ -122,7 +118,6 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
     private void loadReceiverDetails(){
         reseiverGroup = (Group) getIntent().getSerializableExtra(GroupsProvider.NAME_COLLECTION);
-
         textViewTitle.setText(reseiverGroup.getTitle());
     }
 
@@ -130,39 +125,16 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
     *
     * */
 
+    // PARA ENVIAR LA PUBLICACION
     private void sendMessage(){
+        int position = (chatMessages.size()==0) ? 0 : chatMessages.size();
+        String idGroup = reseiverGroup.getId();
 
-        int min = 1;
-        int max = 10;
-
-        Random random = new Random();
-
-        int value = random.nextInt(max + min) + min;
-
-        HashMap<String, Object> mensaje = new HashMap<>();
-
-        int position = (chatMessages.size()==0)?0:chatMessages.size();
-
-        mensaje.put(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID));
-        mensaje.put(Constants.KEY_GROUP_ID, reseiverGroup.getId());
-        mensaje.put(Constants.KEY_MESSAGE, "Mensage: " + value);
-        mensaje.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_SENT);
-        mensaje.put(Constants.KEY_POSITION_MESSAGE, position+"");
-        mensaje.put(Constants.KEY_TIMESTAMP, new Date());
-
-        database.collection(Constants.KEY_COLLECTION_CHAT).add(mensaje)
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-//                        Toast.makeText(this, "Si", Toast.LENGTH_SHORT).show();
-                    }else{
-//                        Toast.makeText(this, "No", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-
-
+        Intent intent = new Intent(ChatActivity.this, CreatePublicationActivity.class);
+        intent.putExtra("POSITION", position+"");
+        intent.putExtra("ID_GROUP", idGroup);
+        intent.putExtra(GroupsProvider.NAME_COLLECTION, reseiverGroup);
+        startActivity(intent);
     }
 
     private void deleteMessage(ChatMessage chatMessage, int position){
@@ -193,8 +165,6 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                 });
     }
 
-
-
     private Bitmap getBitmapFromEndodedString(String encodedImage){
         byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
@@ -224,7 +194,7 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
             int count = chatMessages.size();
             int position = -1;
 
-            for (DocumentChange documentChange: value.getDocumentChanges()){
+            for (DocumentChange documentChange : value.getDocumentChanges()){
                 if(documentChange.getType() == DocumentChange.Type.ADDED){
                     ChatMessage chatMessage = new ChatMessage();
 
@@ -232,31 +202,35 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                     chatMessage.senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
                     chatMessage.groupId = documentChange.getDocument().getString(Constants.KEY_GROUP_ID);
                     chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
-                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
                     chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
                     chatMessage.position = documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE);
                     chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
+                    chatMessage.title = documentChange.getDocument().getString("title");
+                    chatMessage.imageProfileUser = documentChange.getDocument().getString("imageProfileUser");
+                    chatMessage.path = documentChange.getDocument().getString("path");
+                    chatMessage.description = documentChange.getDocument().getString("description");
+                    chatMessage.type = documentChange.getDocument().getString("type");
 
                     chatMessages.add(chatMessage);
                 }
 
                 if(documentChange.getType() == DocumentChange.Type.MODIFIED){
-
-//                    Toast.makeText(this, documentChange.getDocument().getString(""), Toast.LENGTH_SHORT).show();
                     ChatMessage chatMessage = new ChatMessage();
                     chatMessage.idFirebase = documentChange.getDocument().getId();
                     chatMessage.senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
                     chatMessage.groupId = documentChange.getDocument().getString(Constants.KEY_GROUP_ID);
                     chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
-                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
                     chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
                     chatMessage.position = documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE);
                     chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
+                    chatMessage.title = documentChange.getDocument().getString("title");
+                    chatMessage.imageProfileUser = documentChange.getDocument().getString("imageProfileUser");
+                    chatMessage.path = documentChange.getDocument().getString("path");
+                    chatMessage.description = documentChange.getDocument().getString("description");
+                    chatMessage.type = documentChange.getDocument().getString("type");
 
                     position = Integer.parseInt(chatMessage.position);
-
                     chatMessages.set(position, chatMessage);
-
                     count = -1;
                 }
 
@@ -268,20 +242,13 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
                 chatAdapter.notifyDataSetChanged();
 
             }else if(count == -1){
-
                 chatAdapter.notifyItemRangeChanged(position, chatMessages.size());
-
-
-
             }else{
                 chatAdapter.notifyItemRangeInserted(chatMessages.size(), chatMessages.size());
-
                 chatRecyclerView.smoothScrollToPosition(chatMessages.size()-1);
             }
 
-
             chatRecyclerView.setVisibility(View.VISIBLE);
-
         }
     };
 

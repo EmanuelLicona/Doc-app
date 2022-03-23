@@ -29,6 +29,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PM1_PROYECTO_FINAL">
         <activity
+            android:name=".activities.CreatePublicationActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.RecoverPassword"
             android:exported="false" />
         <activity
