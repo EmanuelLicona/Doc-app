@@ -25,8 +25,9 @@ import java.util.List;
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> {
 
     private  List<Group> listGroup;
-    private  List<Group> filterlist;
     private  Grouplistener grouplistener;
+
+    private  List<Group> filterlist;
     private CustomFilter filter;
 
     public GroupAdapter(List<Group> listGroup, Grouplistener grouplistener) {
