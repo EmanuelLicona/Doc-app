@@ -7,7 +7,7 @@ public class Constants {
     public static final String KEY_IMAGE = "image";
     public static final String KEY_USER = "user";
     public static final String KEY_IMAGE_USER = "image";
-
+    public static final String KEY_NAME_USER = "nameUser";
 
 
     /*

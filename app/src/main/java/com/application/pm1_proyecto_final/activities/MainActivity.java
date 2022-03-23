@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
                         preferencesManager.putString(Constants.KEY_USER_ID, user.getId());
                         preferencesManager.putString(Constants.KEY_IMAGE_USER, user.getImage());
+                        preferencesManager.putString(Constants.KEY_NAME_USER, user.getName() +" "+user.getLastname());
                         preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
 
                         Intent intent = new Intent(MainActivity.this, HomeActivity.class);

@@ -4,17 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.models.ChatMessage;
+import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
@@ -112,15 +110,14 @@ public class CreatePublicationActivity extends AppCompatActivity {
                     params.put("description", description);
                     params.put("path", uri.toString());
                     params.put("type", type);
-                    params.put("imageProfileUser", preferencesManager.getString(Constants.KEY_IMAGE_USER));
-                    params.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_SENT);
+                    params.put(Constants.KEY_STATUS_MESSAGE, Publication.STATUS_SENT);
                     params.put(Constants.KEY_POSITION_MESSAGE, position);
                     params.put(Constants.KEY_TIMESTAMP, new Date());
 
                     database.collection(Constants.KEY_COLLECTION_CHAT).add(params).addOnCompleteListener(task -> {
                         pDialog.dismiss();
                         if(task.isSuccessful()){
-                            Intent intent = new Intent(CreatePublicationActivity.this, ChatActivity.class);
+                            Intent intent = new Intent(CreatePublicationActivity.this, PublicationActivity.class);
                             intent.putExtra(GroupsProvider.NAME_COLLECTION, receiverGroup);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
@@ -185,7 +182,6 @@ public class CreatePublicationActivity extends AppCompatActivity {
 
     private void setPreviewImageView() {
         String[] extensionFile = type.split("/");
-
         if (type.equals("application/pdf")) {
             imageViewPublication.setImageResource(R.drawable.pdf);
         } else if(extensionFile[0].equals("image")) {

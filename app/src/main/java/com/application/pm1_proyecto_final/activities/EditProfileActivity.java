@@ -72,7 +72,6 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
     Button btnEditProfile;
     CircleImageView btnBack, circleImageViewProfile;
 
-
     CharSequence options[];
     private final int GALLERY_REQUEST_CODE_PROFILE = 100;
     private final int GALLERY_REQUEST_CODE_COVER = 150;
@@ -216,6 +215,10 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER+user.getId(), new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+                if (bitmapImageProfile != null) {
+                    preferencesManager.putString(Constants.KEY_IMAGE_USER, user.getImage());
+                }
+                preferencesManager.putString(Constants.KEY_NAME_USER, user.getName() +" "+user.getLastname());
                 pDialog.dismiss();
                 finish();
             }

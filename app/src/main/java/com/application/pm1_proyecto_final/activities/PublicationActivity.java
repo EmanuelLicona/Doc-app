@@ -11,14 +11,12 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.adapters.ChatAdapter;
+import com.application.pm1_proyecto_final.adapters.PublicationAdapter;
 import com.application.pm1_proyecto_final.listeners.Chatlistener;
-import com.application.pm1_proyecto_final.models.ChatMessage;
+import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
@@ -37,11 +35,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class ChatActivity extends AppCompatActivity implements Chatlistener {
+public class PublicationActivity extends AppCompatActivity implements Chatlistener {
 
     Group reseiverGroup;
 
@@ -51,9 +48,9 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
     PreferencesManager preferencesManager;
 
-    List<ChatMessage> chatMessages;
+    List<Publication> publications;
 
-    ChatAdapter chatAdapter;
+    PublicationAdapter publicationAdapter;
 
     FirebaseFirestore database;
 
@@ -90,17 +87,17 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
         btnNewFile = (FloatingActionButton) findViewById(R.id.btnNewFile);
 
-        chatMessages = new ArrayList<>();
+        publications = new ArrayList<>();
 
-        chatAdapter = new ChatAdapter(
-                chatMessages,
+        publicationAdapter = new PublicationAdapter(
+                publications,
                 getBitmapFromEndodedString(""),
                 preferencesManager.getString(Constants.KEY_USER_ID),
                 this,
-                ChatActivity.this
+                PublicationActivity.this
         );
 
-        chatRecyclerView.setAdapter(chatAdapter);
+        chatRecyclerView.setAdapter(publicationAdapter);
     }
 
     private void setListeners(){
@@ -127,40 +124,40 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
     // PARA ENVIAR LA PUBLICACION
     private void sendMessage(){
-        int position = (chatMessages.size()==0) ? 0 : chatMessages.size();
+        int position = (publications.size()==0) ? 0 : publications.size();
         String idGroup = reseiverGroup.getId();
 
-        Intent intent = new Intent(ChatActivity.this, CreatePublicationActivity.class);
+        Intent intent = new Intent(PublicationActivity.this, CreatePublicationActivity.class);
         intent.putExtra("POSITION", position+"");
         intent.putExtra("ID_GROUP", idGroup);
         intent.putExtra(GroupsProvider.NAME_COLLECTION, reseiverGroup);
         startActivity(intent);
     }
 
-    private void deleteMessage(ChatMessage chatMessage, int position){
+    private void deleteMessage(Publication publication, int position){
 
         HashMap<String, Object> mensaje = new HashMap<>();
 
 
         mensaje.put(Constants.KEY_MESSAGE, "Mensage eliminado");
-        mensaje.put(Constants.KEY_STATUS_MESSAGE, ChatMessage.STATUS_DELETE);
+        mensaje.put(Constants.KEY_STATUS_MESSAGE, Publication.STATUS_DELETE);
 
 //        positionGeneral = position;
 
-        database.collection(Constants.KEY_COLLECTION_CHAT).document(chatMessage.idFirebase)
+        database.collection(Constants.KEY_COLLECTION_CHAT).document(publication.getIdFirebase())
                 .update(mensaje)
                 .addOnCompleteListener(task -> {
 
                     if(task.isSuccessful()){
-                        ResourceUtil.showAlert("Mensaje", "Publicacion eliminado correctamente", ChatActivity.this, "success");
+                        ResourceUtil.showAlert("Mensaje", "Publicacion eliminado correctamente", PublicationActivity.this, "success");
                     }else{
-                        ResourceUtil.showAlert("Error", "La publicacion no se pudo eliminar", ChatActivity.this, "error");
+                        ResourceUtil.showAlert("Error", "La publicacion no se pudo eliminar", PublicationActivity.this, "error");
                     }
 
 
                 })
                 .addOnFailureListener(e -> {
-                    ResourceUtil.showAlert("Error", "El mensaje no se pudo eliminar", ChatActivity.this, "error");
+                    ResourceUtil.showAlert("Error", "El mensaje no se pudo eliminar", PublicationActivity.this, "error");
 //                    positionGeneral=-1;
                 });
     }
@@ -191,61 +188,60 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
         }
 
         if(value != null){
-            int count = chatMessages.size();
+            int count = publications.size();
             int position = -1;
 
             for (DocumentChange documentChange : value.getDocumentChanges()){
                 if(documentChange.getType() == DocumentChange.Type.ADDED){
-                    ChatMessage chatMessage = new ChatMessage();
+                    Publication publication = new Publication();
+                    publication.setIdFirebase(documentChange.getDocument().getId());
+                    publication.setSenderId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
+                    publication.setGroupId(documentChange.getDocument().getString(Constants.KEY_GROUP_ID));
+                    publication.setDatatime(getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP)));
+                    publication.setStatus(documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE));
+                    publication.setPosition(documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE));
+                    publication.setDateObject(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
+                    publication.setTitle(documentChange.getDocument().getString("title"));
+                    publication.setImageProfileUser(documentChange.getDocument().getString("imageProfileUser"));
+                    publication.setPath(documentChange.getDocument().getString("path"));
+                    publication.setDescription(documentChange.getDocument().getString("description"));
+                    publication.setType(documentChange.getDocument().getString("type"));
 
-                    chatMessage.idFirebase = documentChange.getDocument().getId();
-                    chatMessage.senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
-                    chatMessage.groupId = documentChange.getDocument().getString(Constants.KEY_GROUP_ID);
-                    chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
-                    chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
-                    chatMessage.position = documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE);
-                    chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
-                    chatMessage.title = documentChange.getDocument().getString("title");
-                    chatMessage.imageProfileUser = documentChange.getDocument().getString("imageProfileUser");
-                    chatMessage.path = documentChange.getDocument().getString("path");
-                    chatMessage.description = documentChange.getDocument().getString("description");
-                    chatMessage.type = documentChange.getDocument().getString("type");
-
-                    chatMessages.add(chatMessage);
+                    publications.add(publication);
                 }
 
                 if(documentChange.getType() == DocumentChange.Type.MODIFIED){
-                    ChatMessage chatMessage = new ChatMessage();
-                    chatMessage.idFirebase = documentChange.getDocument().getId();
-                    chatMessage.senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
-                    chatMessage.groupId = documentChange.getDocument().getString(Constants.KEY_GROUP_ID);
-                    chatMessage.datatime = getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
-                    chatMessage.status = documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE);
-                    chatMessage.position = documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE);
-                    chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
-                    chatMessage.title = documentChange.getDocument().getString("title");
-                    chatMessage.imageProfileUser = documentChange.getDocument().getString("imageProfileUser");
-                    chatMessage.path = documentChange.getDocument().getString("path");
-                    chatMessage.description = documentChange.getDocument().getString("description");
-                    chatMessage.type = documentChange.getDocument().getString("type");
+                    Publication publication = new Publication();
+                    publication.setIdFirebase(documentChange.getDocument().getId());
+                    publication.setSenderId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
+                    publication.setGroupId(documentChange.getDocument().getString(Constants.KEY_GROUP_ID));
+                    publication.setDatatime(getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP)));
+                    publication.setStatus(documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE));
+                    publication.setPosition(documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE));
+                    publication.setDateObject(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
+                    publication.setTitle(documentChange.getDocument().getString("title"));
+                    publication.setImageProfileUser(documentChange.getDocument().getString("imageProfileUser"));
+                    publication.setPath(documentChange.getDocument().getString("path"));
+                    publication.setDescription(documentChange.getDocument().getString("description"));
+                    publication.setType(documentChange.getDocument().getString("type"));
 
-                    position = Integer.parseInt(chatMessage.position);
-                    chatMessages.set(position, chatMessage);
+                    position = Integer.parseInt(publication.getPosition());
+                    publications.set(position, publication);
                     count = -1;
                 }
 
             }
 
-            Collections.sort(chatMessages, (obj1, obj2) -> obj1.dateObject.compareTo(obj2.dateObject));
+            Collections.sort(publications, (obj1, obj2) -> obj1.getDateObject().compareTo(obj2.getDateObject()));
 
             if(count == 0){
-                chatAdapter.notifyDataSetChanged();
+                publicationAdapter.notifyDataSetChanged();
 
             }else if(count == -1){
-                chatAdapter.notifyItemRangeChanged(position, chatMessages.size());
+                publicationAdapter.notifyItemRangeChanged(position, publications.size());
             }else{
-                chatAdapter.notifyItemRangeInserted(chatMessages.size(), chatMessages.size());
-                chatRecyclerView.smoothScrollToPosition(chatMessages.size()-1);
+                publicationAdapter.notifyItemRangeInserted(publications.size(), publications.size());
+                chatRecyclerView.smoothScrollToPosition(publications.size()-1);
             }
 
             chatRecyclerView.setVisibility(View.VISIBLE);
@@ -254,30 +250,30 @@ public class ChatActivity extends AppCompatActivity implements Chatlistener {
 
 
     @Override
-    public void onClickChat(ChatMessage chatMessage, int position) {
+    public void onClickChat(Publication publication, int position) {
 
-        if(chatMessage.status.equals(ChatMessage.STATUS_DELETE)){
-            ResourceUtil.showAlert("Error", "Esta publicacion ya ha sido eliminada", ChatActivity.this, "error");
+        if(publication.getStatus().equals(Publication.STATUS_DELETE)){
+            ResourceUtil.showAlert("Error", "Esta publicacion ya ha sido eliminada", PublicationActivity.this, "error");
             return;
         }
 
-        if(chatMessage.senderId.equals(preferencesManager.getString(Constants.KEY_USER_ID))){
-            showAlertMessage("Mensaje", "¿Desea eliminar esta publicacion?", ChatActivity.this, chatMessage, position);
+        if(publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))){
+            showAlertMessage("Mensaje", "¿Desea eliminar esta publicacion?", PublicationActivity.this, publication, position);
         }else{
-            ResourceUtil.showAlert("Error", "Solo puede eliminar publicaciones propias", ChatActivity.this, "error");
+            ResourceUtil.showAlert("Error", "Solo puede eliminar publicaciones propias", PublicationActivity.this, "error");
         }
 
 
     }
 
-    public void showAlertMessage(String title, String response, Context context, ChatMessage chatMessage, int position) {
+    public void showAlertMessage(String title, String response, Context context, Publication publication, int position) {
 
             new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
                     .setTitleText(title)
                     .setContentText(response)
                     .setConfirmText("NO")
                     .setCancelButton("SI",v->{
-                        deleteMessage(chatMessage, position);
+                        deleteMessage(publication, position);
                         v.dismiss();
                     })
                     .show();

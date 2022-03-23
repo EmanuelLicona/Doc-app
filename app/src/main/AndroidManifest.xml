@@ -49,7 +49,7 @@
             android:name=".activities.InfoGroupActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ChatActivity"
+            android:name=".activities.PublicationActivity"
             android:exported="false" />
         <activity
             android:name=".activities.MyGroupsActivity"
