@@ -127,10 +127,11 @@ public class CreatePublicationActivity extends AppCompatActivity {
                     database.collection(Constants.KEY_COLLECTION_CHAT).add(params).addOnCompleteListener(task -> {
                         pDialog.dismiss();
                         if(task.isSuccessful()){
-                            Intent intent = new Intent(CreatePublicationActivity.this, PublicationActivity.class);
-                            intent.putExtra(GroupsProvider.NAME_COLLECTION, receiverGroup);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+//                            Intent intent = new Intent(CreatePublicationActivity.this, PublicationActivity.class);
+//                            intent.putExtra(GroupsProvider.NAME_COLLECTION, receiverGroup);
+//                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(intent);
+                            finish();
                         }else{
                             ResourceUtil.showAlert("Advertencia", "Se produjo un error al guardar la publicación.",CreatePublicationActivity.this,"error");
                         }

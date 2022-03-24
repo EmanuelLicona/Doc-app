@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -87,10 +88,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
-        setDataToNavigationDrawer();
-
         seleccionado(0);
-//        getInfoUserLogged();
+        getInfoUserLogged();
 
         fragmentGrupo = new FragmentGrupo();
         fragmentMain = new FragmentMain();
@@ -104,7 +103,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         txtNameUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtNameUserMenu);
         txtEmailUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtEmailMenu);
-
+        imgViewProfile = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgViewProfileMenu);
     }
 
     private void getInfoUserLogged() {
@@ -114,7 +113,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(JSONObject response) {
                 try {
-
+                    setDataToNavigationDrawer();
                     String name = response.getJSONObject("data").getString("name");
                     String lastname = response.getJSONObject("data").getString("lastname");
                     String email = response.getJSONObject("data").getString("email");
