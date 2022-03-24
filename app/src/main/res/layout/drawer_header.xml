@@ -19,24 +19,24 @@
 
     <TextView
         android:id="@+id/txtNameUserMenu"
-        android:layout_width="269dp"
-        android:layout_height="23dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="#ffffff"
         android:text="Name User"
+        android:textColor="#ffffff"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.825">
+        app:layout_constraintVertical_bias="0.789">
 
     </TextView>
 
     <TextView
         android:id="@+id/txtEmailMenu"
-        android:layout_width="212dp"
-        android:layout_height="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Correo"
         android:textColor="#ffffff"
@@ -46,22 +46,23 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.934">
+        app:layout_constraintVertical_bias="0.886">
 
     </TextView>
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgViewProfileMenu"
-        android:layout_width="366dp"
-        android:layout_height="182dp"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
         android:layout_gravity="center"
         android:src="@drawable/ic_u"
+        app:civ_border_width="5dp"
+        app:civ_border_color="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.488"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintVertical_bias="0.25"/>
 
-        />
 </androidx.constraintlayout.widget.ConstraintLayout>

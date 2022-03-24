@@ -47,13 +47,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
     TextView txtNameUserMenu, txtEmailUserMenu;
-    ImageView imgViewProfile;
+    CircleImageView imgViewProfile;
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
@@ -103,7 +105,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         txtNameUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtNameUserMenu);
         txtEmailUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtEmailMenu);
-        imgViewProfile = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imgViewProfileMenu);
+        imgViewProfile = (CircleImageView) navigationView.getHeaderView(0).findViewById(R.id.imgViewProfileMenu);
     }
 
     private void getInfoUserLogged() {
