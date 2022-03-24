@@ -7,7 +7,7 @@ public class Publication {
     public static final String STATUS_SENT = "1";
     public static final String STATUS_DELETE = "2";
 
-    private String idFirebase, senderId, groupId, title, description, imageProfileUser, path, type, datatime, status, position;
+    private String idFirebase, senderId, groupId, title, description, imageProfileUser, path, type, datatime, status, position, nameUser;
     private Date dateObject;
 
     public Publication() {
@@ -122,5 +122,13 @@ public class Publication {
 
     public void setDateObject(Date dateObject) {
         this.dateObject = dateObject;
+    }
+
+    public String getNameUser() {
+        return nameUser;
+    }
+
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
     }
 }
