@@ -2,25 +2,20 @@ package com.application.pm1_proyecto_final.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
@@ -28,24 +23,16 @@ import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.listeners.Grouplistener;
 import com.application.pm1_proyecto_final.models.Group;
-import com.application.pm1_proyecto_final.models.GroupUser;
-import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
-import com.application.pm1_proyecto_final.utils.ResourceUtil;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MyGroupsActivity extends AppCompatActivity implements Grouplistener{
 
@@ -65,7 +52,6 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_groups);
-
 
         init();
         getMyGroups();
@@ -198,7 +184,7 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
 
     @Override
     public void onClickGroup(Group group) {
-        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        Intent intent = new Intent(getApplicationContext(), PublicationActivity.class);
         intent.putExtra(GroupsProvider.NAME_COLLECTION, group);
         startActivity(intent);
         finish();

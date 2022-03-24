@@ -23,7 +23,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
+import com.application.pm1_proyecto_final.providers.UsersProvider;
+import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
+import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 
 import org.json.JSONException;
@@ -185,7 +188,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 pDialog.dismiss();
-                Intent intent = new Intent(CompleteProfileActivity.this, HomeActivity.class);
+                Intent intent = new Intent(CompleteProfileActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }

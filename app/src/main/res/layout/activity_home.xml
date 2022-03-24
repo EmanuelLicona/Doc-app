@@ -7,9 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.HomeActivity"
-
-    android:fitsSystemWindows="true"
-    >
+    android:fitsSystemWindows="true">
 
     <include
         android:layout_width="match_parent"
@@ -32,6 +30,5 @@
         app:itemIconTint="@drawable/drawer_selector"
         app:itemTextColor="@drawable/drawer_selector"
         android:fitsSystemWindows="true"/>
-
 
 </androidx.drawerlayout.widget.DrawerLayout>

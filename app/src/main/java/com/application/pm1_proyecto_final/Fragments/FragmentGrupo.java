@@ -3,7 +3,6 @@ package com.application.pm1_proyecto_final.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,7 +11,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,21 +20,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.activities.ChatActivity;
+import com.application.pm1_proyecto_final.activities.PublicationActivity;
 import com.application.pm1_proyecto_final.activities.CreateGroupActivity;
-import com.application.pm1_proyecto_final.activities.MyGroupsActivity;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.listeners.Grouplistener;
 import com.application.pm1_proyecto_final.models.Group;
-import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
-import com.application.pm1_proyecto_final.providers.UsersProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -206,7 +199,7 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
     @Override
     public void onClickGroup(Group group) {
-        Intent intent = new Intent(getContext(), ChatActivity.class);
+        Intent intent = new Intent(getContext(), PublicationActivity.class);
         intent.putExtra(GroupsProvider.NAME_COLLECTION, group);
         startActivity(intent);
     }

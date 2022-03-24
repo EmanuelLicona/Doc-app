@@ -87,7 +87,7 @@ public class ResourceUtil {
     }
 
     public static String getImageBase64(Bitmap bitmap) {
-        int previewWidth = 150;
+        int previewWidth = 180;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
 
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);

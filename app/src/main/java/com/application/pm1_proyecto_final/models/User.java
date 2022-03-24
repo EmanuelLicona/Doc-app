@@ -20,6 +20,7 @@ public class User implements Serializable {
     private String image;
     private String password;
     private String imageCover;
+    private String idFirebase;
 
     public User() {
     }
@@ -135,7 +136,15 @@ public class User implements Serializable {
         this.password = password;
     }
 
-//    public String getJson_groups() {
+    public String getIdFirebase() {
+        return idFirebase;
+    }
+
+    public void setIdFirebase(String idFirebase) {
+        this.idFirebase = idFirebase;
+    }
+
+    //    public String getJson_groups() {
 //        return json_groups;
 //    }
 //
@@ -162,5 +171,25 @@ public class User implements Serializable {
 
     public void setImageCover(String imageCover) {
         this.imageCover = imageCover;
+    }
+
+    @Override
+    public String toString() {
+        return "User {" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", carrera='" + carrera + '\'' +
+                ", phone='" + phone + '\'' +
+                ", numberAccount='" + numberAccount + '\'' +
+                ", address='" + address + '\'' +
+                ", status='" + status + '\'' +
+                ", birthDate='" + birthDate + '\'' +
+                ", image='" + image + '\'' +
+                ", password='" + password + '\'' +
+                ", imageCover='" + imageCover + '\'' +
+                ", idFirebase='" + idFirebase + '\'' +
+                '}';
     }
 }
