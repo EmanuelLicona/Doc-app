@@ -31,11 +31,13 @@ import java.util.Date;
 import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CreatePublicationActivity extends AppCompatActivity {
 
     String position = "", idGroup = "", title = "", description = "", type = "", extension = "";
     ImageView imageViewPublication;
+    CircleImageView btnBack;
     TextInputEditText txtTitle, txtDescription;
     Button btnCreatePublication;
     Uri dataPublication;
@@ -59,6 +61,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         loadReceivedData();
 
         imageViewPublication = (ImageView) findViewById(R.id.imageViewPublication);
+        btnBack = (CircleImageView) findViewById(R.id.btnBackCreatePublication);
         btnCreatePublication = (Button) findViewById(R.id.btnCreatePublication);
         txtTitle = (TextInputEditText) findViewById(R.id.txtTitlePublication);
         txtDescription = (TextInputEditText) findViewById(R.id.txtDescriptionPublication);
@@ -75,6 +78,13 @@ public class CreatePublicationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 savePublication();
+            }
+        });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }

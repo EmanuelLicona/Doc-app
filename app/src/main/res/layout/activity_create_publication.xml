@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.CreatePublicationActivity"
-    android:fitsSystemWindows="true"
-    >
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -130,7 +129,7 @@
 
     <!-- BOTON DE REGRESA -->
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/circleImageBack"
+        android:id="@+id/btnBackCreatePublication"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@drawable/ic_arrow_back_white"

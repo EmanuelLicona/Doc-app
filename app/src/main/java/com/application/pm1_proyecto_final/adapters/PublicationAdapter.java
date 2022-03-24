@@ -1,14 +1,11 @@
 package com.application.pm1_proyecto_final.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,14 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.listeners.Chatlistener;
 import com.application.pm1_proyecto_final.models.Publication;
-import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -136,6 +131,13 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     return false;
                 }
             });
+
+            imageViewPost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    chatlistener.onClickFile(publication, getLayoutPosition());
+                }
+            });
         }
 
     }
@@ -149,7 +151,6 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         RoundedImageView imageProfileReceive;
         View view;
 
-
         ReceivedMessageViewHolder(@NonNull View itemView){
             super(itemView);
 
@@ -159,7 +160,6 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             txtDescription = itemView.findViewById(R.id.txtDescriptionPostReceive);
             imageViewPost = itemView.findViewById(R.id.imageViewPostReceive);
             imageProfileReceive = itemView.findViewById(R.id.imageProfileReceive);
-
 
             view = itemView;
         }
@@ -188,6 +188,13 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public boolean onLongClick(View view) {
                     chatlistener.onClickChat(publication, getLayoutPosition());
                     return false;
+                }
+            });
+
+            imageViewPost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    chatlistener.onClickFile(publication, getLayoutPosition());
                 }
             });
         }

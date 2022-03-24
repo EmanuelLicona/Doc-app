@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,6 +62,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     FragmentGrupo fragmentGrupo;
     FragmentMain fragmentMain;
     FrangmentInfo frangmentInfo;
+    View view;
 
     private PreferencesManager preferencesManager;
     @Override
@@ -85,9 +87,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
-        txtNameUserMenu = (TextView) findViewById(R.id.txtNameUserMenu);
-        txtEmailUserMenu = (TextView) findViewById(R.id.txtEmailMenu);
-        imgViewProfile = (ImageView) findViewById(R.id.imgViewProfile);
+        setDataToNavigationDrawer();
 
         seleccionado(0);
 //        getInfoUserLogged();
@@ -99,6 +99,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         openFragment(fragmentMain);
     }
 
+    public void setDataToNavigationDrawer() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(this);
+        txtNameUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtNameUserMenu);
+        txtEmailUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtEmailMenu);
+
+    }
+
     private void getInfoUserLogged() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.GET_USER_ID + preferencesManager.getString(Constants.KEY_USER_ID),
@@ -106,6 +114,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(JSONObject response) {
                 try {
+
                     String name = response.getJSONObject("data").getString("name");
                     String lastname = response.getJSONObject("data").getString("lastname");
                     String email = response.getJSONObject("data").getString("email");
@@ -123,9 +132,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         txtEmailUserMenu.setText(email);
                     }
 
-                } catch (JSONException e) {
-                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar el usuario.", HomeActivity.this, "error");
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    ResourceUtil.showAlert("Advertencia", "Error: "+e.getMessage(), HomeActivity.this, "error");
+//                    e.printStackTrace();
                 }
             }
         }, new com.android.volley.Response.ErrorListener() {
