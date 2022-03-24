@@ -3,8 +3,12 @@ package com.application.pm1_proyecto_final.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -59,6 +63,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
     Group receiverGroup;
 
     private static final int REQUEST_UPLOAD_FILE = 100;
+    private static final int REQUEST_READ_STORAGE = 400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,12 +179,31 @@ public class CreatePublicationActivity extends AppCompatActivity {
     }
 
     private void uploadFile() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
+        } else {
+            startUploadFile();
+        }
+    }
+
+    private void startUploadFile() {
         Intent galleryIntent = new Intent();
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("*/*");
         String[] mimeTypes = {"application/pdf", "image/*", "video/*", "audio/*"};
         galleryIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(galleryIntent, REQUEST_UPLOAD_FILE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_READ_STORAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startUploadFile();
+        } else {
+            Toast.makeText(this, "Permiso denegado....", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
