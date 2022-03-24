@@ -12,13 +12,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Base64;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -66,7 +63,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
     Group reseiverGroup;
     AppCompatImageView imageViewInfo, imageViewBack;
-    TextView textViewTitle;
+    TextView textViewTitle, txtExistPublications;
     PreferencesManager preferencesManager;
     ProgressBar progressBar;
     List<Publication> publications;
@@ -107,15 +104,16 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         imageViewInfo = (AppCompatImageView) findViewById(R.id.imageInfoChat);
         imageViewBack = (AppCompatImageView) findViewById(R.id.btnChatBack);
         textViewTitle = (TextView) findViewById(R.id.groupTitleChat);
+        txtExistPublications = (TextView) findViewById(R.id.existPublications);
         btnNewFile = (FloatingActionButton) findViewById(R.id.btnNewFile);
 
         pBuilderSelector = new AlertDialog.Builder(this);
         pBuilderSelector.setTitle("Seleccione una opción");
         options = new CharSequence[]{"Visualizar Archivo", "Descargar Archivo"};
 
-        loading(true);
         publications = new ArrayList<>();
         userListApi = new ArrayList<>();
+        loading(true);
         getAllUsers();
 
         publicationAdapter = new PublicationAdapter(publications, preferencesManager.getString(Constants.KEY_USER_ID),
@@ -125,7 +123,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
     private void getAllUsers() {
         RequestQueue queue = Volley.newRequestQueue(this);
-
         StringRequest stringRequest = new StringRequest(Request.Method.GET, UserApiMethods.GET_USER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -148,7 +145,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
                     } else {
                         Toast.makeText(PublicationActivity.this, "No se encontraron publicaciones.", Toast.LENGTH_SHORT).show();
                     }
-
                 }
                 catch (JSONException ex) {
                     ResourceUtil.showAlert("Advertencia", "Se produjo un error al obtener la informacion de los usuarios que tiene publicaciones.", PublicationActivity.this, "error");
@@ -162,6 +158,14 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             }
         });
         queue.add(stringRequest);
+    }
+
+    private void existPublications() {
+        if (publications.isEmpty()) {
+            txtExistPublications.setVisibility(View.VISIBLE);
+        } else {
+            txtExistPublications.setVisibility(View.GONE);
+        }
     }
 
     private void setListeners(){
@@ -303,6 +307,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
             chatRecyclerView.setVisibility(View.VISIBLE);
         }
+        existPublications();
     };
 
 

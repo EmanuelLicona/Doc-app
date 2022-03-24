@@ -69,6 +69,17 @@
             android:backgroundTint="@color/color_green"
             android:visibility="gone"/>
 
+        <TextView
+            android:id="@+id/existPublications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay publicaciones"
+            android:layout_margin="20dp"
+            android:textSize="20dp"
+            android:textStyle="italic"
+            android:textColor="@color/color_gray"
+            android:visibility="gone"/>
+
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
