@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -52,6 +53,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.json.JSONArray;
@@ -137,6 +139,12 @@ public class InfoGroupActivity extends AppCompatActivity {
         btnAddMember.setOnClickListener(v -> dialogAddMember());
 
         imageViewEdit.setOnClickListener(v -> dialogEditGroup());
+
+        btnLeaveGroup.setOnClickListener(v -> {
+
+            showAlertMessageLeave("Mensaje", "¿ Desea salir del grupo ?", InfoGroupActivity.this);
+
+        });
     }
 
     private void loadReceiverDetails(){
@@ -639,6 +647,54 @@ public class InfoGroupActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
+    private void leaveGroup(String idUser, String idGroup, String status) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", idUser);
+        params.put("group_id", idGroup);
+        params.put("status", status);
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_USER_GROUP_UPDATE, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    String resposeData = response.getString("data");
+
+                    if(!resposeData.equals("[]")){
+
+                        ResourceUtil.showAlert("Mensaje", "Has salido el grupo", InfoGroupActivity.this, "success");
+
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(reseiverGroup.getId());
+//                        finish();
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error ", InfoGroupActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error", InfoGroupActivity.this, "error");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error .",InfoGroupActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+    }
+
 
     private static Bitmap getGroupImage(String encodedImage){
 
@@ -682,6 +738,20 @@ public class InfoGroupActivity extends AppCompatActivity {
 
         return Base64.encodeToString(bytes, Base64.DEFAULT);
 
+    }
+
+
+    public void showAlertMessageLeave(String title, String response, Context context) {
+
+        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(title)
+                .setContentText(response)
+                .setConfirmText("NO")
+                .setCancelButton("SI",v->{
+                    leaveGroup(preferencesManager.getString(Constants.KEY_USER_ID), reseiverGroup.getId(), GroupUser.STATUS_LEFT);
+                    v.dismiss();
+                })
+                .show();
     }
 
 
