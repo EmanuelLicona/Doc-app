@@ -65,7 +65,7 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
-        return publications.size();
+        return (null != publications ? publications.size() : 0);
     }
 
     @Override
@@ -137,6 +137,7 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View view) {
                     chatlistener.onClickFile(publication, getLayoutPosition());
+
                 }
             });
         }

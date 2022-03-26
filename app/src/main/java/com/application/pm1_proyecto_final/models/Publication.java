@@ -7,7 +7,7 @@ public class Publication {
     public static final String STATUS_SENT = "1";
     public static final String STATUS_DELETE = "2";
 
-    private String idFirebase, senderId, groupId, title, description, imageProfileUser, path, type, datatime, status, position, nameUser;
+    private String idFirebase, senderId, groupId, title, description, imageProfileUser, path, type, datatime, status, position, positionLayout, nameUser;
     private Date dateObject;
 
     public Publication() {
@@ -131,4 +131,30 @@ public class Publication {
     public void setNameUser(String nameUser) {
         this.nameUser = nameUser;
     }
+
+    public String getPositionLayout() {
+        return positionLayout;
+    }
+
+    public void setPositionLayout(String positionLayout) {
+        this.positionLayout = positionLayout;
+    }
+
+    @Override
+    public String toString() {
+        return "Publication {" +
+                "idFirebase='" + idFirebase + '\'' +
+                ", senderId='" + senderId + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", path='" + path + '\'' +
+                ", type='" + type + '\'' +
+                ", datatime='" + datatime + '\'' +
+                ", status='" + status + '\'' +
+                ", position='" + position + '\'' +
+                ", nameUser='" + nameUser + '\'' +
+                ", dateObject=" + dateObject +'}'+"\n";
+    }
+
 }

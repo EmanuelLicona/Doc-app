@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -59,7 +60,6 @@ import java.util.Locale;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PublicationActivity extends AppCompatActivity implements Chatlistener {
-
 
     Group reseiverGroup;
     AppCompatImageView imageViewInfo, imageViewBack;
@@ -200,15 +200,17 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     private void deleteMessage(Publication publication, int position){
         HashMap<String, Object> params = new HashMap<>();
         params.put(Constants.KEY_STATUS_MESSAGE, Publication.STATUS_DELETE);
+        params.put("positionLayout", position);
 //        positionGeneral = position;
 
         database.collection(Constants.KEY_COLLECTION_CHAT).document(publication.getIdFirebase()).update(params)
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-                        userListApi.remove(position);
-                        publicationAdapter.notifyItemRemoved(position);
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "REMOVED 1", Toast.LENGTH_SHORT).show();
+//                        publicationAdapter.notifyItemRemoved(position);
+
                         ResourceUtil.showAlert("Confirmación", "Publicación Eliminado Correctamente.", PublicationActivity.this, "success");
-                    }else {
+                    } else {
                         ResourceUtil.showAlert("Advertencia", "Se produjo un error al eliminar la publicación.", PublicationActivity.this, "error");
                     }
                 })
@@ -230,7 +232,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     }
 
     private final EventListener<QuerySnapshot> eventListener = (value, error) -> {
-        if(error!=null){
+        if(error != null){
             return ;
         }
 
@@ -238,8 +240,13 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             int count = publications.size();
             int position = -1;
 
+            /*
+                Cuando Elimino algo Entra al REMOVED
+             */
+
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if(documentChange.getType() == DocumentChange.Type.ADDED) {
+                    Toast.makeText(this, "ENTRANDO ADDED", Toast.LENGTH_SHORT).show();
                     Publication publication = new Publication();
                     publication.setIdFirebase(documentChange.getDocument().getId());
                     publication.setSenderId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
@@ -263,46 +270,33 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
                     publication.setType(documentChange.getDocument().getString("type"));
 
                     publications.add(publication);
+                    count = -2;
                 }
 
-                if(documentChange.getType() == DocumentChange.Type.MODIFIED) {
+                if (documentChange.getType() == DocumentChange.Type.REMOVED) {
+                    Toast.makeText(this, "ENTRANDO A REMOVER", Toast.LENGTH_SHORT).show();
                     Publication publication = new Publication();
-                    publication.setIdFirebase(documentChange.getDocument().getId());
-                    publication.setSenderId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
+                    publication.setPositionLayout(documentChange.getDocument().getString("positionLayout"));
 
-                    for (int i = 0; i < userListApi.size(); i++) {
-                        if (userListApi.get(i).getId().equals(publication.getSenderId())) {
-                            String nameUser = userListApi.get(i).getName()+" "+userListApi.get(i).getLastname();
-                            publication.setImageProfileUser(userListApi.get(i).getImage());
-                            publication.setNameUser(nameUser);
-                        }
-                    }
-
-                    publication.setGroupId(documentChange.getDocument().getString(Constants.KEY_GROUP_ID));
-                    publication.setDatatime(getReadableDateTime(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP)));
-                    publication.setStatus(documentChange.getDocument().getString(Constants.KEY_STATUS_MESSAGE));
-                    publication.setPosition(documentChange.getDocument().getString(Constants.KEY_POSITION_MESSAGE));
-                    publication.setDateObject(documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP));
-                    publication.setTitle(documentChange.getDocument().getString("title"));
-                    publication.setPath(documentChange.getDocument().getString("path"));
-                    publication.setDescription(documentChange.getDocument().getString("description"));
-                    publication.setType(documentChange.getDocument().getString("type"));
-
-                    position = Integer.parseInt(publication.getPosition());
-                    publications.set(position, publication);
-                    count = -1;
+                    position = Integer.parseInt(publication.getPositionLayout());
+                    publications.remove(position);
+                    publicationAdapter.notifyItemRemoved(position);
+                    publicationAdapter.notifyItemRangeChanged(position, (null != publications ? publications.size() + 1 : 0));
+                    count = 4;
                 }
+
             }
 
+            // Se utiliza para ordenar los elementos presentes en la lista especificada de Colección en orden ascendente.
             Collections.sort(publications, (obj1, obj2) -> obj1.getDateObject().compareTo(obj2.getDateObject()));
 
-            if(count == 0){
+            if (count == 0) {
                 publicationAdapter.notifyDataSetChanged();
-            }else if(count == -1){
+            } else if (count == -1) {
                 publicationAdapter.notifyItemRangeChanged(position, publications.size());
-            }else{
+            } else if (count == -2) {
                 publicationAdapter.notifyItemRangeInserted(publications.size(), publications.size());
-                chatRecyclerView.smoothScrollToPosition(publications.size()-1);
+//                chatRecyclerView.smoothScrollToPosition(publications.size() - 1);
             }
 
             chatRecyclerView.setVisibility(View.VISIBLE);
@@ -320,6 +314,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         }
 
         if(publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))){
+            showAlertMessage("Confirmación", "¿Desea eliminar esta publicación?", PublicationActivity.this, publication, position);
+        } else {
             showAlertMessage("Confirmación", "¿Desea eliminar esta publicación?", PublicationActivity.this, publication, position);
         }
     }
@@ -393,6 +389,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     }
 
     public void showAlertMessage(String title, String response, Context context, Publication publication, int position) {
+        Log.d("LIST", ""+publications.toString());
+        Log.d("HOLA", "Posicion: "+position);
         new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
             .setTitleText(title)
             .setContentText(response)

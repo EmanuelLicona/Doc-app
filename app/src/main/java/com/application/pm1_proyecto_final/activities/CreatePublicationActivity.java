@@ -136,6 +136,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
                     params.put("description", description);
                     params.put("path", uri.toString());
                     params.put("type", type);
+                    params.put("positionLayout", "0");
                     params.put(Constants.KEY_STATUS_MESSAGE, Publication.STATUS_SENT);
                     params.put(Constants.KEY_POSITION_MESSAGE, position);
                     params.put(Constants.KEY_TIMESTAMP, new Date());
