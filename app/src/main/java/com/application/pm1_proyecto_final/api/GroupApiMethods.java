@@ -7,7 +7,7 @@ public class GroupApiMethods {
     public static final String URL_LOCAL = "https://localhost:8000/";
 
 
-    public static final String POST_GROUP = URL + "api/groups";
+    public static final String POST_GROUP = URL + "api/groups/";
 
 
     public static final String POST_GROUP_USER = URL + "api/groupUsers";

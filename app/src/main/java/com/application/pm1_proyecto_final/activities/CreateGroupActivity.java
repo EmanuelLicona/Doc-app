@@ -69,8 +69,6 @@ public class CreateGroupActivity extends AppCompatActivity {
     String encodedImage;
     RoundedImageView roundedImageView;
 
-    boolean returnStatus;
-
     private PreferencesManager preferencesManager;
 
     GroupsProvider groupsProvider;
