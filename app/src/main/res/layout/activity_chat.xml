@@ -60,6 +60,26 @@
         app:layout_constraintTop_toBottomOf="@+id/btnChatBack"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_editor_absoluteX="0dp">
+
+        <ProgressBar
+            android:id="@+id/publicationsProgressBar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/color_green"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/existPublications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay publicaciones"
+            android:layout_margin="20dp"
+            android:textSize="20dp"
+            android:textStyle="italic"
+            android:textColor="@color/color_gray"
+            android:visibility="gone"/>
+
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

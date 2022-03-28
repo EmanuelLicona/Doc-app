@@ -11,7 +11,9 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,13 +47,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     Toolbar toolbar;
     NavigationView navigationView;
     TextView txtNameUserMenu, txtEmailUserMenu;
-    ImageView imgViewProfile;
+    CircleImageView imgViewProfile;
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
@@ -61,6 +65,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     FragmentGrupo fragmentGrupo;
     FragmentMain fragmentMain;
     FrangmentInfo frangmentInfo;
+    View view;
 
     private PreferencesManager preferencesManager;
     @Override
@@ -85,18 +90,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
-        txtNameUserMenu = (TextView) findViewById(R.id.txtNameUserMenu);
-        txtEmailUserMenu = (TextView) findViewById(R.id.txtEmailMenu);
-        imgViewProfile = (ImageView) findViewById(R.id.imgViewProfile);
-
         seleccionado(0);
-//        getInfoUserLogged();
+        getInfoUserLogged();
 
         fragmentGrupo = new FragmentGrupo();
         fragmentMain = new FragmentMain();
         frangmentInfo = new FrangmentInfo();
 
         openFragment(fragmentMain);
+    }
+
+    public void setDataToNavigationDrawer() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(this);
+        txtNameUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtNameUserMenu);
+        txtEmailUserMenu = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txtEmailMenu);
+        imgViewProfile = (CircleImageView) navigationView.getHeaderView(0).findViewById(R.id.imgViewProfileMenu);
     }
 
     private void getInfoUserLogged() {
@@ -106,6 +115,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    setDataToNavigationDrawer();
                     String name = response.getJSONObject("data").getString("name");
                     String lastname = response.getJSONObject("data").getString("lastname");
                     String email = response.getJSONObject("data").getString("email");
@@ -123,9 +133,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         txtEmailUserMenu.setText(email);
                     }
 
-                } catch (JSONException e) {
-                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar el usuario.", HomeActivity.this, "error");
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    ResourceUtil.showAlert("Advertencia", "Error: "+e.getMessage(), HomeActivity.this, "error");
+//                    e.printStackTrace();
                 }
             }
         }, new com.android.volley.Response.ErrorListener() {
@@ -156,7 +166,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, fragment);
-        transaction.addToBackStack(null);
+//        transaction.addToBackStack(null);
         transaction.commit();
     }
 

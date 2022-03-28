@@ -173,5 +173,23 @@ public class User implements Serializable {
         this.imageCover = imageCover;
     }
 
-
+    @Override
+    public String toString() {
+        return "User {" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", carrera='" + carrera + '\'' +
+                ", phone='" + phone + '\'' +
+                ", numberAccount='" + numberAccount + '\'' +
+                ", address='" + address + '\'' +
+                ", status='" + status + '\'' +
+                ", birthDate='" + birthDate + '\'' +
+                ", image='" + image + '\'' +
+                ", password='" + password + '\'' +
+                ", imageCover='" + imageCover + '\'' +
+                ", idFirebase='" + idFirebase + '\'' +
+                '}';
+    }
 }

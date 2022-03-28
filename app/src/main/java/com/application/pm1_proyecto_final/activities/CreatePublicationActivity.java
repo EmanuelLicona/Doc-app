@@ -3,14 +3,25 @@ package com.application.pm1_proyecto_final.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.Group;
@@ -27,15 +38,21 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CreatePublicationActivity extends AppCompatActivity {
 
     String position = "", idGroup = "", title = "", description = "", type = "", extension = "";
     ImageView imageViewPublication;
+    CircleImageView btnBack;
     TextInputEditText txtTitle, txtDescription;
     Button btnCreatePublication;
     Uri dataPublication;
@@ -46,6 +63,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
     Group receiverGroup;
 
     private static final int REQUEST_UPLOAD_FILE = 100;
+    private static final int REQUEST_READ_STORAGE = 400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +77,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         loadReceivedData();
 
         imageViewPublication = (ImageView) findViewById(R.id.imageViewPublication);
+        btnBack = (CircleImageView) findViewById(R.id.btnBackCreatePublication);
         btnCreatePublication = (Button) findViewById(R.id.btnCreatePublication);
         txtTitle = (TextInputEditText) findViewById(R.id.txtTitlePublication);
         txtDescription = (TextInputEditText) findViewById(R.id.txtDescriptionPublication);
@@ -75,6 +94,13 @@ public class CreatePublicationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 savePublication();
+            }
+        });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }
@@ -117,10 +143,8 @@ public class CreatePublicationActivity extends AppCompatActivity {
                     database.collection(Constants.KEY_COLLECTION_CHAT).add(params).addOnCompleteListener(task -> {
                         pDialog.dismiss();
                         if(task.isSuccessful()){
-                            Intent intent = new Intent(CreatePublicationActivity.this, PublicationActivity.class);
-                            intent.putExtra(GroupsProvider.NAME_COLLECTION, receiverGroup);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+                            notyfication(receiverGroup.getTitle(), description, receiverGroup.getId());
+                            finish();
                         }else{
                             ResourceUtil.showAlert("Advertencia", "Se produjo un error al guardar la publicación.",CreatePublicationActivity.this,"error");
                         }
@@ -155,12 +179,31 @@ public class CreatePublicationActivity extends AppCompatActivity {
     }
 
     private void uploadFile() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
+        } else {
+            startUploadFile();
+        }
+    }
+
+    private void startUploadFile() {
         Intent galleryIntent = new Intent();
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("*/*");
         String[] mimeTypes = {"application/pdf", "image/*", "video/*", "audio/*"};
         galleryIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(galleryIntent, REQUEST_UPLOAD_FILE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_READ_STORAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startUploadFile();
+        } else {
+            Toast.makeText(this, "Permiso denegado....", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -191,6 +234,57 @@ public class CreatePublicationActivity extends AppCompatActivity {
         } else if(extensionFile[0].equals("video")) {
             imageViewPublication.setImageResource(R.drawable.video);
         }
+
+    }
+
+
+    private void notyfication(String title, String description, String groupId){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        JSONObject json = new JSONObject();
+
+        try {
+
+            json.put("to", "/topics/"+groupId);
+
+            JSONObject notificacion = new JSONObject();
+            notificacion.put("titulo",title);
+            notificacion.put("detalle",description);
+            notificacion.put("senderId",preferencesManager.getString(Constants.KEY_USER_ID));
+
+            json.put("data", notificacion);
+
+
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    Request.Method.POST,
+                    Constants.URL_FCM,
+                    json,
+                    null,
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(CreatePublicationActivity.this, "Error1: "+ error.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+            ){
+                @Override
+                public Map<String, String> getHeaders(){
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content-type", "application/json");
+                    header.put("authorization", "key="+Constants.AUTHORIZATION_FCM);
+
+                    return header;
+                }
+            };
+
+            requestQueue.add(jsonObjectRequest);
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+
 
     }
 

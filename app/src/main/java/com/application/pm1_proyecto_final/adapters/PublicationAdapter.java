@@ -1,12 +1,12 @@
 package com.application.pm1_proyecto_final.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +25,6 @@ import java.util.List;
 public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private final List<Publication> publications;
-    private final Bitmap reseiverProfileImage;
     private final String senderId;
 
     private Chatlistener chatlistener;
@@ -34,9 +33,8 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
-    public PublicationAdapter(List<Publication> publications, Bitmap reseiverProfileImage, String senderId, Chatlistener chatlistener, Context context) {
+    public PublicationAdapter(List<Publication> publications, String senderId, Chatlistener chatlistener, Context context) {
         this.publications = publications;
-        this.reseiverProfileImage = reseiverProfileImage;
         this.senderId = senderId;
         this.chatlistener = chatlistener;
         this.context = context;
@@ -47,7 +45,6 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         if(viewType == VIEW_TYPE_SENT){
-
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_container_send_message, parent, false);
             return new PublicationAdapter.SendMessageViewHolder(view);
 
@@ -62,7 +59,7 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (getItemViewType(position) == VIEW_TYPE_SENT){
             ((SendMessageViewHolder) holder).setData(publications.get(position));
         }else {
-            ((ReceivedMessageViewHolder) holder).setData(publications.get(position), reseiverProfileImage);
+            ((ReceivedMessageViewHolder) holder).setData(publications.get(position));
         }
     }
 
@@ -135,12 +132,18 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     return false;
                 }
             });
+
+            imageViewPost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    chatlistener.onClickFile(publication, getLayoutPosition());
+                }
+            });
         }
 
     }
 
     class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
-
         TextView txtTitle;
         TextView txtNameUser;
         TextView txtDateTime;
@@ -148,7 +151,6 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ImageView imageViewPost;
         RoundedImageView imageProfileReceive;
         View view;
-
 
         ReceivedMessageViewHolder(@NonNull View itemView){
             super(itemView);
@@ -163,12 +165,12 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             view = itemView;
         }
 
-        void setData(Publication publication, Bitmap receiverProfileImage){
+        void setData(Publication publication) {
             txtTitle.setText(publication.getTitle());
-            txtNameUser.setText("Favian Hernandez");
             txtDateTime.setText(publication.getDatatime());
             txtDescription.setText(publication.getDescription());
-//            imageProfileSend.setImageBitmap(ResourceUtil.decodeImage(preferencesManager.getString(Constants.KEY_IMAGE_USER)));
+            txtNameUser.setText(publication.getNameUser());
+            imageProfileReceive.setImageBitmap(ResourceUtil.decodeImage(publication.getImageProfileUser()));
 
             String[] extensionFile = publication.getType().split("/");
 
@@ -182,12 +184,18 @@ public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 imageViewPost.setImageResource(R.drawable.video_publication);
             }
 
-
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     chatlistener.onClickChat(publication, getLayoutPosition());
                     return false;
+                }
+            });
+
+            imageViewPost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    chatlistener.onClickFile(publication, getLayoutPosition());
                 }
             });
         }

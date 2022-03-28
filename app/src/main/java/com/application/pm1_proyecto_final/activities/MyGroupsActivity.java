@@ -53,7 +53,6 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_groups);
 
-
         init();
         getMyGroups();
         setListeners();

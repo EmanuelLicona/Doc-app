@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PM1_PROYECTO_FINAL</string>
+    <string name="app_name">DOC-APP</string>
     <string name="cliente_id">864018432040-41gk7l1v95js87071kl7tk4ds6ejv5ur.apps.googleusercontent.com</string>
     <string-array name="list_courses">
         <item>--Seleccionar--</item>

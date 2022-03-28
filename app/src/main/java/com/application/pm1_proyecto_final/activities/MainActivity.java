@@ -19,6 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.UsersProvider;
@@ -27,6 +28,7 @@ import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 import org.json.JSONArray;
@@ -54,17 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
         preferencesManager = new PreferencesManager(getApplicationContext());
 
-        if(preferencesManager.getBoolean(Constants.KEY_IS_SIGNED_IN)){
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        
-//        else{
-//            preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-//            preferencesManager.putString(Constants.KEY_USER_ID, user.getId()+"");
-//            preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
-//        }
 
         pDialog = ResourceUtil.showAlertLoading(MainActivity.this);
 
@@ -96,6 +87,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) { login(); }
         });
+
+
+        if(preferencesManager.getBoolean(Constants.KEY_IS_SIGNED_IN)){
+            if(!getGroupForNotification(preferencesManager.getString(Constants.KEY_USER_ID))){
+
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                finish();
+
+            }else{
+                ResourceUtil.showAlert("Advertencia", "A ocurrido un error al asignar temas del usuario", MainActivity.this, "error");
+            }
+
+        }
+
     }
 
     private void login() {
@@ -115,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray userJson = response.getJSONArray("data");
+
                     JSONObject dataUser = userJson.getJSONObject(0);
                     user.setId(dataUser.getString("id"));
                     user.setIdFirebase(dataUser.getString("idFirebase"));
@@ -132,18 +140,27 @@ public class MainActivity extends AppCompatActivity {
                     user.setPassword(dataUser.getString("password"));
                     updateUserDisabled();
 
-                    pDialog.dismiss();
-                    if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                        preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-                        preferencesManager.putString(Constants.KEY_USER_ID, user.getId());
-                        preferencesManager.putString(Constants.KEY_IMAGE_USER, user.getImage());
-                        preferencesManager.putString(Constants.KEY_NAME_USER, user.getName() +" "+user.getLastname());
-                        preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
 
-                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
+                    if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
+                        if(!getGroupForNotification(dataUser.getString("id"))) {
+
+                            pDialog.dismiss();
+
+                            preferencesManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                            preferencesManager.putString(Constants.KEY_USER_ID, user.getId());
+                            preferencesManager.putString(Constants.KEY_IMAGE_USER, user.getImage());
+                            preferencesManager.putString(Constants.KEY_NAME_USER, user.getName() + " " + user.getLastname());
+                            preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
+
+                            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        } else{
+                            pDialog.dismiss();
+                            ResourceUtil.showAlert("Advertencia", "A ocurrido un error al asignar temas del usuario", MainActivity.this, "error");
+                        }
                     } else {
+                        pDialog.dismiss();
                         ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
                         Toast.makeText(MainActivity.this, "ENTRANDO", Toast.LENGTH_SHORT).show();
                     }
@@ -163,6 +180,58 @@ public class MainActivity extends AppCompatActivity {
         });
         requestQueue.add(request);
 
+    }
+
+    boolean error = false;
+    private boolean getGroupForNotification(String id) {
+
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                (GroupApiMethods.GET_GROUPS_FOR_USER_ACTIVE+id),
+                null,
+                new com.android.volley.Response.Listener<JSONObject>(){
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject  jsonObject = null;
+
+                            if(response.getString("res").equals("true")){
+
+
+                                JSONArray array = response.getJSONArray("data");
+
+                                for (int i = 0; i < array.length(); i++) {
+                                    jsonObject = new JSONObject(array.get(i).toString());
+                                    FirebaseMessaging.getInstance().subscribeToTopic(jsonObject.getString("id"));
+                                }
+                                error = false;
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
+                                error = true;
+                            }
+
+                        } catch (JSONException e) {
+                            Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            error = true;
+                        }
+
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: "+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+        );
+
+        requestQueue.add(request);
+
+        return error;
     }
 
     private void updateUserDisabled() {
