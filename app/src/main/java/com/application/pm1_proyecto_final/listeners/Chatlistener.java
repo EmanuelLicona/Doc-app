@@ -1,9 +1,9 @@
 package com.application.pm1_proyecto_final.listeners;
 
-import com.application.pm1_proyecto_final.models.ChatMessage;
-import com.application.pm1_proyecto_final.models.Group;
+import com.application.pm1_proyecto_final.models.Publication;
 
 public interface Chatlistener {
 
-    void onClickChat(ChatMessage chatMessage, int position);
+    void onClickChat(Publication publication, int position);
+    void onClickFile(Publication publication, int position);
 }

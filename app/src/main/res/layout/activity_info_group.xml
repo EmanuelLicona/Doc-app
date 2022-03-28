@@ -132,13 +132,36 @@
 
                 <Button
                     android:id="@+id/btnAddMember"
-                    android:layout_width="wrap_content"
+                    android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:text="Agregar Miembro"
                     android:background="@drawable/backgroud_button"
                     android:textColor="@color/white"
                     android:paddingHorizontal="4dp"
                     android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center"/>
+
+                <Button
+                    android:id="@+id/btnCerrarGrupo"
+                    android:layout_width="180dp"
+                    android:layout_height="wrap_content"
+                    android:text="Eliminar Grupo"
+                    android:background="@drawable/background_button_red"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="4dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center"/>
+
+                <Button
+                    android:id="@+id/btnSalirGrupo"
+                    android:layout_width="180dp"
+                    android:layout_height="wrap_content"
+                    android:text="Salir del grupo"
+                    android:background="@drawable/background_button_red"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="4dp"
+                    android:layout_marginBottom="10dp"
                     android:layout_gravity="center"/>
 
 

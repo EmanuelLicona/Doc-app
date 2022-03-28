@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@color/white"
     tools:context=".activities.CompleteProfileActivity">
 
     <LinearLayout
@@ -86,6 +87,7 @@
                 android:layout_height="40dp"
                 android:hint="Correo Electrónico."
                 android:inputType="textEmailAddress"
+                android:textAlignment="center"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/color_gray"/>
@@ -190,7 +192,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="VERIFICAR"
-            android:background="@drawable/rounded_button"
+            android:background="@drawable/backgroud_button"
             android:backgroundTint="@color/color_green"
             android:layout_gravity="bottom"
             android:textColor="@color/white"
@@ -206,7 +208,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:text="No recibí el código"
-            android:layout_gravity="left"
+            android:layout_gravity="center"
             android:textSize="17sp"
             android:textStyle="bold"
             android:textColor="@color/color_blue"/>

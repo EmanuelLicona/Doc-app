@@ -70,14 +70,13 @@
                     android:orientation="vertical"
                     android:overScrollMode="never"
                     android:padding="20dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-
-                    />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
                 <ProgressBar
                     android:id="@+id/myGroupsProgressBar"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:backgroundTint="@color/color_green"
                     android:layout_marginTop="200dp"
                     android:layout_gravity="center"
                     android:visibility="gone"/>

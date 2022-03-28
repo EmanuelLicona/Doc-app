@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class UserApiMethods {
 
-    public static final String URL = "https://dennisdomain.com/";
+    public static final String URL = "https://dennisdomain.com/api_rest/";
 
     public static final String GET_USER = URL + "api/users";
     public static final String GET_USER_ID = URL + "api/users/";

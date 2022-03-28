@@ -11,6 +11,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <queries>
@@ -29,6 +30,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PM1_PROYECTO_FINAL">
         <activity
+            android:name=".activities.CreatePublicationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.RecoverPassword"
+            android:exported="false" />
+        <activity
             android:name=".activities.EditPasswordActivity"
             android:exported="false" />
         <activity
@@ -43,7 +50,7 @@
             android:name=".activities.InfoGroupActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ChatActivity"
+            android:name=".activities.PublicationActivity"
             android:exported="false" />
         <activity
             android:name=".activities.MyGroupsActivity"
@@ -81,6 +88,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+
+        <service
+            android:name=".firebase.MessaginService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

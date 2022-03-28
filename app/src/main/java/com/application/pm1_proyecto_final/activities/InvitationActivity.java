@@ -39,6 +39,7 @@ import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -218,6 +219,8 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
     private void AgreeInvitation(GroupUser groupUser, AlertDialog dialog) {
 
         updateInvitation(groupUser.getIdUser(), groupUser.getIdGroup(), GroupUser.STATUS_ACCEPT);
+
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(groupUser.getIdGroup());
 
         dialog.dismiss();
 

@@ -35,7 +35,7 @@ public class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
     protected void onPreExecute() {
         super.onPreExecute();
         //Show progress dialog while sending email
-        mProgressDialog = ProgressDialog.show(mContext,"Enviando código de verificación", "Espere por favor...",false,false);
+        mProgressDialog = ProgressDialog.show(mContext,"Enviando al correo eletrónico.", "Espere por favor...",false,false);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class JavaMailAPI extends AsyncTask<Void,Void,Void>  {
         mProgressDialog.dismiss();
 
         //Show success toast
-        ResourceUtil.showAlert("Confirmación", "Código de verificación enviado al correo proporcionado.", mContext, "success");
+        ResourceUtil.showAlert("Confirmación", "Enviado correctamente, revise su correo eletrónico.", mContext, "success");
     }
 
     @Override
