@@ -210,6 +210,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             openMyInvitations();
         }else if(item.getItemId() == R.id.item_mis_grupos){
             openMyGroups();
+        }else if(item.getItemId() == R.id.item_mis_apuntes){
+            openFragment(new FrangmentApuntes());
         }else if(item.getItemId() == R.id.item_informacion){
             openFragment(frangmentInfo);
         } else if(item.getItemId() == R.id.item_cerrar_sesion){
