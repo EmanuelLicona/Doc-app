@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="Buscar"
+  <!--  <item android:title="Buscar"
         android:id="@+id/item_buscar"
         android:icon="@drawable/ic_search"
         app:showAsAction="ifRoom"
-        ></item>
+        ></item>-->
 
 
 </menu>

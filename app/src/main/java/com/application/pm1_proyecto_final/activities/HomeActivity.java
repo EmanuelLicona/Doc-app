@@ -176,13 +176,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         menuI.setChecked(true);
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.item_buscar){
             Toast.makeText(getApplicationContext(),"BUSCANDO", Toast.LENGTH_LONG).show();
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
