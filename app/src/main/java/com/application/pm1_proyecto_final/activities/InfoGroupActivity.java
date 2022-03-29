@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -96,6 +97,8 @@ public class InfoGroupActivity extends AppCompatActivity {
     Button btnSaveGroupDialog;
     TextView textImageDialog;
     TextInputEditText textInputEditTextTitle, textInputEditTextDescription;
+
+    String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,7 +266,6 @@ public class InfoGroupActivity extends AppCompatActivity {
         requestQueue.add(request);
 
     }
-
 
     private void dialogAddMember(){
 
@@ -581,7 +583,7 @@ public class InfoGroupActivity extends AppCompatActivity {
                     if(!resposeData.equals("[]")){
 
                         ResourceUtil.showAlert("Mensaje", "Invitacion enviada correctamente", InfoGroupActivity.this, "success");
-
+                        getTokenFmcUser(idUser);
                     }else {
                         ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion", InfoGroupActivity.this, "error");
                     }
@@ -626,7 +628,7 @@ public class InfoGroupActivity extends AppCompatActivity {
                     if(!resposeData.equals("[]")){
 
                         ResourceUtil.showAlert("Mensaje", "Invitacion enviada correctamente", InfoGroupActivity.this, "success");
-
+                        getTokenFmcUser(idUser);
                     }else {
                         ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar la invitacion (U)", InfoGroupActivity.this, "error");
                     }
@@ -645,6 +647,110 @@ public class InfoGroupActivity extends AppCompatActivity {
                 error.printStackTrace();
 
             }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+    }
+
+
+    private void notyfication(String title, String description, String token){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        JSONObject json = new JSONObject();
+
+        try {
+
+            if(token.length() == 0){
+                Toast.makeText(this, "Error al recuperar token fcm", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            json.put("to", token);
+
+            JSONObject notificacion = new JSONObject();
+            notificacion.put("titulo",title);
+            notificacion.put("detalle",description);
+            notificacion.put("senderId",preferencesManager.getString(Constants.KEY_USER_ID));
+
+            json.put("data", notificacion);
+
+
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    Request.Method.POST,
+                    Constants.URL_FCM,
+                    json,
+                    null,
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(InfoGroupActivity.this, "Error1: "+ error.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+            ){
+                @Override
+                public Map<String, String> getHeaders(){
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content-type", "application/json");
+                    header.put("authorization", "key="+Constants.AUTHORIZATION_FCM);
+
+                    return header;
+                }
+            };
+
+            requestQueue.add(jsonObjectRequest);
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void getTokenFmcUser(String idUser){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                UserApiMethods.PUT_USER+idUser,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        try {
+                            String resposeData = response.getString("res");
+
+                            if(resposeData.equals("true")){
+
+                                JSONObject jsonObject = response.getJSONObject("data");
+
+                                token = jsonObject.getString("idFirebase");
+
+                                notyfication(
+                                        "Invitacion a grupo",
+                                        preferencesManager.getString(Constants.KEY_NAME_USER) + " te esta inivitando a unirte al grupo " + reseiverGroup.getTitle(),
+                                        token
+                                );
+                            }
+
+                        } catch (JSONException e) {
+                            ResourceUtil.showAlert("Advertencia", "Se produjo un error al leer notificacion.",InfoGroupActivity.this, "error");
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar notificacion.",InfoGroupActivity.this, "error");
+                        error.printStackTrace();
+
+                    }
         });
 
         requestQueue.add(jsonObjectRequest);
