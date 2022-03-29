@@ -145,6 +145,8 @@ public class InfoGroupActivity extends AppCompatActivity {
             showAlertMessageLeave("Mensaje", "¿ Desea salir del grupo ?", InfoGroupActivity.this);
 
         });
+
+        btnDeleteGroup.setOnClickListener(v -> showAlertMessageClose("Mensaje", "¿Quieres cerrar el grupo", InfoGroupActivity.this));
     }
 
     private void loadReceiverDetails(){
@@ -170,6 +172,7 @@ public class InfoGroupActivity extends AppCompatActivity {
         }else{
             btnLeaveGroup.setVisibility(View.GONE);
         }
+
     }
 
     //En este metodo solo deberian cargar los usuarios que estan aceptados
@@ -695,6 +698,65 @@ public class InfoGroupActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
+    private void closeGroup(){
+        Group group = new Group();
+
+        group = reseiverGroup;
+        group.setStatus(Group.STATUS_INACTIVE);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("id", reseiverGroup.getId());
+        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+        params.put("title", group.getTitle());
+        params.put("description", group.getDescription());
+        params.put("image", group.getImage());
+        params.put("status", group.getStatus());
+        params.put("user_id_created", group.getUser_create());
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, GroupApiMethods.POST_GROUP+reseiverGroup.getId(), new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        pDialog.dismiss();
+
+                        try {
+                            String resposeData = response.getString("data");
+
+
+                            if(!resposeData.equals("[]")){
+
+
+                                ResourceUtil.showAlert("Advertencia", "Grupo cerrado correctamente.",InfoGroupActivity.this, "success");
+                                finish();
+
+                            }else {
+                                ResourceUtil.showAlert("Advertencia", "Se produjo un error al cerrar el grupo.",InfoGroupActivity.this, "error");
+                            }
+
+                        } catch (JSONException e) {
+                            ResourceUtil.showAlert("Advertencia", "Se produjo un error al cerrar el grupo",InfoGroupActivity.this, "error");
+                        }
+
+
+//                Toast.makeText(CreateGroupActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al cerrar el grupo.",InfoGroupActivity.this, "error");
+                Log.d("ERROR_USER", "Error Register: "+error.getMessage());
+
+//                Toast.makeText(CreateGroupActivity.this, "Error: " +error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+
+
+    }
 
     private static Bitmap getGroupImage(String encodedImage){
 
@@ -703,6 +765,7 @@ public class InfoGroupActivity extends AppCompatActivity {
     }
 
     private final ActivityResultLauncher<Intent> pickImageDialog = registerForActivityResult(
+
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK){
@@ -750,6 +813,20 @@ public class InfoGroupActivity extends AppCompatActivity {
                 .setCancelButton("SI",v->{
                     leaveGroup(preferencesManager.getString(Constants.KEY_USER_ID), reseiverGroup.getId(), GroupUser.STATUS_LEFT);
                     v.dismiss();
+                })
+                .show();
+    }
+
+
+    public void showAlertMessageClose(String title, String response, Context context) {
+
+        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(title)
+                .setContentText(response)
+                .setConfirmText("NO")
+                .setCancelButton("SI",v->{
+                   closeGroup();
+                   v.dismiss();
                 })
                 .show();
     }
