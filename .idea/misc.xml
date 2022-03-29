@@ -28,7 +28,6 @@
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/activity_my_groups.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/activity_recover_password.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/activity_register.xml" value="0.3458333333333333" />
-        <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/cardview_publication.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/content_main.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/dialog_add_member.xml" value="0.3458333333333333" />
         <entry key="..\:/Users/10bra/Desktop/Proyecto PM/Doc-APP/app/src/main/res/layout/drawer_header.xml" value="0.3458333333333333" />
@@ -58,13 +57,18 @@
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_chat.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_complete_profile.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_create_group.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_create_publication.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_edit_password.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_edit_profile.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_home.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_info_group.xml" value="0.33" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_invitation.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_main.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_my_groups.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_recover_password.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_register.xml" value="0.27355072463768115" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_temp.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/cardview_publication.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/content_main.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/dialog_add_member.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/dialog_edit_group.xml" value="0.1" />
