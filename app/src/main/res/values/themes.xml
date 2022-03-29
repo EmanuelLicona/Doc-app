@@ -32,4 +32,10 @@
         <item name="color">@android:color/white</item>
     </style>
 
+
+   <style name="SplashTheme" parent="Theme.PM1_PROYECTO_FINAL">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+   </style>
+
+
 </resources>

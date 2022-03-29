@@ -27,10 +27,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.PublicationAdapter;
+import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.listeners.Chatlistener;
 import com.application.pm1_proyecto_final.models.Publication;
@@ -146,6 +149,13 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getGroupReturn();
+    }
+
     private void getAllUsers() {
         loading(true);
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -187,8 +197,26 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
     private void setListeners(){
         imageViewBack.setOnClickListener(v -> onBackPressed());
-        imageViewInfo.setOnClickListener(view -> moveToInfo());
-        btnNewFile.setOnClickListener(v -> sendMessage());
+        imageViewInfo.setOnClickListener(view -> {
+
+            if(reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)){
+                ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
+                return;
+            }
+            moveToInfo();
+
+        });
+        btnNewFile.setOnClickListener(v -> {
+
+            if(reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)){
+                ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
+                return;
+            }
+
+
+
+            sendMessage();
+        });
     }
 
     private void moveToInfo() {
@@ -271,6 +299,70 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         } else {
             ResourceUtil.showAlert("Advertencia", "Se produjo un error al descargar el archivo", this, "error");
         }
+    }
+
+    //Metodo para recuperar el grupo al volver a la actividad
+    private void getGroupReturn(){
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                (GroupApiMethods.POST_GROUP+reseiverGroup.getId()),
+                null,
+                new com.android.volley.Response.Listener<JSONObject>(){
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        try {
+
+                            JSONObject  jsonObject = null;
+
+                            Group groupTemp = null;
+
+
+                            if(!response.has("res")){
+
+                                    jsonObject = response.getJSONObject("data");
+
+
+                                    groupTemp = new Group();
+                                    groupTemp.setId(jsonObject.getString("id"));
+                                    groupTemp.setTitle(jsonObject.getString("title"));
+                                    groupTemp.setDescription(jsonObject.getString("description"));
+                                    groupTemp.setImage(jsonObject.getString("image"));
+                                    groupTemp.setStatus(jsonObject.getString("status"));
+                                    groupTemp.setUser_create(jsonObject.getString("user_id_created"));
+
+
+//                                Toast.makeText(PublicationActivity.this, groupTemp.getTitle(), Toast.LENGTH_LONG).show();
+
+                                reseiverGroup = groupTemp;
+
+                                textViewTitle.setText(reseiverGroup.getTitle());
+
+
+
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (JSONException e) {
+                            Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: "+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+        );
+
+        requestQueue.add(request);
     }
 
     @Override
