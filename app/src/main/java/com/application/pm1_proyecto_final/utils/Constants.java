@@ -15,10 +15,15 @@ public class Constants {
     * */
 
     public static final String KEY_FCM_TOKEN = "fcmToken";
-    public static final String KEY_COLLECTION_CHAT = "chat";
+    public static final String KEY_COLLECTION_CHAT = "Publication";
     public static final String KEY_SENDER_ID = "senderId";
     public static final String KEY_GROUP_ID = "groupId";
     public static final String KEY_TIMESTAMP = "timestamp";
+    public static final String KEY_TITLE = "title";
+    public static final String KEY_TYPE = "type";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_PATH = "path";
+
     public static final String KEY_MESSAGE = "message";
     public static final String KEY_STATUS_MESSAGE = "status";
     public static final String KEY_POSITION_MESSAGE = "position";
