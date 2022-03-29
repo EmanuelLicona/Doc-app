@@ -105,6 +105,8 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="20dp"
         android:src="@drawable/ic_add"
+        android:backgroundTint="@color/color_green"
+        android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
