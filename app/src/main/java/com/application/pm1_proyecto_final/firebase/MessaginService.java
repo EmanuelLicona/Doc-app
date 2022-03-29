@@ -16,6 +16,7 @@ import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.activities.MainActivity;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.TokenPreference;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -24,6 +25,7 @@ import java.util.Random;
 public class MessaginService extends FirebaseMessagingService {
 
     PreferencesManager preferencesManager;
+    TokenPreference tokenPreference;
 
 
     @Override
@@ -31,9 +33,11 @@ public class MessaginService extends FirebaseMessagingService {
         super.onNewToken(token);
 
         Log.d("FCM", "onNewToken: " + token);
+
+       tokenPreference = new TokenPreference(getApplicationContext());
+       tokenPreference.putString(Constants.KEY_FCM_TOKEN, token);
+
     }
-
-
 
 //    Este metodo es cuando resivo notificacion cuando no estoy en segundo plano
     @Override
