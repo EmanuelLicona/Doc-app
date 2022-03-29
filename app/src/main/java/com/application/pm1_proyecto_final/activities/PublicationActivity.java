@@ -1,6 +1,7 @@
 package com.application.pm1_proyecto_final.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,7 +18,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,14 +38,13 @@ import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.providers.PublicationProvider;
-import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -55,13 +54,9 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PublicationActivity extends AppCompatActivity implements Chatlistener {
 
@@ -70,7 +65,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     TextView textViewTitle, txtExistPublications;
     PreferencesManager preferencesManager;
     ProgressBar progressBar;
-    List<Publication> publications;
     List<User> userListApi;
     PublicationAdapter publicationAdapter;
     RecyclerView chatRecyclerView;
@@ -114,7 +108,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         pBuilderSelector.setTitle("Seleccione una opción");
         options = new CharSequence[]{"Visualizar Archivo", "Descargar Archivo"};
 
-        publications = new ArrayList<>();
         userListApi = new ArrayList<>();
         mPublicationProvider = new PublicationProvider();
 
@@ -128,18 +121,15 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
                         .setQuery(query, Publication.class)
                         .build();
 
-//        if (!options.getSnapshots().isEmpty()) {
-            notPublications = false;
-            publicationAdapter = new PublicationAdapter(options, PublicationActivity.this, (ArrayList<User>) userListApi);
-            publicationAdapter.notifyDataSetChanged();
-            chatRecyclerView.setAdapter(publicationAdapter);
-            publicationAdapter.startListening();
-//        } else {
-//            notPublications = true;
-//            existPublications();
-//        }
-        loading(false);
+//        notPublications = false;
+        publicationAdapter = new PublicationAdapter(options, PublicationActivity.this, (ArrayList<User>) userListApi, this);
+        publicationAdapter.notifyDataSetChanged();
+        chatRecyclerView.setAdapter(publicationAdapter);
+        publicationAdapter.startListening();
+//        notPublications = true;
+//        existPublications();
 
+        loading(false);
     }
 
     @Override
@@ -154,7 +144,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         if (!notPublications) {
             publicationAdapter.stopListening();
         }
-
     }
 
     private void getAllUsers() {
@@ -192,11 +181,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     }
 
     private void existPublications() {
-        if (publications.isEmpty()) {
-            txtExistPublications.setVisibility(View.VISIBLE);
-        } else {
-            txtExistPublications.setVisibility(View.GONE);
-        }
+        txtExistPublications.setVisibility(View.VISIBLE);
+        txtExistPublications.setVisibility(View.GONE);
     }
 
     private void setListeners(){
@@ -218,53 +204,20 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
     // PARA ENVIAR LA PUBLICACION
     private void sendMessage(){
-        int position = ( publications.size() == 0 ) ? 0 : publications.size();
         String idGroup = reseiverGroup.getId();
 
         Intent intent = new Intent(PublicationActivity.this, CreatePublicationActivity.class);
-        intent.putExtra("POSITION", position+"");
         intent.putExtra("ID_GROUP", idGroup);
         intent.putExtra(GroupsProvider.NAME_COLLECTION, reseiverGroup);
         startActivity(intent);
     }
-
-//    private void deleteMessage(Publication publication, int position){
-//        HashMap<String, Object> params = new HashMap<>();
-////        params.put(Constants.KEY_STATUS_MESSAGE, Publication.STATUS_DELETE);
-//        params.put("positionLayout", position);
-//
-//        database.collection(Constants.KEY_COLLECTION_CHAT).document(publication.getIdFirebase()).update(params)
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        ResourceUtil.showAlert("Confirmación", "Publicación Eliminado Correctamente.", PublicationActivity.this, "success");
-//                    } else {
-//                        ResourceUtil.showAlert("Advertencia", "Se produjo un error al eliminar la publicación.", PublicationActivity.this, "error");
-//                    }
-//                })
-//                .addOnFailureListener(e -> {
-//                    ResourceUtil.showAlert("Advertencia", "Error al eliminar la publicación.", PublicationActivity.this, "error");
-//                });
-//    }
 
     private String getReadableDateTime(Date date){
         return new SimpleDateFormat("MM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 
     @Override
-    public void onClickChat(Publication publication, int position) {
-
-//        if(publication.getStatus().equals(Publication.STATUS_DELETE)){
-//            ResourceUtil.showAlert("Advertencia", "Esta publicación ya ha sido eliminada.", PublicationActivity.this, "error");
-//            return;
-//        }
-
-        if(publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))){
-            showAlertMessage("Confirmación", "¿Desea eliminar esta publicación?", PublicationActivity.this, publication, position);
-        }
-    }
-
-    @Override
-    public void onClickFile(Publication publication, int position) {
+    public void onClickFile(Publication publication) {
         pBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -329,18 +282,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         } else {
             Toast.makeText(this, "Permiso denegado para guardar el archivo.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void showAlertMessage(String title, String response, Context context, Publication publication, int position) {
-        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
-            .setTitleText(title)
-            .setContentText(response)
-            .setConfirmText("NO")
-            .setCancelButton("SI",v->{
-//                deleteMessage(publication, position);
-                v.dismiss();
-            })
-            .show();
     }
 
     private void loading(boolean isLoading) {

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.listeners.Chatlistener;
 import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.PublicationProvider;
@@ -40,13 +41,15 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
     List<User> userList;
     PublicationProvider publicationProvider;
     PreferencesManager preferencesManager;
+    private Chatlistener chatListener;
 
-    public PublicationAdapter(@NonNull FirestoreRecyclerOptions<Publication> options, Context context, ArrayList<User> userArrayList) {
+    public PublicationAdapter(@NonNull FirestoreRecyclerOptions<Publication> options, Context context, ArrayList<User> userArrayList, Chatlistener chatListener) {
         super(options);
         this.context = context;
         this.userList = userArrayList;
         publicationProvider = new PublicationProvider();
         preferencesManager = new PreferencesManager(context);
+        this.chatListener = chatListener;
     }
 
     @Override
@@ -59,9 +62,13 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
         String relativeTime = RelativeTime.getTimeAgo(publication.getTimestamp(), context);
         holder.textDateTimeSend.setText(relativeTime);
         String[] infoUser = getInfoUser(publication.getSenderId());
+
         if (infoUser.length != 0) {
             holder.imageProfile.setImageBitmap(ResourceUtil.decodeImage(infoUser[0]));
             holder.txtNameUserPost.setText(infoUser[1]);
+        }
+        if (publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))) {
+            holder.txtMyPublication.setText(" - Mi Publicación");
         }
 
         String[] extensionFile = publication.getType().split("/");
@@ -85,6 +92,22 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
                 return false;
             }
         });
+
+        holder.imageViewPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chatListener.onClickFile(publication);
+            }
+        });
+    }
+
+    @Override
+    public void onDataChanged() {
+        super.onDataChanged();
+
+        if (getItemCount() == 0) {
+
+        }
     }
 
     @NonNull

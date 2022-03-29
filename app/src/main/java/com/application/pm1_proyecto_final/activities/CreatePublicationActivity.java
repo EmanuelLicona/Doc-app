@@ -50,7 +50,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CreatePublicationActivity extends AppCompatActivity {
 
-    String position = "", idGroup = "", title = "", description = "", type = "", extension = "";
+    String idGroup = "", title = "", description = "", type = "", extension = "";
     ImageView imageViewPublication;
     CircleImageView btnBack;
     TextInputEditText txtTitle, txtDescription;
@@ -106,7 +106,6 @@ public class CreatePublicationActivity extends AppCompatActivity {
     }
 
     private void loadReceivedData() {
-        position = getIntent().getStringExtra("POSITION");
         idGroup = getIntent().getStringExtra("ID_GROUP");
         receiverGroup = (Group) getIntent().getSerializableExtra(GroupsProvider.NAME_COLLECTION);
     }
@@ -252,8 +251,6 @@ public class CreatePublicationActivity extends AppCompatActivity {
             notificacion.put("senderId",preferencesManager.getString(Constants.KEY_USER_ID));
 
             json.put("data", notificacion);
-
-
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.POST,
