@@ -64,12 +64,24 @@
 
 
                 <ProgressBar
-                    android:id="@+id/InvitationProgressBar"
+                    android:id="@+id/invitationProgressBar"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_marginTop="200dp"
                     android:layout_gravity="center"
                     android:visibility="gone"/>
+
+
+                <TextView
+                    android:id="@+id/textMessageInvitation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="No hay ninguna invitacion"
+                    android:textColor="@color/color_gray"
+                    android:textSize="18sp"
+                    android:layout_gravity="center"
+                    />
 
 
             </LinearLayout>
