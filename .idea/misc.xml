@@ -54,6 +54,7 @@
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/background_image.xml" value="0.222" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/background_user_group.xml" value="0.2435" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/background_white_chat.xml" value="0.242" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/drawable/splash_screen.xml" value="0.1635" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_chat.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_complete_profile.xml" value="0.3645833333333333" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_create_group.xml" value="0.36666666666666664" />
@@ -67,6 +68,7 @@
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_my_groups.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_recover_password.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_register.xml" value="0.27355072463768115" />
+        <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_splash_screen.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/activity_temp.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/cardview_publication.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/alico/AndroidStudioProjects/Doc-app/app/src/main/res/layout/content_main.xml" value="0.3645833333333333" />
