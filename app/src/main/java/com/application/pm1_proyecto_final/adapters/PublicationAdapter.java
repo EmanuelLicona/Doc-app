@@ -72,16 +72,7 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
         }
 
         String[] extensionFile = publication.getType().split("/");
-
-        if (publication.getType().equals("application/pdf")) {
-            holder.imageViewPost.setImageResource(R.drawable.pdf_publication);
-        } else if(extensionFile[0].equals("image")) {
-            Picasso.with(context).load(publication.getPath()).into(holder.imageViewPost);
-        } else if (extensionFile[0].equals("audio")) {
-            holder.imageViewPost.setImageResource(R.drawable.audio_publication);
-        } else if(extensionFile[0].equals("video")) {
-            holder.imageViewPost.setImageResource(R.drawable.video_publication);
-        }
+        viewImageByTypeFile(extensionFile, holder, publication);
 
         holder.viewHolder.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -101,20 +92,49 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
         });
     }
 
-    @Override
-    public void onDataChanged() {
-        super.onDataChanged();
-
-        if (getItemCount() == 0) {
-
-        }
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_publication, parent, false);
         return new ViewHolder(view);
+    }
+
+    private void viewImageByTypeFile(String[] extensionFile, ViewHolder holder, Publication publication) {
+
+        if (publication.getType().equals("application/pdf")) {
+            holder.imageViewPost.setImageResource(R.drawable.pdf_publication);
+        } else if(extensionFile[0].equals("image")) {
+            Picasso.with(context).load(publication.getPath()).into(holder.imageViewPost);
+        } else if (extensionFile[0].equals("audio")) {
+            holder.imageViewPost.setImageResource(R.drawable.audio_publication);
+        } else if(extensionFile[0].equals("video")) {
+            holder.imageViewPost.setImageResource(R.drawable.video_publication);
+        } else if(extensionFile[1].equals("msword") || extensionFile[1].equals("vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            holder.imageViewPost.setImageResource(R.drawable.word_image);
+        } else if(extensionFile[1].equals("onenote")) {
+            holder.imageViewPost.setImageResource(R.drawable.onenote_image);
+        } else if(extensionFile[1].equals("vnd.ms-powerpoint") || extensionFile[1].equals("vnd.openxmlformats-officedocument.presentationml.presentation")) {
+            holder.imageViewPost.setImageResource(R.drawable.power_point_image);
+        } else if(extensionFile[1].equals("vnd.ms-excel") || extensionFile[1].equals("vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            holder.imageViewPost.setImageResource(R.drawable.excel_image);
+        } else if(extensionFile[1].equals("plain")) {
+            holder.imageViewPost.setImageResource(R.drawable.text_image);
+        } else if(extensionFile[1].equals("javascript")) {
+            holder.imageViewPost.setImageResource(R.drawable.javascript_image);
+        } else if(extensionFile[1].equals("json")) {
+            holder.imageViewPost.setImageResource(R.drawable.json_image);
+        } else if(extensionFile[1].equals("x-java-source,java") || extensionFile[1].equals("java-vm")) {
+            holder.imageViewPost.setImageResource(R.drawable.java_image);
+        } else if(extensionFile[1].equals("zip")) {
+            holder.imageViewPost.setImageResource(R.drawable.zip_image);
+        } else if(extensionFile[1].equals("x-rar-compressed")) {
+            holder.imageViewPost.setImageResource(R.drawable.winrar_image);
+        } else if(extensionFile[1].equals("html")) {
+            holder.imageViewPost.setImageResource(R.drawable.html_image);
+        } else {
+            holder.imageViewPost.setImageResource(R.drawable.text_image);
+        }
+
     }
 
     private String[] getInfoUser(String idUser) {

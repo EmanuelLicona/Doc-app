@@ -36,5 +36,4 @@ public class Constants {
     public static final String URL_FCM = "https://fcm.googleapis.com/fcm/send";
     public static final String AUTHORIZATION_FCM = "AAAAySuDACg:APA91bFh7cVhHYAJvfDKQNua93RNXcPLtJuK1aDDqxg3fseTOWGS28u0xOzsPfRsn3-fGxmWpW4t2J_rz5nt_RpVWJPctrAL0aqo2JFHXQi8IYZRaAO0kzncNZxZALQVsi6bUiXLRmKR";
 
-
 }

@@ -260,9 +260,14 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     }
 
     private void viewFile(Publication publication) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(publication.getPath()), publication.getType());
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(publication.getPath()), publication.getType());
+            startActivity(intent);
+        } catch (Exception e) {
+            //Falla al visualizar archivo word, excel, power point
+            ResourceUtil.showAlert("Advertencia", "Se produjo un error al visualizar el archivo.", this, "error");
+        }
     }
 
     private void downloadFile(Publication publication) {
