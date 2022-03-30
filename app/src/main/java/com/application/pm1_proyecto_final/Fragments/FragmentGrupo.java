@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -51,6 +53,10 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
     EditText editTextSearch;
 
+    ProgressBar progressBar;
+
+    TextView textViewMessage;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,6 +84,12 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
         recyclerView = (RecyclerView) view.findViewById(R.id.groupsRecyclerView);
 
         editTextSearch = (EditText) view.findViewById(R.id.textSearchGroup);
+
+
+
+        progressBar = (ProgressBar) view.findViewById(R.id.fragGroupsProgressBar);
+
+        textViewMessage = (TextView) view.findViewById(R.id.textMessageFragGroups);
     }
 
     private void setListeners(){
@@ -97,7 +109,9 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                groupAdapter.getFilter().filter(charSequence);
+                try {
+                    groupAdapter.getFilter().filter(charSequence);
+                }catch (Exception e){}
             }
 
             @Override
@@ -109,11 +123,9 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
 
     private void getMyGroups(){
-//        loading(true);
+        loading(true);
 
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-
-
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                 (GroupApiMethods.GET_GROUPS_FOR_USER_ACTIVE+preferencesManager.getString(Constants.KEY_USER_ID)),
@@ -156,15 +168,17 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
 //                                loading(false);
 
-                                if(groups.size() > 0){
+                                if(groups.size() == 0){
 
-                                    groupAdapter = new GroupAdapter(groups, FragmentGrupo.this);
-                                    recyclerView.setAdapter(groupAdapter);
-//                            recyclerView.setVisibility(View.VISIBLE);
-
+                                    textViewMessage.setVisibility(View.VISIBLE);
                                 }else{
-                                    Toast.makeText(getContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+                                    textViewMessage.setVisibility(View.GONE);
                                 }
+
+                                groupAdapter = new GroupAdapter(groups, FragmentGrupo.this);
+                                recyclerView.setAdapter(groupAdapter);
+
+                                loading(false);
 
                             }else{
                                 Toast.makeText(getContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
@@ -202,5 +216,15 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
         Intent intent = new Intent(getContext(), PublicationActivity.class);
         intent.putExtra(GroupsProvider.NAME_COLLECTION, group);
         startActivity(intent);
+    }
+
+
+    private void loading(boolean isLoading) {
+
+        if(isLoading){
+            progressBar.setVisibility(View.VISIBLE);
+        }else{
+            progressBar.setVisibility(View.GONE);
+        }
     }
 }

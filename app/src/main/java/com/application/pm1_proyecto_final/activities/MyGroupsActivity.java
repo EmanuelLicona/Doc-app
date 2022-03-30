@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -48,6 +49,8 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
 
     EditText editTextSearch;
 
+    TextView textViewMessage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,11 +66,13 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
 
 
         btnBack = (AppCompatImageView) findViewById(R.id.btnMyGroupBack);
-        progressBar = (ProgressBar) findViewById(R.id.myGroupsProgressBar);
+        progressBar = (ProgressBar) findViewById(R.id.groupsProgressBar);
 
         recyclerView = (RecyclerView) findViewById(R.id.myGroupsRecyclerView);
 
         editTextSearch = (EditText) findViewById(R.id.textSearchMyGroup);
+
+        textViewMessage = (TextView) findViewById(R.id.textMessageGroups);
      }
 
     private void setListeners(){
@@ -139,15 +144,15 @@ public class MyGroupsActivity extends AppCompatActivity implements Grouplistener
 
                                 loading(false);
 
-                                if(groups.size() > 0){
-
-                                    groupAdapter = new GroupAdapter(groups, MyGroupsActivity.this);
-                                    recyclerView.setAdapter(groupAdapter);
-//                            recyclerView.setVisibility(View.VISIBLE);
+                                if(groups.size() == 0){
+                                    textViewMessage.setVisibility(View.VISIBLE);
 
                                 }else{
-                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+                                    textViewMessage.setVisibility(View.GONE);
                                 }
+
+                                groupAdapter = new GroupAdapter(groups, MyGroupsActivity.this);
+                                recyclerView.setAdapter(groupAdapter);
 
                             }else{
                                 Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();

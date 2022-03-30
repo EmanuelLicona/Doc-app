@@ -1,6 +1,8 @@
 package com.application.pm1_proyecto_final.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,191 +16,174 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.listeners.Chatlistener;
 import com.application.pm1_proyecto_final.models.Publication;
+import com.application.pm1_proyecto_final.models.User;
+import com.application.pm1_proyecto_final.providers.PublicationProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.RelativeTime;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class PublicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private final List<Publication> publications;
-    private final String senderId;
-
-    private Chatlistener chatlistener;
+public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, PublicationAdapter.ViewHolder> {
     Context context;
+    List<User> userList;
+    PublicationProvider publicationProvider;
+    PreferencesManager preferencesManager;
+    private Chatlistener chatListener;
 
-    public static final int VIEW_TYPE_SENT = 1;
-    public static final int VIEW_TYPE_RECEIVED = 2;
-
-    public PublicationAdapter(List<Publication> publications, String senderId, Chatlistener chatlistener, Context context) {
-        this.publications = publications;
-        this.senderId = senderId;
-        this.chatlistener = chatlistener;
+    public PublicationAdapter(@NonNull FirestoreRecyclerOptions<Publication> options, Context context, ArrayList<User> userArrayList, Chatlistener chatListener) {
+        super(options);
         this.context = context;
+        this.userList = userArrayList;
+        publicationProvider = new PublicationProvider();
+        preferencesManager = new PreferencesManager(context);
+        this.chatListener = chatListener;
+    }
+
+    @Override
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, int position, @NonNull Publication publication) {
+        DocumentSnapshot document = getSnapshots().getSnapshot(position);
+        final String publicationId = document.getId();
+
+        holder.txtTitleViewPublication.setText(publication.getTitle());
+        holder.txtDescriptionPost.setText(publication.getDescription());
+        String relativeTime = RelativeTime.getTimeAgo(publication.getTimestamp(), context);
+        holder.textDateTimeSend.setText(relativeTime);
+        String[] infoUser = getInfoUser(publication.getSenderId());
+
+        if (infoUser.length != 0) {
+            holder.imageProfile.setImageBitmap(ResourceUtil.decodeImage(infoUser[0]));
+            holder.txtNameUserPost.setText(infoUser[1]);
+        }
+        if (publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))) {
+            holder.txtMyPublication.setText(" - Mi Publicación");
+        }
+
+        String[] extensionFile = publication.getType().split("/");
+
+        if (publication.getType().equals("application/pdf")) {
+            holder.imageViewPost.setImageResource(R.drawable.pdf_publication);
+        } else if(extensionFile[0].equals("image")) {
+            Picasso.with(context).load(publication.getPath()).into(holder.imageViewPost);
+        } else if (extensionFile[0].equals("audio")) {
+            holder.imageViewPost.setImageResource(R.drawable.audio_publication);
+        } else if(extensionFile[0].equals("video")) {
+            holder.imageViewPost.setImageResource(R.drawable.video_publication);
+        }
+
+        holder.viewHolder.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))) {
+                    showConfirmDelete(publicationId);
+                }
+                return false;
+            }
+        });
+
+        holder.imageViewPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chatListener.onClickFile(publication);
+            }
+        });
+    }
+
+    @Override
+    public void onDataChanged() {
+        super.onDataChanged();
+
+        if (getItemCount() == 0) {
+
+        }
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_publication, parent, false);
+        return new ViewHolder(view);
+    }
 
-        if(viewType == VIEW_TYPE_SENT){
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_container_send_message, parent, false);
-            return new PublicationAdapter.SendMessageViewHolder(view);
+    private String[] getInfoUser(String idUser) {
+        String[] arrayUser = new String[2];
 
-        }else {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_container_reseive_message, parent, false);
-            return new PublicationAdapter.ReceivedMessageViewHolder(view);
+        for (User item : userList) {
+
+            if (item.getId().equals(idUser)) {
+                arrayUser[0] = item.getImage();
+                arrayUser[1] = item.getName() + " " + item.getLastname();
+                break;
+            }
+
         }
+        return arrayUser;
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (getItemViewType(position) == VIEW_TYPE_SENT){
-            ((SendMessageViewHolder) holder).setData(publications.get(position));
-        }else {
-            ((ReceivedMessageViewHolder) holder).setData(publications.get(position));
-        }
+    private void showConfirmDelete(final String publicationId) {
+        new AlertDialog.Builder(context)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Eliminar publicación")
+                .setMessage("¿Está seguro de eliminar la publicación?")
+                .setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deletePublication(publicationId);
+                    }
+                })
+                .setNegativeButton("NO", null)
+                .show();
     }
 
-    @Override
-    public int getItemCount() {
-        return publications.size();
+    private void deletePublication(String postId) {
+        publicationProvider.delete(postId).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    ResourceUtil.showAlert("Confirmación", "La publicación se elimino correctamente.",context, "success");
+                    Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    ResourceUtil.showAlert("Confirmación", "No se pudo eliminar la publicación.",context, "error");
+                }
+            }
+        });
     }
 
-    @Override
-    public int getItemViewType(int position) {
-
-        if(publications.get(position).getSenderId().equals(senderId)){
-            return VIEW_TYPE_SENT;
-        }else {
-            return VIEW_TYPE_RECEIVED;
-        }
-    }
-
-    class SendMessageViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTitle;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        RoundedImageView imageProfile;
+        ImageView imageViewPost;
+        TextView txtNameUserPost;
         TextView txtMyPublication;
-        TextView txtNameUser;
-        TextView txtDateTime;
-        TextView txtDescription;
-        ImageView imageViewPost;
-        RoundedImageView imageProfileSend;
+        TextView txtTitleViewPublication;
+        TextView txtDescriptionPost;
+        TextView textDateTimeSend;
+        View viewHolder;
 
-        View view;
+        public ViewHolder(View view) {
+            super(view);
+            viewHolder = view;
 
-        SendMessageViewHolder(@NonNull View itemView){
-            super(itemView);
+            imageProfile = view.findViewById(R.id.imageProfileSend);
+            imageViewPost = view.findViewById(R.id.imageViewPost);
+            txtNameUserPost = view.findViewById(R.id.txtNameUserPost);
+            txtMyPublication = view.findViewById(R.id.txtMyPublication);
+            txtTitleViewPublication = view.findViewById(R.id.txtTitleViewPublication);
+            txtDescriptionPost = view.findViewById(R.id.txtDescriptionPost);
+            textDateTimeSend = view.findViewById(R.id.textDateTimeSend);
 
-            txtTitle = itemView.findViewById(R.id.txtTitleViewPublication);
-            txtNameUser = itemView.findViewById(R.id.txtNameUserPost);
-            txtMyPublication = itemView.findViewById(R.id.txtMyPublication);
-            txtDateTime = itemView.findViewById(R.id.textDateTimeSend);
-            txtDescription = itemView.findViewById(R.id.txtDescriptionPost);
-            imageViewPost = itemView.findViewById(R.id.imageViewPost);
-            imageProfileSend = itemView.findViewById(R.id.imageProfileSend);
-
-            view = itemView;
-        }
-
-        void setData(Publication publication){
-            PreferencesManager preferencesManager = new PreferencesManager(context);
-            txtTitle.setText(publication.getTitle());
-            txtMyPublication.setText(" - Mi Publicación");
-            txtDescription.setText(publication.getDescription());
-            txtNameUser.setText(preferencesManager.getString(Constants.KEY_NAME_USER));
-            imageProfileSend.setImageBitmap(ResourceUtil.decodeImage(preferencesManager.getString(Constants.KEY_IMAGE_USER)));
-            txtDateTime.setText(publication.getDatatime());
-            String[] extensionFile = publication.getType().split("/");
-
-            if (publication.getType().equals("application/pdf")) {
-                imageViewPost.setImageResource(R.drawable.pdf_publication);
-            } else if(extensionFile[0].equals("image")) {
-                Picasso.with(context).load(publication.getPath()).into(imageViewPost);
-            } else if (extensionFile[0].equals("audio")) {
-                imageViewPost.setImageResource(R.drawable.audio_publication);
-            } else if(extensionFile[0].equals("video")) {
-                imageViewPost.setImageResource(R.drawable.video_publication);
-            }
-
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-
-                    chatlistener.onClickChat(publication, getLayoutPosition());
-
-                    return false;
-                }
-            });
-
-            imageViewPost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    chatlistener.onClickFile(publication, getLayoutPosition());
-                }
-            });
-        }
-
-    }
-
-    class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTitle;
-        TextView txtNameUser;
-        TextView txtDateTime;
-        TextView txtDescription;
-        ImageView imageViewPost;
-        RoundedImageView imageProfileReceive;
-        View view;
-
-        ReceivedMessageViewHolder(@NonNull View itemView){
-            super(itemView);
-
-            txtTitle = itemView.findViewById(R.id.txtTitleViewPublicationReceive);
-            txtNameUser = itemView.findViewById(R.id.txtNameUserPostReceive);
-            txtDateTime = itemView.findViewById(R.id.textDateTimeReceive);
-            txtDescription = itemView.findViewById(R.id.txtDescriptionPostReceive);
-            imageViewPost = itemView.findViewById(R.id.imageViewPostReceive);
-            imageProfileReceive = itemView.findViewById(R.id.imageProfileReceive);
-
-            view = itemView;
-        }
-
-        void setData(Publication publication) {
-            txtTitle.setText(publication.getTitle());
-            txtDateTime.setText(publication.getDatatime());
-            txtDescription.setText(publication.getDescription());
-            txtNameUser.setText(publication.getNameUser());
-            imageProfileReceive.setImageBitmap(ResourceUtil.decodeImage(publication.getImageProfileUser()));
-
-            String[] extensionFile = publication.getType().split("/");
-
-            if (publication.getType().equals("application/pdf")) {
-                imageViewPost.setImageResource(R.drawable.pdf_publication);
-            } else if(extensionFile[0].equals("image")) {
-                Picasso.with(context).load(publication.getPath()).into(imageViewPost);
-            } else if (extensionFile[0].equals("audio")) {
-                imageViewPost.setImageResource(R.drawable.audio_publication);
-            } else if(extensionFile[0].equals("video")) {
-                imageViewPost.setImageResource(R.drawable.video_publication);
-            }
-
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    chatlistener.onClickChat(publication, getLayoutPosition());
-                    return false;
-                }
-            });
-
-            imageViewPost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    chatlistener.onClickFile(publication, getLayoutPosition());
-                }
-            });
         }
     }
-
 }

@@ -12,14 +12,19 @@ import android.widget.TextView;
 
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.activities.CreateGroupActivity;
+import com.application.pm1_proyecto_final.utils.Constants;
+import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FragmentMain extends Fragment {
 
-    TextView txtNameUserMenu;
+    TextView textView;
 
 
     FloatingActionButton fboton;
+
+    PreferencesManager preferencesManager;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -33,7 +38,22 @@ public class FragmentMain extends Fragment {
 
 
     private void init(View view){
-//        fboton = (FloatingActionButton) view.findViewById(R.id.btnadd);
+
+        preferencesManager = new PreferencesManager(getContext());
+
+        textView = view.findViewById(R.id.textMain);
+
+
+
+        String textMain = "Hola " + preferencesManager.getString(Constants.KEY_NAME_USER) +
+                ", en esta plataforma usted podra realizar tareas exclusivas para nuestros estudiantes" +
+                " con el fin de facilitar la interaccion entre los mismos, desarrollando un sentimiento de " +
+                " pertenencia y compañerismo."
+                ;
+
+
+        textView.setText(textMain);
+
     }
 
     private void setListeners(){
