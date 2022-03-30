@@ -173,7 +173,6 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     ResourceUtil.showAlert("Confirmación", "La publicación se elimino correctamente.",context, "success");
-                    Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     ResourceUtil.showAlert("Confirmación", "No se pudo eliminar la publicación.",context, "error");

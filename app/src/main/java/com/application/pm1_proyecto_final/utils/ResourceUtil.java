@@ -101,4 +101,32 @@ public class ResourceUtil {
         byte[] bytes = android.util.Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
+
+    public static String getTypeFile(String type) {
+        String typeFile = "";
+
+        if (type.equals("msword")) {
+            typeFile = "doc";
+        } else if (type.equals("vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            typeFile = "docx";
+        } else if (type.equals("vnd.ms-powerpoint")) {
+            typeFile = "ppt";
+        } else if (type.equals("vnd.openxmlformats-officedocument.presentationml.presentation")) {
+            typeFile = "pptx";
+        } else if (type.equals("vnd.ms-excel")) {
+            typeFile = "xls";
+        } else if (type.equals("vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            typeFile = "xlsx";
+        } else if (type.equals("javascript")) {
+            typeFile = "js";
+        } else if (type.equals("java-vm")) {
+            typeFile = "class";
+        } else if (type.equals("x-rar-compressed")) {
+            typeFile = "rar";
+        } else {
+            typeFile = type;
+        }
+
+        return typeFile;
+    }
 }

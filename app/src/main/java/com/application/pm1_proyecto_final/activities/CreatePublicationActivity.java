@@ -118,7 +118,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         } else {
             pDialog.show();
             storageReference = FirebaseStorage.getInstance().getReference("publications/");
-            String fileName = extension.toUpperCase()+"_"+System.currentTimeMillis()+"."+extension;
+            String fileName = extension.toUpperCase()+"_"+System.currentTimeMillis()+".doc";
             StorageReference reference = storageReference.child(fileName);
 
             reference.putFile(dataPublication).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -189,9 +189,9 @@ public class CreatePublicationActivity extends AppCompatActivity {
         galleryIntent.setType("*/*");
         String[] mimeTypes = {
                 "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/onenote", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                 "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain",
-                "application/javascript", "application/json", "text/x-java-source,java", "application/java-vm", "application/zip",
+                "application/javascript", "application/json", "application/java-vm", "application/zip",
                 "image/*", "video/*", "audio/*", "application/x-rar-compressed", "text/html"
         };
         galleryIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -215,7 +215,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_UPLOAD_FILE) {
             dataPublication = data.getData();
             type = getContentResolver().getType(dataPublication);
-            extension = type.split("/")[1];
+            extension = ResourceUtil.getTypeFile(type.split("/")[1]);
             /*
                 application/pdf
                 image/jpeg, image/png
