@@ -1,7 +1,6 @@
 package com.application.pm1_proyecto_final.activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -33,7 +31,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.PublicationAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
@@ -47,11 +44,8 @@ import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,14 +119,10 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         FirestoreRecyclerOptions<Publication> options = new FirestoreRecyclerOptions.Builder<Publication>()
                         .setQuery(query, Publication.class)
                         .build();
-
-//        notPublications = false;
         publicationAdapter = new PublicationAdapter(options, PublicationActivity.this, (ArrayList<User>) userListApi, this);
         publicationAdapter.notifyDataSetChanged();
         chatRecyclerView.setAdapter(publicationAdapter);
         publicationAdapter.startListening();
-//        notPublications = true;
-//        existPublications();
 
         loading(false);
     }
@@ -190,11 +180,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             }
         });
         queue.add(stringRequest);
-    }
-
-    private void existPublications() {
-        txtExistPublications.setVisibility(View.VISIBLE);
-        txtExistPublications.setVisibility(View.GONE);
     }
 
     private void setListeners(){
