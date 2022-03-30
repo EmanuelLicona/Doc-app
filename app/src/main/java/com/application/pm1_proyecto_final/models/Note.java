@@ -9,6 +9,9 @@ public class Note implements Serializable {
     private String status;
     private String user_create;
 
+    public final static String STATUS_ACTIVE = "1";
+    public final static String STATUS_INACTIVE = "0";
+
     public Note() {
     }
 

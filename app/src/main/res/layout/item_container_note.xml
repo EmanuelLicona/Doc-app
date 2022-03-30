@@ -36,7 +36,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/primary_text"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@id/viewSuppoterNote"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/imageProfileNote"/>
@@ -50,7 +50,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/primary_text"
-        android:textSize="15dp"
+        android:textSize="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/imageProfileNote"
         app:layout_constraintTop_toBottomOf="@id/viewSuppoterNote"

@@ -55,7 +55,7 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
 
         recyclerView = (RecyclerView) view.findViewById(R.id.myNotesRecyclerView);
 
-        //progressBar = (ProgressBar) view.findViewById(R.id.myNotesProgressBar);
+        progressBar = (ProgressBar) view.findViewById(R.id.myNotesProgressBar);
 
         buttonaddNote.setOnClickListener(this);
         getMyNotes();
@@ -84,7 +84,7 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
 
 
                             if(response.getString("res").equals("true")){
-//                                t = response.getJSONObject("data").getString("name");
+//                               t = response.getJSONObject("data").getString("name");
 
 
                                 JSONArray array = response.getJSONObject("data").getJSONArray("notas_creates");
@@ -102,7 +102,6 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
                                     notes.add(noteTemp);
 
                                 }
-
                                 //loading(false);
 
                                 if(notes.size() > 0){
@@ -111,7 +110,7 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
                                     recyclerView.setAdapter(noteAdapter);
 
                                 }else{
-                                    Toast.makeText(getContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Advertencia: No tiene ninguna nota", Toast.LENGTH_SHORT).show();
                                 }
 
                             }else{
