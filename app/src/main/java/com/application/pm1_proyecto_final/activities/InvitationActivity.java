@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +61,9 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
     ArrayList<GroupUser> listUsersGroupsTemp;
 
+    ProgressBar progressBar;
+
+    TextView textViewMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,10 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         btnBack = (AppCompatImageView) findViewById(R.id.btnInvitationBack);
 
 
+        progressBar = (ProgressBar) findViewById(R.id.invitationProgressBar);
+
+        textViewMessage = (TextView) findViewById(R.id.textMessageInvitation);
+
 
 
     }
@@ -93,6 +101,8 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
 
     private void getInvitationsUser(){
+
+        loading(true);
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -138,11 +148,17 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
                                 }
 
-//                                if(listUsersGroupsTemp.size() > 0){
+                                if(listUsersGroupsTemp.size() == 0){
+                                    textViewMessage.setVisibility(View.VISIBLE);
+                                }else{
+                                    textViewMessage.setVisibility(View.GONE);
+                                }
 
                                     InvitationAdapter adapterInvitation = new InvitationAdapter(getApplicationContext(), listUsersGroupsTemp, InvitationActivity.this);
 
                                     listView.setAdapter(adapterInvitation);
+
+                                    loading(false);
 
 //                                }else{
 //                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
@@ -169,6 +185,8 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         );
 
         requestQueue.add(request);
+
+
 
     }
 
@@ -272,6 +290,17 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
         requestQueue.add(jsonObjectRequest);
     }
+
+
+    private void loading(boolean isLoading) {
+
+        if(isLoading){
+            progressBar.setVisibility(View.VISIBLE);
+        }else{
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     public void OnClickInvitation(GroupUser groupUser) {
