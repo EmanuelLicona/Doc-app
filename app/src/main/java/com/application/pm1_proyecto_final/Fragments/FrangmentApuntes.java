@@ -19,11 +19,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.activities.EditActivityNote;
 import com.application.pm1_proyecto_final.activities.NotesActivity;
+import com.application.pm1_proyecto_final.activities.PublicationActivity;
 import com.application.pm1_proyecto_final.adapters.NoteAdapter;
 import com.application.pm1_proyecto_final.api.NoteApiMethods;
 import com.application.pm1_proyecto_final.listeners.Notelistener;
 import com.application.pm1_proyecto_final.models.Note;
+import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -165,6 +168,10 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClickNote(Note note) {
-
+        Intent intent = new Intent(getContext(), EditActivityNote.class);
+        intent.putExtra("noteEdit", note);
+        //Bundle bundle = new Bundle();
+        //bundle.putSerializable("noteEdit",note);
+        startActivity(intent);
     }
 }

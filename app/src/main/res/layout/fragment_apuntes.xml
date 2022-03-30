@@ -38,7 +38,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/myNotesRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="487dp"
+                android:layout_height="502dp"
                 android:clipToPadding="false"
                 android:orientation="vertical"
                 android:overScrollMode="never"

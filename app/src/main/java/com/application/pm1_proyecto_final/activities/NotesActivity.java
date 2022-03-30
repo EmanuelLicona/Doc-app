@@ -35,11 +35,14 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class NotesActivity extends AppCompatActivity {
     AppCompatImageView imageViewBack;
     EditText txtTitle,txtDescription;
     Button btnSaveNote;
     private PreferencesManager preferencesManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +55,7 @@ public class NotesActivity extends AppCompatActivity {
         btnSaveNote = (Button) findViewById(R.id.btnSaveNote);
 
         preferencesManager = new PreferencesManager(getApplicationContext());
+
 
         setListener();
 
@@ -108,7 +112,7 @@ public class NotesActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                           ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar la nota.",NotesActivity.this, "error");
                     }
-                       Toast.makeText(NotesActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+                       //Toast.makeText(NotesActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -121,8 +125,6 @@ public class NotesActivity extends AppCompatActivity {
                 }
             });
             requestQueue.add(jsonObjectRequest);
-
-
 
     }
 
