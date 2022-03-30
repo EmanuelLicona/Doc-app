@@ -13,7 +13,7 @@
         <ImageView
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:src="@drawable/logo"
+            android:src="@drawable/img_logo"
             android:layout_gravity="center"
             android:layout_marginTop="80dp"
             />
@@ -26,12 +26,28 @@
             >
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/textMain"
+                android:paddingHorizontal="30dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textAlignment="center"
                 android:text="FRAGMENT MAIN"/>
+
+
 
         </LinearLayout>
 
+        <TextView
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:paddingHorizontal="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aplicación creada por el grupo 7 de la clase de
+            programación móvil I de la Universidad Tecnológica de Honduras (UTH)"
+            android:textAlignment="center"
+            />
     </LinearLayout>
 
 <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->

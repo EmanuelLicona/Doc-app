@@ -27,8 +27,11 @@ import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
+import com.application.pm1_proyecto_final.utils.TokenPreference;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 
 import org.json.JSONArray;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     User user;
 
     private PreferencesManager preferencesManager;
+    private TokenPreference tokenPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         preferencesManager = new PreferencesManager(getApplicationContext());
-
+        tokenPreference = new TokenPreference(getApplicationContext());
 
         pDialog = ResourceUtil.showAlertLoading(MainActivity.this);
 
@@ -153,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
                             preferencesManager.putString(Constants.KEY_NAME_USER, user.getName() + " " + user.getLastname());
                             preferencesManager.putString(UsersProvider.KEY_EMAIL, user.getEmail());
 
+                            updateFcmTokenOnAPI(user);
+
                             Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
@@ -181,6 +187,49 @@ public class MainActivity extends AppCompatActivity {
         });
         requestQueue.add(request);
 
+    }
+
+    private void updateFcmTokenOnAPI(User user) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        HashMap<String, String> params = new HashMap<>();
+
+        String token = tokenPreference.getString(Constants.KEY_FCM_TOKEN);
+
+        token = token.trim();
+
+        preferencesManager.putString(Constants.KEY_FCM_TOKEN, token);
+
+        params.put("idFirebase", token);
+        params.put("name", user.getName());
+        params.put("lastname", user.getLastname());
+        params.put("numberAccount", user.getNumberAccount());
+        params.put("phone", user.getPhone());
+        params.put("status", "ACTIVO");
+        params.put("address", user.getAddress());
+        params.put("birthDate", user.getBirthDate());
+        params.put("carrera", user.getCarrera());
+        params.put("image", user.getImage());
+        params.put("imageCover", user.getImageCover());
+        params.put("email", user.getEmail());
+        params.put("password", user.getPassword());
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.PUT,
+                UserApiMethods.PUT_USER+user.getId(),
+                new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MainActivity.this, "Error al actualizar fcmToken: "+ error.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("volleyError", "onErrorResponse: ", error);
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 
     boolean error = false;
