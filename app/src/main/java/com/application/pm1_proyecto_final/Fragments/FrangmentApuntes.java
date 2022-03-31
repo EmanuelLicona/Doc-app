@@ -9,11 +9,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,9 +27,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.activities.CreateGroupActivity;
 import com.application.pm1_proyecto_final.activities.EditActivityNote;
 import com.application.pm1_proyecto_final.activities.NotesActivity;
 import com.application.pm1_proyecto_final.activities.PublicationActivity;
+import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.NoteAdapter;
 import com.application.pm1_proyecto_final.api.NoteApiMethods;
 import com.application.pm1_proyecto_final.listeners.Notelistener;
@@ -46,7 +52,7 @@ import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
-public class FrangmentApuntes extends Fragment implements View.OnClickListener, Notelistener {
+public class FrangmentApuntes extends Fragment implements Notelistener {
 
     FloatingActionButton buttonaddNote;
     PreferencesManager preferencesManager;
@@ -56,6 +62,8 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
     AlertDialog.Builder pBuilderSelector;
     CharSequence options[];
     SweetAlertDialog pDialog;
+    TextView textViewMessage;
+    EditText textSearchNote;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,20 +78,26 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
 
         progressBar = (ProgressBar) view.findViewById(R.id.myNotesProgressBar);
 
-        buttonaddNote.setOnClickListener(this);
 
         pDialog = ResourceUtil.showAlertLoading(getContext());
 
+        textViewMessage = (TextView) view.findViewById(R.id.textMessageNotes);
+
+        textSearchNote = (EditText) view.findViewById(R.id.textSearchNote);
+
         pBuilderSelector = new AlertDialog.Builder(getContext());
         pBuilderSelector.setTitle("Seleccione una opción");
-        options = new CharSequence[]{"Actualizar", "Eliminar"};
+        options = new CharSequence[]{"Ver/Actualizar", "Eliminar"};
 
+        setListeners();
         getMyNotes();
         return view;
     }
 
+
+
     public void getMyNotes(){
-        //loading(true);
+        loading(true);
 
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
@@ -92,8 +106,6 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
                 new com.android.volley.Response.Listener<JSONObject>(){
                     @Override
                     public void onResponse(JSONObject response) {
-
-
                         try {
 
                             JSONObject  jsonObject = null;
@@ -117,6 +129,7 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
                                     noteTemp.setTitle(jsonObject.getString("title"));
                                     noteTemp.setDescription(jsonObject.getString("content"));
                                     noteTemp.setStatus(jsonObject.getString("status"));
+                                    noteTemp.setDate(jsonObject.getString("updated_at"));
                                     noteTemp.setUser_create(jsonObject.getString("user_id"));
 
                                     notes.add(noteTemp);
@@ -124,14 +137,15 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
                                 }
                                 //loading(false);
 
-                                if(notes.size() > 0){
-
-                                    noteAdapter = new NoteAdapter(notes, FrangmentApuntes.this);
-                                    recyclerView.setAdapter(noteAdapter);
+                                if(notes.size() == 0){
+                                    textViewMessage.setVisibility(View.VISIBLE);
 
                                 }else{
-                                    Toast.makeText(getContext(), "Advertencia: No tiene ninguna nota", Toast.LENGTH_SHORT).show();
+                                    textViewMessage.setVisibility(View.GONE);
                                 }
+                                noteAdapter = new NoteAdapter(notes, FrangmentApuntes.this);
+                                recyclerView.setAdapter(noteAdapter);
+                                loading(false);
 
                             }else{
                                 Toast.makeText(getContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
@@ -166,16 +180,36 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.btnaddNote:
+    private void setListeners(){
+        buttonaddNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 Intent intent = new Intent(getContext(), NotesActivity.class);
                 startActivity(intent);
-                break;
-        }
+            }
+        });
 
+        textSearchNote.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                try {
+                    noteAdapter.getFilter().filter(charSequence);
+                }catch (Exception e){}
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
+
+
 
     public void onResume() {
         super.onResume();
@@ -191,8 +225,6 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
                 if (i == 0) {
                     Intent intent = new Intent(getContext(), EditActivityNote.class);
                     intent.putExtra("noteEdit", note);
-                    //Bundle bundle = new Bundle();
-                    //bundle.putSerializable("noteEdit",note);
                     startActivity(intent);
                 } else if(i == 1) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -220,13 +252,13 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
 
     }
 
-    private void deleteNote(String no) {
+    private void deleteNote(String idnota) {
        if (pDialog.isShowing()) {
            pDialog.show();
         }
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-        JsonObjectRequest jsonObjectRequest= new JsonObjectRequest(Request.Method.DELETE, NoteApiMethods.DELETE_NOTE+no, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest= new JsonObjectRequest(Request.Method.DELETE, NoteApiMethods.DELETE_NOTE+idnota, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 ResourceUtil.showAlert("Mensaje", "Nota Eliminada.",getContext(), "success");

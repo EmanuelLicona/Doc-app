@@ -38,7 +38,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class EditActivityNote extends AppCompatActivity {
     AppCompatImageView imageViewBack;
     EditText txtTitle,txtDescription;
-    Button btnEditNote,btnDeleteNote;
+    Button btnEditNote;
     String title="",description="";
     private PreferencesManager preferencesManager;
     SweetAlertDialog pDialog;
@@ -54,12 +54,8 @@ public class EditActivityNote extends AppCompatActivity {
         txtDescription = (EditText) findViewById(R.id.txtDescriptionNoteEdit);
 
         btnEditNote = (Button) findViewById(R.id.btnEditNote);
-        btnDeleteNote = (Button) findViewById(R.id.btnDeleteNote);
 
         preferencesManager = new PreferencesManager(getApplicationContext());
-
-
-
 
         pDialog = ResourceUtil.showAlertLoading(this);
         setData();
@@ -78,27 +74,6 @@ public class EditActivityNote extends AppCompatActivity {
             }
         });
 
-        btnDeleteNote.setOnClickListener( view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(EditActivityNote.this);
-
-            builder.setMessage("¿Seguro que desea eliminar la nota?").setTitle("Alerta");
-
-            builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    deleteNote();
-                }
-            });
-
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {}
-            });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        });
-
 
     }
 
@@ -106,7 +81,6 @@ public class EditActivityNote extends AppCompatActivity {
 
         note.setTitle(title);
         note.setDescription(description);
-        //note.setId(preferencesManager.getString(Constants.KEY_USER_ID));
         updateNote(note);
     }
 
@@ -137,27 +111,7 @@ public class EditActivityNote extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void deleteNote() {
-        if (pDialog.isShowing()) {
-            pDialog.show();
-        }
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        JsonObjectRequest jsonObjectRequest= new JsonObjectRequest(Request.Method.DELETE, NoteApiMethods.DELETE_NOTE+note.getId(), null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                finish();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                pDialog.dismiss();
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error al eliminar la nota.",EditActivityNote.this, "error");
-                //Log.d("ERROR_NOTE", "Error Delete: "+error.getMessage());
-            }
-        });
-        requestQueue.add(jsonObjectRequest);
-    }
 
     private void setData(){
         Bundle objeto = getIntent().getExtras();

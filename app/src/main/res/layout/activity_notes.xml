@@ -91,7 +91,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Descripcion"
-                            android:inputType="textMultiLine" />
+                            android:inputType="textMultiLine"
+                            android:lines="13"
+                            android:overScrollMode="always"
+                            android:scrollbars="vertical"
+                            android:scrollbarStyle="insideInset"
+                            android:scrollHorizontally="false"
+                            android:gravity="top"/>
 
 
 

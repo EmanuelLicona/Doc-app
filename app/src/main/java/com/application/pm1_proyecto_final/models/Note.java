@@ -1,12 +1,16 @@
 package com.application.pm1_proyecto_final.models;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Note implements Serializable {
     private String id;
     private String title;
     private String description;
     private String status;
+    private String date;
     private String user_create;
 
     public final static String STATUS_ACTIVE = "1";
@@ -15,11 +19,12 @@ public class Note implements Serializable {
     public Note() {
     }
 
-    public Note(String id, String title, String description,String user_create, String status) {
+    public Note(String id, String title, String description,String user_create,String date, String status) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.user_create = user_create;
+        this.date = date;
         this.status = status;
     }
 
@@ -55,6 +60,14 @@ public class Note implements Serializable {
         this.user_create = user_create;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -62,4 +75,8 @@ public class Note implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
+
+
+
 }
