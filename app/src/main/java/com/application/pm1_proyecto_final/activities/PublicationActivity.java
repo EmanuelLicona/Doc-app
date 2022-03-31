@@ -1,7 +1,6 @@
 package com.application.pm1_proyecto_final.activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,7 +31,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.PublicationAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
@@ -45,11 +44,8 @@ import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,14 +119,10 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         FirestoreRecyclerOptions<Publication> options = new FirestoreRecyclerOptions.Builder<Publication>()
                         .setQuery(query, Publication.class)
                         .build();
-
-//        notPublications = false;
         publicationAdapter = new PublicationAdapter(options, PublicationActivity.this, (ArrayList<User>) userListApi, this);
         publicationAdapter.notifyDataSetChanged();
         chatRecyclerView.setAdapter(publicationAdapter);
         publicationAdapter.startListening();
-//        notPublications = true;
-//        existPublications();
 
         loading(false);
     }
@@ -188,11 +180,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             }
         });
         queue.add(stringRequest);
-    }
-
-    private void existPublications() {
-        txtExistPublications.setVisibility(View.VISIBLE);
-        txtExistPublications.setVisibility(View.GONE);
     }
 
     private void setListeners(){
@@ -260,14 +247,52 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     }
 
     private void viewFile(Publication publication) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(publication.getPath()), publication.getType());
-        startActivity(intent);
+        try {
+            String typeFile = publication.getType();
+            String extensionFile = typeFile.split("/")[1];
+
+            if (viewOrDownloadFile(extensionFile).equals("download")) {
+                downloadFile(publication);
+                return;
+            }
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(publication.getPath()), typeFile);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            this.startActivity(intent.createChooser(intent, "Elija la aplicación para abrir el documento"));
+        } catch (ActivityNotFoundException e) {
+            //Falla al visualizar archivo word, excel, power point
+            ResourceUtil.showAlert("Advertencia", "Se produjo un error al visualizar el archivo.", this, "error");
+        }
+    }
+
+    private String viewOrDownloadFile(String typeFile) {
+        String response = "view";
+        if (typeFile.equals("msword")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.ms-powerpoint")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.openxmlformats-officedocument.presentationml.presentation")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.ms-excel")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            response = "download";
+        } else if (typeFile.equals("javascript")) {
+            response = "download";
+        } else if (typeFile.equals("java-vm")) {
+            response = "download";
+        } else if (typeFile.equals("x-rar-compressed")) {
+            response = "download";
+        }
+        return response;
     }
 
     private void downloadFile(Publication publication) {
         pathUri = publication.getPath();
-        typeFile = publication.getType().split("/")[1];
+        typeFile = ResourceUtil.getTypeFile(publication.getType().split("/")[1]);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -286,6 +311,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
     private void startDownloadFile() {
         if (!pathUri.isEmpty() && !typeFile.isEmpty()) {
+            Toast.makeText(this, "Descargando el archivo", Toast.LENGTH_SHORT).show();
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(pathUri));
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
             request.setTitle("Descargar");
