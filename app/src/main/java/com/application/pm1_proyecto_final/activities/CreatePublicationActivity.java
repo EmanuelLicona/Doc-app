@@ -118,7 +118,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         } else {
             pDialog.show();
             storageReference = FirebaseStorage.getInstance().getReference("publications/");
-            String fileName = extension.toUpperCase()+"_"+System.currentTimeMillis()+"."+extension;
+            String fileName = extension.toUpperCase()+"_"+System.currentTimeMillis()+".doc";
             StorageReference reference = storageReference.child(fileName);
 
             reference.putFile(dataPublication).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -187,7 +187,13 @@ public class CreatePublicationActivity extends AppCompatActivity {
         Intent galleryIntent = new Intent();
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("*/*");
-        String[] mimeTypes = {"application/pdf", "image/*", "video/*", "audio/*"};
+        String[] mimeTypes = {
+                "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain",
+                "application/javascript", "application/json", "application/java-vm", "application/zip",
+                "image/*", "video/*", "audio/*", "application/x-rar-compressed", "text/html"
+        };
         galleryIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(galleryIntent, REQUEST_UPLOAD_FILE);
     }
@@ -209,7 +215,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_UPLOAD_FILE) {
             dataPublication = data.getData();
             type = getContentResolver().getType(dataPublication);
-            extension = type.split("/")[1];
+            extension = ResourceUtil.getTypeFile(type.split("/")[1]);
             /*
                 application/pdf
                 image/jpeg, image/png
@@ -222,6 +228,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
 
     private void setPreviewImageView() {
         String[] extensionFile = type.split("/");
+
         if (type.equals("application/pdf")) {
             imageViewPublication.setImageResource(R.drawable.pdf);
         } else if(extensionFile[0].equals("image")) {
@@ -230,6 +237,30 @@ public class CreatePublicationActivity extends AppCompatActivity {
             imageViewPublication.setImageResource(R.drawable.audio);
         } else if(extensionFile[0].equals("video")) {
             imageViewPublication.setImageResource(R.drawable.video);
+        } else if (extensionFile[1].equals("msword") || extensionFile[1].equals("vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            imageViewPublication.setImageResource(R.drawable.word);
+        } else if (extensionFile[1].equals("onenote")) {
+            imageViewPublication.setImageResource(R.drawable.onenote);
+        } else if (extensionFile[1].equals("vnd.ms-powerpoint") || extensionFile[1].equals("vnd.openxmlformats-officedocument.presentationml.presentation")) {
+            imageViewPublication.setImageResource(R.drawable.powerpoint);
+        } else if (extensionFile[1].equals("vnd.ms-excel") || extensionFile[1].equals("vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            imageViewPublication.setImageResource(R.drawable.excel);
+        } else if (extensionFile[1].equals("plain")) {
+            imageViewPublication.setImageResource(R.drawable.txt);
+        } else if (extensionFile[1].equals("javascript")) {
+            imageViewPublication.setImageResource(R.drawable.javascript);
+        } else if (extensionFile[1].equals("json")) {
+            imageViewPublication.setImageResource(R.drawable.json);
+        } else if (extensionFile[1].equals("x-java-source,java") || extensionFile[1].equals("java-vm")) {
+            imageViewPublication.setImageResource(R.drawable.java);
+        } else if (extensionFile[1].equals("zip")) {
+            imageViewPublication.setImageResource(R.drawable.zip);
+        } else if (extensionFile[1].equals("x-rar-compressed")) {
+            imageViewPublication.setImageResource(R.drawable.rar);
+        } else if (extensionFile[1].equals("html")) {
+            imageViewPublication.setImageResource(R.drawable.html);
+        } else  {
+            imageViewPublication.setImageResource(R.drawable.txt);
         }
 
     }
