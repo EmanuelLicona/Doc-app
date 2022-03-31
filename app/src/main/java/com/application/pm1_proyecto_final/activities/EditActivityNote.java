@@ -166,7 +166,7 @@ public class EditActivityNote extends AppCompatActivity {
         txtTitle.setText(note.getTitle());
         txtDescription.setText(note.getDescription());
 
-        Toast.makeText(this, "ES "+note.getId(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "ES "+note.getId(), Toast.LENGTH_SHORT).show();
     }
 
     private String validNote(){
