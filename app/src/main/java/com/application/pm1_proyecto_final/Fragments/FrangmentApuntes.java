@@ -1,5 +1,7 @@
 package com.application.pm1_proyecto_final.Fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -7,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -29,6 +33,7 @@ import com.application.pm1_proyecto_final.models.Note;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
+import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
@@ -38,6 +43,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 
 public class FrangmentApuntes extends Fragment implements View.OnClickListener, Notelistener {
 
@@ -46,6 +53,9 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
     ProgressBar progressBar;
     RecyclerView recyclerView;
     NoteAdapter noteAdapter;
+    AlertDialog.Builder pBuilderSelector;
+    CharSequence options[];
+    SweetAlertDialog pDialog;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,11 +71,18 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
         progressBar = (ProgressBar) view.findViewById(R.id.myNotesProgressBar);
 
         buttonaddNote.setOnClickListener(this);
+
+        pDialog = ResourceUtil.showAlertLoading(getContext());
+
+        pBuilderSelector = new AlertDialog.Builder(getContext());
+        pBuilderSelector.setTitle("Seleccione una opción");
+        options = new CharSequence[]{"Actualizar", "Eliminar"};
+
         getMyNotes();
         return view;
     }
 
-    private void getMyNotes(){
+    public void getMyNotes(){
         //loading(true);
 
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
@@ -162,16 +179,67 @@ public class FrangmentApuntes extends Fragment implements View.OnClickListener, 
 
     public void onResume() {
         super.onResume();
-
         getMyNotes();
     }
 
+
     @Override
     public void onClickNote(Note note) {
-        Intent intent = new Intent(getContext(), EditActivityNote.class);
-        intent.putExtra("noteEdit", note);
-        //Bundle bundle = new Bundle();
-        //bundle.putSerializable("noteEdit",note);
-        startActivity(intent);
+        pBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (i == 0) {
+                    Intent intent = new Intent(getContext(), EditActivityNote.class);
+                    intent.putExtra("noteEdit", note);
+                    //Bundle bundle = new Bundle();
+                    //bundle.putSerializable("noteEdit",note);
+                    startActivity(intent);
+                } else if(i == 1) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                    builder.setMessage("¿Seguro que desea eliminar la nota?").setTitle("Alerta");
+
+                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            deleteNote(note.getId());
+                        }
+                    });
+
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {}
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        });
+        pBuilderSelector.show();
+
+    }
+
+    private void deleteNote(String no) {
+       if (pDialog.isShowing()) {
+           pDialog.show();
+        }
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+
+        JsonObjectRequest jsonObjectRequest= new JsonObjectRequest(Request.Method.DELETE, NoteApiMethods.DELETE_NOTE+no, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                ResourceUtil.showAlert("Mensaje", "Nota Eliminada.",getContext(), "success");
+                getMyNotes();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pDialog.dismiss();
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al eliminar la nota.",getContext(), "error");
+                Log.d("ERROR_NOTE", "Error Delete: "+error.getMessage());
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 }
