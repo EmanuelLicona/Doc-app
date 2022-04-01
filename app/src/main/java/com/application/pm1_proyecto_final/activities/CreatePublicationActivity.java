@@ -23,7 +23,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
@@ -137,7 +136,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
                     params.put(Constants.KEY_TYPE, type);
                     params.put(Constants.KEY_TIMESTAMP, new Date().getTime());
 
-                    database.collection(Constants.KEY_COLLECTION_CHAT).add(params).addOnCompleteListener(task -> {
+                    database.collection(Constants.KEY_COLLECTION_PUBLICATION).add(params).addOnCompleteListener(task -> {
                         pDialog.dismiss();
                         if(task.isSuccessful()){
                             notyfication(receiverGroup.getTitle(), description, receiverGroup.getId());

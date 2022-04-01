@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -32,8 +31,6 @@ public class MessaginService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
 
-        Log.d("FCM", "onNewToken: " + token);
-
        tokenPreference = new TokenPreference(getApplicationContext());
        tokenPreference.putString(Constants.KEY_FCM_TOKEN, token);
 
@@ -43,9 +40,6 @@ public class MessaginService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-
-//        Log.d("FCM", "onMessageReceived: "+ remoteMessage.getNotification().getBody());
-
 //        Looper.prepare();
 //
 //        new Handler().post(() -> {
@@ -74,11 +68,8 @@ public class MessaginService extends FirebaseMessagingService {
                     mostrarNotificacionMenorOreo(titulo, detalle);
                 }
 
-
             }
         }
-        
-
 
     }
 

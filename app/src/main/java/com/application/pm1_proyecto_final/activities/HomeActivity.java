@@ -27,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.application.pm1_proyecto_final.Fragments.FragmentChat;
 import com.application.pm1_proyecto_final.Fragments.FragmentGrupo;
 import com.application.pm1_proyecto_final.Fragments.FragmentMain;
 import com.application.pm1_proyecto_final.Fragments.FragmentPerfil;
@@ -65,6 +66,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     FragmentGrupo fragmentGrupo;
     FragmentMain fragmentMain;
     FrangmentInfo frangmentInfo;
+    FragmentChat fragmentChat;
     View view;
 
     private PreferencesManager preferencesManager;
@@ -96,6 +98,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         fragmentGrupo = new FragmentGrupo();
         fragmentMain = new FragmentMain();
         frangmentInfo = new FrangmentInfo();
+        fragmentChat = new FragmentChat();
 
         openFragment(fragmentMain);
     }
@@ -189,8 +192,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     if(item.getItemId() == R.id.botton_home){
                         openFragment(fragmentMain);
-                    }else if(item.getItemId() == R.id.botton_grupos){
+                    } else if(item.getItemId() == R.id.botton_grupos){
                         openFragment(fragmentGrupo);
+                    } else if(item.getItemId() == R.id.botton_chat){
+                        openFragment(fragmentChat);
                     }
                     return true;
                 }

@@ -183,6 +183,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         params.put("imageCover", "IMAGE");
         params.put("email", email);
         params.put("password", password);
+        params.put("availability", "0");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, UserApiMethods.POST_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
