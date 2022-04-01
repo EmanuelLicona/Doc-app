@@ -136,9 +136,9 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     @Override
     protected void onStop() {
         super.onStop();
-        if (!notPublications) {
-            publicationAdapter.stopListening();
-        }
+//        if (!notPublications) {
+//            publicationAdapter.stopListening();
+//        }
     }
 
     @Override
@@ -225,10 +225,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         intent.putExtra("ID_GROUP", idGroup);
         intent.putExtra(GroupsProvider.NAME_COLLECTION, reseiverGroup);
         startActivity(intent);
-    }
-
-    private String getReadableDateTime(Date date){
-        return new SimpleDateFormat("MM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 
     @Override
