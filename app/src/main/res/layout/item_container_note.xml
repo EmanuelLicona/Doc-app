@@ -60,18 +60,19 @@
 
     <TextView
         android:id="@+id/textDateNote"
-        android:layout_width="163dp"
-        android:layout_height="14dp"
+        android:layout_width="129dp"
+        android:layout_height="20dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:maxLines="1"
+        android:textAlignment="textEnd"
         android:textColor="@color/primary_text"
         android:textSize="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.952"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@id/imageProfileNote"
         app:layout_constraintTop_toBottomOf="@id/viewSuppoterNote"
         app:layout_constraintVertical_bias="0.0" />

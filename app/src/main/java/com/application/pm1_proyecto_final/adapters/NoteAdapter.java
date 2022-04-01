@@ -11,7 +11,7 @@ import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.listeners.Notelistener;
 import com.application.pm1_proyecto_final.models.Note;
 
-import java.text.ParseException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,7 +60,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             description = itemView.findViewById(R.id.textDescriptionNote);
             date = itemView.findViewById(R.id.textDateNote);
             card = itemView.findViewById(R.id.cardNote);
-
             view = itemView;
 
         }
@@ -71,13 +70,22 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
             description.setText(note.getDescription());
 
-            date.setText(note.getDate());
+            date.setText(formato(note.getDate()));
 
             view.setOnClickListener(v -> notelistener.onClickNote(note));
         }
 
 
     }
+
+    public String formato(String str){
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        str = dateFormat.format(date);
+        return str;
+    }
+
+
     //Filter
     /**********************************************************************************/
 
@@ -135,6 +143,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public ArrayList<Note> getFilterlist(){
         return (ArrayList<Note>) filterlist;
     }
-    
+
 
 }
