@@ -109,11 +109,12 @@ public class ChaatActivity extends BaseActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+
                     user.setIdFirebase(response.getJSONObject("data").getString("idFirebase"));
                     isReceiverAvailable = Integer.parseInt(response.getJSONObject("data").getString(Constants.KEY_AVAILABILITY)) == 1;
 
                     if (!isReceiverAvailable && sendNotification) {
-                        sendNotification(binding.inputMessage.getText().toString(), receiverUser.getIdFirebase());
+                        sendNotification(binding.inputMessage.getText().toString(), user.getIdFirebase());
                         isOnlineUser(isReceiverAvailable);
                     } else {
                         isOnlineUser(isReceiverAvailable);
