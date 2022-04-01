@@ -79,19 +79,6 @@
         android:background="@color/color_green"
         app:layout_constraintTop_toBottomOf="@id/imageBackChat2"/>
 
-    <TextView
-        android:id="@+id/textAvailability"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/viewSupporter"
-        android:background="@color/color_blue"
-        android:text="@string/online"
-        android:gravity="center"
-        android:textSize="@dimen/_10sdp"
-        android:textColor="@color/white"
-        android:padding="@dimen/_1sdp"
-        android:visibility="gone"/>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
@@ -164,5 +151,17 @@
         app:layout_constraintEnd_toStartOf="@id/layoutSend"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <TextView
+        android:id="@+id/textAvailability"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/viewSupporter"
+        android:background="@color/color_blue"
+        android:text="@string/online"
+        android:gravity="center"
+        android:textSize="@dimen/_10sdp"
+        android:textColor="@color/white"
+        android:padding="@dimen/_1sdp"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -563,19 +563,15 @@ public class InfoGroupActivity extends AppCompatActivity {
     }
 
     private void sendInvitation(String idUser, String idGroup) {
-
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-
         HashMap<String, String> params = new HashMap<>();
         params.put("user_id", idUser);
         params.put("group_id", idGroup);
         params.put("status", GroupUser.STATUS_INVITED);
 
-
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_GROUP_USER, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
 
                 try {
                     String resposeData = response.getString("data");
@@ -597,10 +593,8 @@ public class InfoGroupActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
                 ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InfoGroupActivity.this, "error");
                 error.printStackTrace();
-
             }
         });
 
@@ -620,7 +614,6 @@ public class InfoGroupActivity extends AppCompatActivity {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_USER_GROUP_UPDATE, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
 
                 try {
                     String resposeData = response.getString("data");
@@ -652,11 +645,8 @@ public class InfoGroupActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-
     private void notyfication(String title, String description, String token){
-
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-
         JSONObject json = new JSONObject();
 
         try {
@@ -674,8 +664,6 @@ public class InfoGroupActivity extends AppCompatActivity {
             notificacion.put("senderId",preferencesManager.getString(Constants.KEY_USER_ID));
 
             json.put("data", notificacion);
-
-
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.POST,

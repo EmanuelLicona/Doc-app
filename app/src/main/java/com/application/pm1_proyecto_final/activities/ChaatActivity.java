@@ -50,11 +50,13 @@ public class ChaatActivity extends BaseActivity {
     private String conversationId = null;
     private Boolean isReceiverAvailable = false;
     private RequestQueue requestQueue = null;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChaatBinding.inflate(getLayoutInflater());
+        user = new User();
         setContentView(binding.getRoot());
         setListeners();
         loadReceiverDetails();
@@ -95,10 +97,10 @@ public class ChaatActivity extends BaseActivity {
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
-        binding.inputMessage.setText(null);
+        listenAvailabilityOfReceiver(true);
     }
 
-    private void listenAvailabilityOfReceiver() {
+    private void listenAvailabilityOfReceiver(boolean sendNotification) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(ChaatActivity.this);
         }
@@ -107,15 +109,25 @@ public class ChaatActivity extends BaseActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    user.setIdFirebase(response.getJSONObject("data").getString("idFirebase"));
                     isReceiverAvailable = Integer.parseInt(response.getJSONObject("data").getString(Constants.KEY_AVAILABILITY)) == 1;
-                    isOnlineUser(isReceiverAvailable);
+
+                    if (!isReceiverAvailable && sendNotification) {
+                        sendNotification(binding.inputMessage.getText().toString(), receiverUser.getIdFirebase());
+                        isOnlineUser(isReceiverAvailable);
+                    } else {
+                        isOnlineUser(isReceiverAvailable);
+                    }
+
                 } catch (JSONException e) {
                     Toast.makeText(ChaatActivity.this, "Se produjo un error al cargar el usuario", Toast.LENGTH_LONG).show();
                 }
+                binding.inputMessage.setText(null);
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                binding.inputMessage.setText(null);
                 Toast.makeText(ChaatActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -130,27 +142,31 @@ public class ChaatActivity extends BaseActivity {
         }
     }
 
-    private void sendNotification(String nameUser, String message){
+    private void sendNotification(String message, String token){
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         JSONObject json = new JSONObject();
 
         try {
-//            json.put("to", "/topics/"+groupId);
+            if(token.length() == 0 || token == null){
+                Toast.makeText(this, "Error al recuperar TOKEN_FCM", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            JSONObject notificacion = new JSONObject();
-            notificacion.put("titulo", nameUser);
-            notificacion.put("detalle", message);
-            notificacion.put("senderId", preferencesManager.getString(Constants.KEY_USER_ID));
+            json.put("to", token);
 
-            json.put("data", notificacion);
+            JSONObject notification = new JSONObject();
+            notification.put("titulo", preferencesManager.getString(Constants.KEY_NAME_USER));
+            notification.put("detalle", message);
+            notification.put("senderId",preferencesManager.getString(Constants.KEY_USER_ID));
+            json.put("data", notification);
 
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Constants.URL_FCM, json, null, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(ChaatActivity.this, "Error-1: "+ error.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-            ){
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Constants.URL_FCM, json,null,new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(ChaatActivity.this, "Error-1: "+ error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            })
+            {
                 @Override
                 public Map<String, String> getHeaders(){
                     Map<String, String> header = new HashMap<>();
@@ -160,13 +176,11 @@ public class ChaatActivity extends BaseActivity {
                     return header;
                 }
             };
-
             requestQueue.add(jsonObjectRequest);
 
-        } catch (JSONException e) {
+        }catch (JSONException e){
             Toast.makeText(ChaatActivity.this, "Error-2: "+ e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
 
     }
 
@@ -273,6 +287,6 @@ public class ChaatActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        listenAvailabilityOfReceiver();
+        listenAvailabilityOfReceiver(false);
     }
 }

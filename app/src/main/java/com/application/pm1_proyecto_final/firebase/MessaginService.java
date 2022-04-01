@@ -68,11 +68,8 @@ public class MessaginService extends FirebaseMessagingService {
                     mostrarNotificacionMenorOreo(titulo, detalle);
                 }
 
-
             }
         }
-        
-
 
     }
 
