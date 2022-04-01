@@ -8,7 +8,7 @@
         android:icon="@drawable/ic_profile"></item>
     <item android:title="Solicitud de Grupo"
         android:id="@+id/item_solicitud_grupo"
-        android:icon="@drawable/ic_group"></item>
+        android:icon="@drawable/ic_group_add"></item>
     <item android:title="Mis grupos"
         android:id="@+id/item_mis_grupos"
         android:icon="@drawable/ic_group"></item>

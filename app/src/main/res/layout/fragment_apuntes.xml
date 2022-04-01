@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/textNote"
-        android:layout_width="135dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Mis Apuntes"
