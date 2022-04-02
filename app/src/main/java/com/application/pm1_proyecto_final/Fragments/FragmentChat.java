@@ -7,9 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -48,7 +51,9 @@ public class FragmentChat extends Fragment implements UserListener {
     TextView textUsersEmpty;
     ProgressBar progressBar;
     RecyclerView recyclerViewUser;
+    EditText editTextSearchComp;
     private PreferencesManager preferencesManager;
+    UsersChatAdapter usersChatAdapter;
     List<User> userList;
 
     public FragmentChat() {
@@ -66,8 +71,32 @@ public class FragmentChat extends Fragment implements UserListener {
         textUsersEmpty = view.findViewById(R.id.textUsersEmpty);
         recyclerViewUser = view.findViewById(R.id.usersRecyclerView);
         preferencesManager = new PreferencesManager(getContext());
+
+        editTextSearchComp = (EditText) view.findViewById(R.id.editTextSearchComp);
+
         userList = new ArrayList<>();
         getUsers();
+
+
+
+        editTextSearchComp.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                try {
+                    usersChatAdapter.getFilter().filter(charSequence);
+                }catch (Exception e){}
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         return view;
     }
@@ -126,7 +155,7 @@ public class FragmentChat extends Fragment implements UserListener {
     }
 
     private void loadConfigAdapter() {
-        UsersChatAdapter usersChatAdapter = new UsersChatAdapter(userList, this);
+        usersChatAdapter = new UsersChatAdapter(userList, this);
         recyclerViewUser.setAdapter(usersChatAdapter);
         recyclerViewUser.setVisibility(View.VISIBLE);
     }

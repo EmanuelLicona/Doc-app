@@ -2,25 +2,34 @@ package com.application.pm1_proyecto_final.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.databinding.ItemContainerUserBinding;
 import com.application.pm1_proyecto_final.listeners.UserListener;
+import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UsersChatAdapter extends  RecyclerView.Adapter<UsersChatAdapter.UserChatViewHolder> {
 
-    private final List<User> users;
-    private final UserListener userListener;
+    private  List<User> users;
+    private  UserListener userListener;
+
+    private  List<User> filterlist;
+    private  CustomFilter filter;
 
     public UsersChatAdapter(List<User> users, UserListener userListener) {
         this.users = users;
         this.userListener = userListener;
+
+        this.filterlist = users;
+
     }
 
     @NonNull
@@ -62,6 +71,61 @@ public class UsersChatAdapter extends  RecyclerView.Adapter<UsersChatAdapter.Use
         }
 
     }
+
+
+    //Filter
+    /**********************************************************************************/
+
+    class CustomFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+
+            FilterResults filterResults = new FilterResults();
+
+            if(charSequence != null && charSequence.length()>0){
+
+                charSequence = charSequence.toString().toUpperCase();
+
+                ArrayList<User> filters = new ArrayList<>();
+
+                for(int i = 0;i < filterlist.size(); i++){
+
+                    if((filterlist.get(i).getName() + filterlist.get(i).getLastname()).toUpperCase().contains(charSequence)){
+
+                        filters.add(filterlist.get(i));
+                    }
+                }
+
+                filterResults.count = filters.size();
+                filterResults.values = filters;
+
+            }else {
+
+                filterResults.count = filterlist.size();
+                filterResults.values = filterlist;
+            }
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+            users = (ArrayList<User>) filterResults.values;
+            notifyDataSetChanged();
+        }
+    }
+
+    public Filter getFilter(){
+
+        if(filter == null){
+            filter = new CustomFilter();
+        }
+
+        return filter;
+    }
+
 
 
 }
