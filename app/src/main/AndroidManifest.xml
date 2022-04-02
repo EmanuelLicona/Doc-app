@@ -35,6 +35,14 @@
         <activity
             android:name=".activities.DetailPublicationActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".activities.NotesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activities.EditActivityNote"
+            android:exported="false" />
         <activity
             android:name=".activities.ChaatActivity"
             android:exported="false"

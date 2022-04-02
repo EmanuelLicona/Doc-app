@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Mis Apuntes"
+        android:textAlignment="center"
         android:textColor="@color/primary_text"
         android:textSize="22sp"
         android:textStyle="bold"
