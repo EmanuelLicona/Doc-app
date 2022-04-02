@@ -3,6 +3,7 @@ package com.application.pm1_proyecto_final.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -76,7 +77,7 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
 
 
     private void init(View view){
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Grupos");
         preferencesManager = new PreferencesManager(getContext());
 
         fboton = (FloatingActionButton) view.findViewById(R.id.btnaddGrupo);
@@ -84,7 +85,6 @@ public class FragmentGrupo extends Fragment implements Grouplistener {
         recyclerView = (RecyclerView) view.findViewById(R.id.groupsRecyclerView);
 
         editTextSearch = (EditText) view.findViewById(R.id.textSearchGroup);
-
 
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragGroupsProgressBar);

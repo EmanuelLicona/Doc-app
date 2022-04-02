@@ -54,17 +54,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textTitleGroupInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Titulo del grupo"
-                    android:textColor="@color/primary_text"
-                    android:textSize="25sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"/>
-
 
                 <FrameLayout
                     android:id="@+id/layoutImage"
@@ -75,6 +64,7 @@
 
                     <com.makeramen.roundedimageview.RoundedImageView
                         android:id="@+id/imageGroupInfo"
+                        android:layout_marginTop="10dp"
                         android:layout_width="120dp"
                         android:layout_height="120dp"
                         android:background="@drawable/background_image"
@@ -169,8 +159,22 @@
         </ScrollView>
     </FrameLayout>
 
-
-
+    <TextView
+        android:id="@+id/textTitleGroupInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Titulo del Grupo"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.009" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

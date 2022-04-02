@@ -3,6 +3,7 @@ package com.application.pm1_proyecto_final.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,6 +58,8 @@ public class FragmentChat extends Fragment implements UserListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
+
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Chats");
 
         usersProvider = new UsersProvider();
         progressBar = view.findViewById(R.id.usersProgressBar);

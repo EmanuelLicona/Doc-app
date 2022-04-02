@@ -3,6 +3,7 @@ package com.application.pm1_proyecto_final.Fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -48,6 +49,8 @@ public class FragmentMain extends Fragment implements ConversationListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Doc-App");
 
         usersProvider = new UsersProvider();
         preferencesManager = new PreferencesManager(getContext());

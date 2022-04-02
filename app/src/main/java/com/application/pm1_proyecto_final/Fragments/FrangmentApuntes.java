@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,6 +89,8 @@ public class FrangmentApuntes extends Fragment implements Notelistener {
         pBuilderSelector = new AlertDialog.Builder(getContext());
         pBuilderSelector.setTitle("Seleccione una opción");
         options = new CharSequence[]{"Ver/Actualizar", "Eliminar"};
+
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Mis Apuntes");
 
         setListeners();
         getMyNotes();

@@ -2,6 +2,7 @@ package com.application.pm1_proyecto_final.Fragments;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ public class FrangmentInfo extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.frangement_info,container,false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Información");
         return view;
     }
 }

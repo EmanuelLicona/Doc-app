@@ -49,31 +49,6 @@
 <!--            >-->
 
 
-            <TextView
-                android:id="@+id/textGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Grupos"
-                android:textColor="@color/primary_text"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
-
-            <EditText
-                android:id="@+id/textSearchGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Nombre del grupo"
-                android:layout_marginHorizontal="20dp"
-                app:layout_constraintTop_toBottomOf="@id/textGroup"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
     <!--            <ProgressBar-->
 <!--                android:id="@+id/myGroupsProgressBar"-->
 <!--                android:layout_width="25dp"-->
@@ -85,6 +60,19 @@
 
 <!--&lt;!&ndash;        </LinearLayout>&ndash;&gt;-->
 <!--&lt;!&ndash;    </ScrollView>&ndash;&gt;-->
+
+    <EditText
+        android:id="@+id/textSearchGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:hint="Nombre del grupo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.042" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/groupsRecyclerView"
