@@ -153,4 +153,11 @@ public class ResourceUtil {
         }
         return response;
     }
+
+    public static String letterIcon(String name, String lastname) {
+        String firstLetter =  (name.charAt(0)+"").toUpperCase();
+        String secondLetter =  (lastname.charAt(0)+"").toUpperCase();
+        String info = firstLetter+secondLetter;
+        return info;
+    }
 }

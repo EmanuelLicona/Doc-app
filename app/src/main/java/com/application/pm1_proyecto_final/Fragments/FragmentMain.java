@@ -69,14 +69,6 @@ public class FragmentMain extends Fragment implements ConversationListener {
         conversationsAdapter = new RecentConversationsAdapter(conversations, this);
         recyclerView.setAdapter(conversationsAdapter);
         database = FirebaseFirestore.getInstance();
-
-//        textView = view.findViewById(R.id.textMain);
-//        String textMain = "Hola " + preferencesManager.getString(Constants.KEY_NAME_USER) +
-//                ", en esta plataforma usted podra realizar tareas exclusivas para nuestros estudiantes" +
-//                " con el fin de facilitar la interaccion entre los mismos, desarrollando un sentimiento de " +
-//                " pertenencia y compañerismo."
-//                ;
-//        textView.setText(textMain);
     }
 
     private void listenConversations() {
@@ -102,11 +94,9 @@ public class FragmentMain extends Fragment implements ConversationListener {
                     chatMessage.setReceiverId(receiverId);
 
                     if (preferencesManager.getString(Constants.KEY_USER_ID).equals(senderId)) {
-                        chatMessage.setConversionImage(documentChange.getDocument().getString(Constants.KEY_RECEIVER_IMAGE));
                         chatMessage.setConversionName(documentChange.getDocument().getString(Constants.KEY_RECEIVER_NAME));
                         chatMessage.setConversionId(documentChange.getDocument().getString(Constants.KEY_RECEIVER_ID));
                     } else {
-                        chatMessage.setConversionImage(documentChange.getDocument().getString(Constants.KEY_SENDER_IMAGE));
                         chatMessage.setConversionName(documentChange.getDocument().getString(Constants.KEY_SENDER_NAME));
                         chatMessage.setConversionId(documentChange.getDocument().getString(Constants.KEY_SENDER_ID));
                     }

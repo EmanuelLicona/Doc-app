@@ -1,6 +1,5 @@
 package com.application.pm1_proyecto_final.activities;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -18,7 +17,6 @@ import com.application.pm1_proyecto_final.models.Chat;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
-import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -66,11 +64,12 @@ public class ChaatActivity extends BaseActivity {
 
     private void init() {
         preferencesManager = new PreferencesManager(getApplicationContext());
+        String nameUser = receiverUser.getName() + " "+receiverUser.getLastname();
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(
                 chatMessages,
-                ResourceUtil.decodeImage(receiverUser.getImage()),
-                preferencesManager.getString(Constants.KEY_USER_ID)
+                preferencesManager.getString(Constants.KEY_USER_ID),
+                nameUser
         );
         binding.chatRecyclerView.setAdapter(chatAdapter);
         database = FirebaseFirestore.getInstance();
@@ -96,10 +95,8 @@ public class ChaatActivity extends BaseActivity {
             HashMap<String, Object> conversion = new HashMap<>();
             conversion.put(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID));
             conversion.put(Constants.KEY_SENDER_NAME, preferencesManager.getString(Constants.KEY_NAME_USER));
-            conversion.put(Constants.KEY_SENDER_IMAGE, preferencesManager.getString(Constants.KEY_IMAGE_USER));
             conversion.put(Constants.KEY_RECEIVER_ID, receiverUser.getId());
-            conversion.put(Constants.KEY_RECEIVER_NAME, receiverUser.getName() +" "+receiverUser.getLastname());
-            conversion.put(Constants.KEY_RECEIVER_IMAGE, receiverUser.getImage());
+            conversion.put(Constants.KEY_RECEIVER_NAME, receiverUser.getName() +" "+ receiverUser.getLastname());
             conversion.put(Constants.KEY_LAST_MESSAGE, messageSend);
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
@@ -116,7 +113,6 @@ public class ChaatActivity extends BaseActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-
                     user.setIdFirebase(response.getJSONObject("data").getString("idFirebase"));
                     isReceiverAvailable = Integer.parseInt(response.getJSONObject("data").getString(Constants.KEY_AVAILABILITY)) == 1;
 
