@@ -2,6 +2,7 @@ package com.application.pm1_proyecto_final.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
@@ -66,6 +67,9 @@ public class DetailPublicationActivity extends AppCompatActivity implements Comm
         userListApi = new ArrayList<>();
         commentsProvider = new CommentsProvider();
         preferencesManager = new PreferencesManager(DetailPublicationActivity.this);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(DetailPublicationActivity.this);
+        binding.recyclerViewComments.setLayoutManager(linearLayoutManager);
 
         loadReceiverDetails();
         setListeners();
@@ -204,7 +208,6 @@ public class DetailPublicationActivity extends AppCompatActivity implements Comm
     }
 
     private void getAllUsers() {
-
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, UserApiMethods.GET_USER, new Response.Listener<String>() {
             @Override
