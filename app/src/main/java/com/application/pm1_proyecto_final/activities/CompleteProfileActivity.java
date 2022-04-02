@@ -36,9 +36,11 @@ import org.w3c.dom.Text;
 import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CompleteProfileActivity extends AppCompatActivity {
 
+    CircleImageView btnBackEditPass;
     SweetAlertDialog pDialog;
     String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "", address = "", course = "", email = "", password = "", codeGenerated = "", nameUser = "", image = "";
     Button btnCodeVerify;
@@ -59,6 +61,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
         txtCode4 = (EditText) findViewById(R.id.txtCode4Complete);
         txtCode5 = (EditText) findViewById(R.id.txtCode5Complete);
         txtCode6 = (EditText) findViewById(R.id.txtCode6Complete);
+        btnBackEditPass = (CircleImageView) findViewById(R.id.btnBackEditPass);
 
         txtChangeEmail = (TextView) findViewById(R.id.txtChangeEmail);
         btnSendCode = (TextView) findViewById(R.id.btnSendCodeComplete);
@@ -140,6 +143,13 @@ public class CompleteProfileActivity extends AppCompatActivity {
                     verifyCodeGenerated();
                 }
 
+            }
+        });
+
+        btnBackEditPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }

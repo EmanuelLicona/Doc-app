@@ -1,8 +1,9 @@
 package com.application.pm1_proyecto_final.models;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Publication {
+public class Publication implements Serializable {
 
     private String description;
     private String groupId;
@@ -12,6 +13,8 @@ public class Publication {
     private Long timestamp;
     private String title;
     private String type;
+    private String image;
+    private String nameUserPublication;
 
     public Publication() {
     }
@@ -89,5 +92,21 @@ public class Publication {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getNameUserPublication() {
+        return nameUserPublication;
+    }
+
+    public void setNameUserPublication(String nameUserPublication) {
+        this.nameUserPublication = nameUserPublication;
     }
 }

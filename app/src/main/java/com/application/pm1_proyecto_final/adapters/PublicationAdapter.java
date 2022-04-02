@@ -61,8 +61,16 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
         String[] infoUser = getInfoUser(publication.getSenderId());
 
         if (infoUser.length != 0) {
-            holder.imageProfile.setImageBitmap(ResourceUtil.decodeImage(infoUser[0]));
-            holder.txtNameUserPost.setText(infoUser[1]);
+            publication.setNameUserPublication(infoUser[1]);
+            publication.setImage(infoUser[0]);
+
+            if (!infoUser[0].isEmpty() && !infoUser[0].equals("IMAGE")) {
+                holder.imageProfile.setImageBitmap(ResourceUtil.decodeImage(publication.getImage()));
+            } else {
+                holder.imageProfile.setImageResource(R.drawable.ic_user);
+            }
+
+            holder.txtNameUserPost.setText(publication.getNameUserPublication());
         }
         if (publication.getSenderId().equals(preferencesManager.getString(Constants.KEY_USER_ID))) {
             holder.txtMyPublication.setText(" - Mi Publicación");
@@ -85,6 +93,13 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
             @Override
             public void onClick(View view) {
                 chatListener.onClickFile(publication);
+            }
+        });
+
+        holder.viewHolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chatListener.onClickPublicationDetail(publication, publicationId);
             }
         });
     }

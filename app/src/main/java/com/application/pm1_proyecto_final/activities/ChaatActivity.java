@@ -56,8 +56,8 @@ public class ChaatActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChaatBinding.inflate(getLayoutInflater());
-        user = new User();
         setContentView(binding.getRoot());
+        user = new User();
         setListeners();
         loadReceiverDetails();
         init();
@@ -109,6 +109,7 @@ public class ChaatActivity extends BaseActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+
                     user.setIdFirebase(response.getJSONObject("data").getString("idFirebase"));
                     isReceiverAvailable = Integer.parseInt(response.getJSONObject("data").getString(Constants.KEY_AVAILABILITY)) == 1;
 
