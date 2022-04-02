@@ -129,4 +129,28 @@ public class ResourceUtil {
 
         return typeFile;
     }
+
+    public static String viewOrDownloadFile(String typeFile) {
+        String response = "view";
+        if (typeFile.equals("msword")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.ms-powerpoint")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.openxmlformats-officedocument.presentationml.presentation")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.ms-excel")) {
+            response = "download";
+        } else if (typeFile.equals("vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+            response = "download";
+        } else if (typeFile.equals("javascript")) {
+            response = "download";
+        } else if (typeFile.equals("java-vm")) {
+            response = "download";
+        } else if (typeFile.equals("x-rar-compressed")) {
+            response = "download";
+        }
+        return response;
+    }
 }

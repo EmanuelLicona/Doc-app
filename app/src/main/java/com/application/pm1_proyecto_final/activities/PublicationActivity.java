@@ -75,8 +75,6 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     AlertDialog.Builder pBuilderSelector;
     CharSequence options[];
     private static final int REQUEST_PERMISSION_STORAGE = 300;
-    boolean notPublications = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         loadReceiverDetails();
     }
 
-    private void init(){
+    private void init() {
         reseiverGroup = null;
 
         preferencesManager = new PreferencesManager(getApplicationContext());
@@ -117,8 +115,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     private void getAllPublication() {
         Query query = mPublicationProvider.getAll(reseiverGroup.getId());
         FirestoreRecyclerOptions<Publication> options = new FirestoreRecyclerOptions.Builder<Publication>()
-                        .setQuery(query, Publication.class)
-                        .build();
+                .setQuery(query, Publication.class)
+                .build();
         publicationAdapter = new PublicationAdapter(options, PublicationActivity.this, (ArrayList<User>) userListApi, this);
         publicationAdapter.notifyDataSetChanged();
         chatRecyclerView.setAdapter(publicationAdapter);
@@ -158,7 +156,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
                     JSONObject jsonObject = new JSONObject(response);
                     JSONArray arrayUsers = jsonObject.getJSONArray("data");
 
-                    for(int i = 0; i < arrayUsers.length(); i++) {
+                    for (int i = 0; i < arrayUsers.length(); i++) {
                         JSONObject rowUser = arrayUsers.getJSONObject(i);
                         User user = new User();
                         user.setId(rowUser.getString("id"));
@@ -168,8 +166,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
                         userListApi.add(user);
                     }
                     getAllPublication();
-                }
-                catch (JSONException ex) {
+                } catch (JSONException ex) {
                     ResourceUtil.showAlert("Advertencia", "Se produjo un error al obtener la informacion de los usuarios que tiene publicaciones.", PublicationActivity.this, "error");
                 }
             }
@@ -182,11 +179,11 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         queue.add(stringRequest);
     }
 
-    private void setListeners(){
+    private void setListeners() {
         imageViewBack.setOnClickListener(v -> onBackPressed());
         imageViewInfo.setOnClickListener(view -> {
 
-            if(reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)){
+            if (reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)) {
                 ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
                 return;
             }
@@ -194,7 +191,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
         });
         btnNewFile.setOnClickListener(v -> {
-            if(reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)){
+            if (reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)) {
                 ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
                 return;
             }
@@ -208,13 +205,13 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         startActivity(intent);
     }
 
-    private void loadReceiverDetails(){
+    private void loadReceiverDetails() {
         reseiverGroup = (Group) getIntent().getSerializableExtra(GroupsProvider.NAME_COLLECTION);
         textViewTitle.setText(reseiverGroup.getTitle());
     }
 
     // PARA ENVIAR LA PUBLICACION
-    private void sendMessage(){
+    private void sendMessage() {
         String idGroup = reseiverGroup.getId();
 
         Intent intent = new Intent(PublicationActivity.this, CreatePublicationActivity.class);
@@ -230,7 +227,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (i == 0) {
                     viewFile(publication);
-                } else if(i == 1) {
+                } else if (i == 1) {
                     downloadFile(publication);
                 }
             }
@@ -251,7 +248,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             String typeFile = publication.getType();
             String extensionFile = typeFile.split("/")[1];
 
-            if (viewOrDownloadFile(extensionFile).equals("download")) {
+            if (ResourceUtil.viewOrDownloadFile(extensionFile).equals("download")) {
                 downloadFile(publication);
                 return;
             }
@@ -261,33 +258,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             this.startActivity(intent.createChooser(intent, "Elija la aplicación para abrir el documento"));
         } catch (ActivityNotFoundException e) {
-            //Falla al visualizar archivo word, excel, power point
             ResourceUtil.showAlert("Advertencia", "Se produjo un error al visualizar el archivo.", this, "error");
         }
-    }
-
-    private String viewOrDownloadFile(String typeFile) {
-        String response = "view";
-        if (typeFile.equals("msword")) {
-            response = "download";
-        } else if (typeFile.equals("vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-            response = "download";
-        } else if (typeFile.equals("vnd.ms-powerpoint")) {
-            response = "download";
-        } else if (typeFile.equals("vnd.openxmlformats-officedocument.presentationml.presentation")) {
-            response = "download";
-        } else if (typeFile.equals("vnd.ms-excel")) {
-            response = "download";
-        } else if (typeFile.equals("vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
-            response = "download";
-        } else if (typeFile.equals("javascript")) {
-            response = "download";
-        } else if (typeFile.equals("java-vm")) {
-            response = "download";
-        } else if (typeFile.equals("x-rar-compressed")) {
-            response = "download";
-        }
-        return response;
     }
 
     private void downloadFile(Publication publication) {
@@ -318,7 +290,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             request.setDescription("Descargando archivo....");
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, ""+ System.currentTimeMillis()+"."+typeFile);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "" + System.currentTimeMillis() + "." + typeFile);
 
             DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
@@ -328,66 +300,48 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     }
 
     //Metodo para recuperar el grupo al volver a la actividad
-    private void getGroupReturn(){
+    private void getGroupReturn() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                (GroupApiMethods.POST_GROUP+reseiverGroup.getId()),
+                (GroupApiMethods.POST_GROUP + reseiverGroup.getId()),
                 null,
-                new com.android.volley.Response.Listener<JSONObject>(){
+                new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
 
-
                         try {
-
-                            JSONObject  jsonObject = null;
-
+                            JSONObject jsonObject = null;
                             Group groupTemp = null;
 
+                            if (!response.has("res")) {
+                                jsonObject = response.getJSONObject("data");
 
-                            if(!response.has("res")){
-
-                                    jsonObject = response.getJSONObject("data");
-
-
-                                    groupTemp = new Group();
-                                    groupTemp.setId(jsonObject.getString("id"));
-                                    groupTemp.setTitle(jsonObject.getString("title"));
-                                    groupTemp.setDescription(jsonObject.getString("description"));
-                                    groupTemp.setImage(jsonObject.getString("image"));
-                                    groupTemp.setStatus(jsonObject.getString("status"));
-                                    groupTemp.setUser_create(jsonObject.getString("user_id_created"));
-
-
-//                                Toast.makeText(PublicationActivity.this, groupTemp.getTitle(), Toast.LENGTH_LONG).show();
+                                groupTemp = new Group();
+                                groupTemp.setId(jsonObject.getString("id"));
+                                groupTemp.setTitle(jsonObject.getString("title"));
+                                groupTemp.setDescription(jsonObject.getString("description"));
+                                groupTemp.setImage(jsonObject.getString("image"));
+                                groupTemp.setStatus(jsonObject.getString("status"));
+                                groupTemp.setUser_create(jsonObject.getString("user_id_created"));
 
                                 reseiverGroup = groupTemp;
-
                                 textViewTitle.setText(reseiverGroup.getTitle());
-
-
-
-                            }else{
-                                Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Error: " + response.getString("msg"), Toast.LENGTH_SHORT).show();
                             }
-
                         } catch (JSONException e) {
-                            Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 },
                 new com.android.volley.Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "Error: "+error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
-
-
         );
-
         requestQueue.add(request);
     }
 
@@ -404,9 +358,9 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
     private void loading(boolean isLoading) {
         progressBar = (ProgressBar) findViewById(R.id.publicationsProgressBar);
-        if(isLoading){
+        if (isLoading) {
             progressBar.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             progressBar.setVisibility(View.GONE);
         }
     }

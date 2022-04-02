@@ -22,4 +22,8 @@ public class CommentsProvider {
     public Query getAll(String idPublication) {
         return collectionReference.whereEqualTo("idPost", idPublication).orderBy("timestamp", Query.Direction.ASCENDING);
     }
+
+    public Task<Void> delete(String id) {
+        return collectionReference.document(id).delete();
+    }
 }

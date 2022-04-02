@@ -58,16 +58,6 @@
                         android:textStyle="bold"
                         android:textColor="@color/white" />
 
-                    <TextView
-                        android:id="@+id/textViewLikes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Likes"
-                        android:textStyle="italic"
-                        android:layout_marginTop="5dp"
-                        android:layout_gravity="bottom"
-                        android:textColor="@color/white" />
-
                 </LinearLayout>
 
             </FrameLayout>
@@ -92,8 +82,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
-
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
@@ -217,7 +205,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewComments"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"/>
 
             </LinearLayout>
 

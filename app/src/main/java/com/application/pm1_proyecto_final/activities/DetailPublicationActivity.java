@@ -3,12 +3,19 @@ package com.application.pm1_proyecto_final.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -22,10 +29,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.CommentAdapter;
-import com.application.pm1_proyecto_final.adapters.PublicationAdapter;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.databinding.ActivityDetailPublicationBinding;
-import com.application.pm1_proyecto_final.listeners.CommentListener;
 import com.application.pm1_proyecto_final.models.Comment;
 import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.User;
@@ -48,7 +53,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DetailPublicationActivity extends AppCompatActivity implements CommentListener {
+public class DetailPublicationActivity extends AppCompatActivity {
 
     private ActivityDetailPublicationBinding binding;
     private Publication publicationReceiver;
@@ -56,7 +61,11 @@ public class DetailPublicationActivity extends AppCompatActivity implements Comm
     private String mPublicationId;
     private PreferencesManager preferencesManager;
     private CommentAdapter commentAdapter;
-    List<User> userListApi;
+    private List<User> userListApi;
+    private AlertDialog.Builder pBuilderSelector;
+    private CharSequence options[];
+    private static final int REQUEST_PERMISSION_STORAGE = 300;
+    private String pathUri = "", typeFile = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +76,9 @@ public class DetailPublicationActivity extends AppCompatActivity implements Comm
         userListApi = new ArrayList<>();
         commentsProvider = new CommentsProvider();
         preferencesManager = new PreferencesManager(DetailPublicationActivity.this);
+        pBuilderSelector = new AlertDialog.Builder(this);
+        pBuilderSelector.setTitle("Seleccione una opción");
+        options = new CharSequence[]{"Visualizar Archivo", "Descargar Archivo"};
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(DetailPublicationActivity.this);
         binding.recyclerViewComments.setLayoutManager(linearLayoutManager);
@@ -84,6 +96,20 @@ public class DetailPublicationActivity extends AppCompatActivity implements Comm
         });
         binding.btnNewComment.setOnClickListener(view -> {
             showDialogComment();
+        });
+
+        binding.imagePublicationDetail.setOnClickListener(view -> {
+            pBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (i == 0) {
+                        viewFile(publicationReceiver);
+                    } else if (i == 1) {
+                        downloadFile(publicationReceiver);
+                    }
+                }
+            });
+            pBuilderSelector.show();
         });
     }
 
@@ -245,19 +271,76 @@ public class DetailPublicationActivity extends AppCompatActivity implements Comm
         FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>()
                 .setQuery(query, Comment.class)
                 .build();
-        commentAdapter = new CommentAdapter(options, DetailPublicationActivity.this, (ArrayList<User>) userListApi, this);
+        commentAdapter = new CommentAdapter(options, DetailPublicationActivity.this, (ArrayList<User>) userListApi);
         commentAdapter.notifyDataSetChanged();
         binding.recyclerViewComments.setAdapter(commentAdapter);
         commentAdapter.startListening();
     }
 
-    @Override
-    public void onClickFile(Publication publication) {
+    private void viewFile(Publication publication) {
+        try {
+            String typeFile = publication.getType();
+            String extensionFile = typeFile.split("/")[1];
+
+            if (ResourceUtil.viewOrDownloadFile(extensionFile).equals("download")) {
+                downloadFile(publication);
+                return;
+            }
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(publication.getPath()), typeFile);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            this.startActivity(intent.createChooser(intent, "Elija la aplicación para abrir el documento"));
+        } catch (ActivityNotFoundException e) {
+            ResourceUtil.showAlert("Advertencia", "Se produjo un error al visualizar el archivo.", this, "error");
+        }
+    }
+
+    private void downloadFile(Publication publication) {
+        pathUri = publication.getPath();
+        typeFile = ResourceUtil.getTypeFile(publication.getType().split("/")[1]);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                    String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                    requestPermissions(permissions, REQUEST_PERMISSION_STORAGE);
+                } else {
+                    startDownloadFile();
+                }
+            }
+        } else {
+            startDownloadFile();
+        }
 
     }
 
-    @Override
-    public void onClickPublicationDetail(Publication publication, String publicationId) {
+    private void startDownloadFile() {
+        if (!pathUri.isEmpty() && !typeFile.isEmpty()) {
+            Toast.makeText(this, "Descargando el archivo", Toast.LENGTH_SHORT).show();
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(pathUri));
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request.setTitle("Descargar");
+            request.setDescription("Descargando archivo....");
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "" + System.currentTimeMillis() + "." + typeFile);
 
+            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
+        } else {
+            ResourceUtil.showAlert("Advertencia", "Se produjo un error al descargar el archivo", this, "error");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_PERMISSION_STORAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startDownloadFile();
+        } else {
+            Toast.makeText(this, "Permiso denegado para guardar el archivo.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

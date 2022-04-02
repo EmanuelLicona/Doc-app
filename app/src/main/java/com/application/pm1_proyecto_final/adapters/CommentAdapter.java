@@ -7,16 +7,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.listeners.Chatlistener;
-import com.application.pm1_proyecto_final.listeners.CommentListener;
 import com.application.pm1_proyecto_final.models.Comment;
 import com.application.pm1_proyecto_final.models.User;
-import com.application.pm1_proyecto_final.providers.PublicationProvider;
+import com.application.pm1_proyecto_final.providers.CommentsProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
@@ -35,17 +34,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CommentAdapter extends FirestoreRecyclerAdapter<Comment, CommentAdapter.ViewHolder> {
     Context context;
     List<User> userList;
-    PublicationProvider publicationProvider;
     PreferencesManager preferencesManager;
-    private CommentListener commentListener;
+    private CommentsProvider commentsProvider;
 
-    public CommentAdapter(@NonNull FirestoreRecyclerOptions<Comment> options, Context context, ArrayList<User> userArrayList, CommentListener commentListener) {
+    public CommentAdapter(@NonNull FirestoreRecyclerOptions<Comment> options, Context context, ArrayList<User> userArrayList) {
         super(options);
         this.context = context;
         this.userList = userArrayList;
-        publicationProvider = new PublicationProvider();
         preferencesManager = new PreferencesManager(context);
-        this.commentListener = commentListener;
+        this.commentsProvider = new CommentsProvider();
     }
 
     @Override
@@ -99,27 +96,27 @@ public class CommentAdapter extends FirestoreRecyclerAdapter<Comment, CommentAda
     private void showConfirmDelete(final String commentId) {
         new AlertDialog.Builder(context)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Eliminar publicación")
-                .setMessage("¿Está seguro de eliminar la publicación?")
+                .setTitle("Eliminar comentario")
+                .setMessage("¿Está seguro de eliminar el comentario?")
                 .setPositiveButton("SI", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        deletePublication(commentId);
+                        deleteComment(commentId);
                     }
                 })
                 .setNegativeButton("NO", null)
                 .show();
     }
 
-    private void deletePublication(String postId) {
-        publicationProvider.delete(postId).addOnCompleteListener(new OnCompleteListener<Void>() {
+    private void deleteComment(String idComment) {
+        commentsProvider.delete(idComment).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    ResourceUtil.showAlert("Confirmación", "La publicación se elimino correctamente.",context, "success");
+                    Toast.makeText(context, "Comentario eliminado", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    ResourceUtil.showAlert("Confirmación", "No se pudo eliminar la publicación.",context, "error");
+                    Toast.makeText(context, "Error al eliminar el comentario", Toast.LENGTH_SHORT).show();
                 }
             }
         });
