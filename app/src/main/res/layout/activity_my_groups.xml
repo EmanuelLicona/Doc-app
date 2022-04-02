@@ -91,6 +91,7 @@
                     android:textColor="@color/color_gray"
                     android:textSize="18sp"
                     android:layout_gravity="center"
+                    android:visibility="gone"
                     />
 
 

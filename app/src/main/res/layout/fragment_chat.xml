@@ -22,6 +22,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <EditText
+        android:id="@+id/editTextSearchComp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/textTitleUser"
+        android:hint="Ejemplo: Jose Diaz"
+        android:layout_marginHorizontal="20dp"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/usersRecyclerView"
         android:layout_width="match_parent"
@@ -34,7 +43,7 @@
         android:paddingLeft="@dimen/_10sdp"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/textTitleUser"
+        app:layout_constraintTop_toBottomOf="@id/editTextSearchComp"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="0dp"/>
 
