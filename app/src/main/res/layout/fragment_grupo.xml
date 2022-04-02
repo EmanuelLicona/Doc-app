@@ -7,59 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.FragmentGrupo"
     android:layout_marginBottom="50dp"
-    android:layout_marginTop="50dp"
-    >
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:orientation="vertical">-->
-<!--        <ImageView-->
-<!--            android:layout_width="200dp"-->
-<!--            android:layout_height="200dp"-->
-<!--            android:src="@drawable/logo"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:layout_marginTop="80dp"-->
-<!--            />-->
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:gravity="center"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            >-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="FRAGMENT SOLICITUD DE GRUPO"/>-->
-
-<!--        </LinearLayout>-->
-
-<!--    </LinearLayout>-->
-
-<!--    <ScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:orientation="vertical"-->
-<!--            >-->
-
-
-    <!--            <ProgressBar-->
-<!--                android:id="@+id/myGroupsProgressBar"-->
-<!--                android:layout_width="25dp"-->
-<!--                android:layout_height="25dp"-->
-<!--                android:layout_marginTop="200dp"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:visibility="gone"/>-->
-
-
-<!--&lt;!&ndash;        </LinearLayout>&ndash;&gt;-->
-<!--&lt;!&ndash;    </ScrollView>&ndash;&gt;-->
+    android:layout_marginTop="50dp">
 
     <EditText
         android:id="@+id/textSearchGroup"
@@ -69,10 +17,9 @@
         android:hint="Nombre del grupo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.042" />
+        app:layout_constraintVertical_bias="0.027" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/groupsRecyclerView"
@@ -81,7 +28,11 @@
         android:clipToPadding="false"
         android:orientation="vertical"
         android:overScrollMode="never"
-        android:padding="20dp"
+
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:paddingBottom="20dp"
+        android:paddingTop="10dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/textSearchGroup"
         app:layout_constraintBottom_toBottomOf="parent"
