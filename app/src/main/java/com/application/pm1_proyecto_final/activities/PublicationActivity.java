@@ -194,14 +194,10 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
         });
         btnNewFile.setOnClickListener(v -> {
-
             if(reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)){
                 ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
                 return;
             }
-
-
-
             sendMessage();
         });
     }
@@ -240,6 +236,14 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             }
         });
         pBuilderSelector.show();
+    }
+
+    @Override
+    public void onClickPublicationDetail(Publication publication, String publicationId) {
+        Intent intent = new Intent(PublicationActivity.this, DetailPublicationActivity.class);
+        intent.putExtra("Publication", publication);
+        intent.putExtra("publicationId", publicationId);
+        startActivity(intent);
     }
 
     private void viewFile(Publication publication) {

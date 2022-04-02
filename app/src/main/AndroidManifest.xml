@@ -30,16 +30,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PM1_PROYECTO_FINAL">
         <activity
-            android:name=".activities.EditActivityNote"
+            android:name=".activities.UserProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.NotesActivity"
+            android:name=".activities.DetailPublicationActivity"
             android:exported="false" />
         <activity
             android:name=".activities.ChaatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".activities.CreatePublicationActivity"
             android:exported="false" />

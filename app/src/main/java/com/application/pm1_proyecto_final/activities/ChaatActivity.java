@@ -56,8 +56,8 @@ public class ChaatActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChaatBinding.inflate(getLayoutInflater());
-        user = new User();
         setContentView(binding.getRoot());
+        user = new User();
         setListeners();
         loadReceiverDetails();
         init();
