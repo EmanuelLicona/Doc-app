@@ -45,21 +45,23 @@ public class UsersProvider {
     }
 
     public void updateAvailability(int value, String idUser, Context context) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        HashMap<String, Integer> params = new HashMap<>();
-        params.put(Constants.KEY_AVAILABILITY, value);
+        if (idUser != null) {
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            HashMap<String, Integer> params = new HashMap<>();
+            params.put(Constants.KEY_AVAILABILITY, value);
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER + idUser, new JSONObject(params), new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER + idUser, new JSONObject(params), new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
 //                Toast.makeText(context, "Availability Actualizada.", Toast.LENGTH_SHORT).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, "Error al actualizar availability user.", Toast.LENGTH_SHORT).show();
-            }
-        });
-        requestQueue.add(jsonObjectRequest);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context, "Error al actualizar availability user.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            requestQueue.add(jsonObjectRequest);
+        }
     }
 }
