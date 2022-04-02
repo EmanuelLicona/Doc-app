@@ -37,6 +37,7 @@ import com.application.pm1_proyecto_final.adapters.GroupAdapter;
 import com.application.pm1_proyecto_final.adapters.UsersGroupAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
+import com.application.pm1_proyecto_final.listeners.UserGroupListener;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
 import com.application.pm1_proyecto_final.models.User;
@@ -71,7 +72,7 @@ import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class InfoGroupActivity extends AppCompatActivity {
+public class InfoGroupActivity extends AppCompatActivity implements UserGroupListener {
 
     Group reseiverGroup;
 
@@ -236,7 +237,7 @@ public class InfoGroupActivity extends AppCompatActivity {
                                 if(arrayList.size() > 0){
                                     users = arrayList;
 
-                                    UsersGroupAdapter usersGroupAdapter = new UsersGroupAdapter(users, reseiverGroup, preferencesManager);
+                                    UsersGroupAdapter usersGroupAdapter = new UsersGroupAdapter(users, reseiverGroup, preferencesManager, InfoGroupActivity.this);
 
                                     recyclerViewUsuarios.setAdapter(usersGroupAdapter);
                                 }else{
@@ -925,5 +926,77 @@ public class InfoGroupActivity extends AppCompatActivity {
                 .show();
     }
 
+    public void showAlertMessageExpel(String title, String response, Context context, User user) {
 
+        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(title)
+                .setContentText(response)
+                .setConfirmText("NO")
+                .setCancelButton("SI",v->{
+                    expelUser(user.getId(), reseiverGroup.getId(), GroupUser.STATUS_LEFT);
+                    v.dismiss();
+                })
+                .show();
+    }
+
+    private void expelUser(String idUser, String idGroup, String status) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", idUser);
+        params.put("group_id", idGroup);
+        params.put("status", status);
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_USER_GROUP_UPDATE, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    String resposeData = response.getString("data");
+
+                    if(!resposeData.equals("[]")){
+
+                        ResourceUtil.showAlert("Mensaje", "Usuario a salido del grupo", InfoGroupActivity.this, "success");
+                        loadUsersGroups();
+
+                    }else {
+                        ResourceUtil.showAlert("Advertencia", "Se produjo un error ", InfoGroupActivity.this, "error");
+                    }
+
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error", InfoGroupActivity.this, "error");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error .",InfoGroupActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+
+    }
+
+
+    @Override
+    public void onClickUser(User user) {
+
+        if(preferencesManager.getString(Constants.KEY_USER_ID).equals(reseiverGroup.getUser_create())){
+            if(user.getId().equals(reseiverGroup.getUser_create())){
+                ResourceUtil.showAlert("Advertencia", "No puede eliminar del grupo al administrador",InfoGroupActivity.this, "error");
+            }else{
+
+                showAlertMessageExpel("Adventencia", "¿Desea eliminar a "+ user.getName()+" "+user.getLastname()+ " del grupo?", InfoGroupActivity.this, user);
+            }
+        }
+    }
 }

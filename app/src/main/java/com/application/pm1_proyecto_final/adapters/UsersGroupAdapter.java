@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
+import com.application.pm1_proyecto_final.listeners.UserGroupListener;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.utils.Constants;
@@ -28,10 +29,14 @@ public class UsersGroupAdapter extends RecyclerView.Adapter<UsersGroupAdapter.Us
     PreferencesManager preferencesManager;
     Group group;
 
-    public UsersGroupAdapter(List<User> users, Group group, PreferencesManager preferencesManager) {
+    private UserGroupListener userGroupListener;
+
+    public UsersGroupAdapter(List<User> users, Group group, PreferencesManager preferencesManager, UserGroupListener userGroupListener) {
         this.users = users;
         this.preferencesManager = preferencesManager;
         this.group = group;
+
+        this.userGroupListener = userGroupListener;
     }
 
     @NonNull
@@ -82,6 +87,8 @@ public class UsersGroupAdapter extends RecyclerView.Adapter<UsersGroupAdapter.Us
             }
 
             imageView.setImageBitmap(decodeImage(user.getImage()));
+
+            view.setOnClickListener(v -> userGroupListener.onClickUser(user));
 
         }
 
