@@ -6,15 +6,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="@dimen/_8sdp">
 
-    <com.makeramen.roundedimageview.RoundedImageView
+    <TextView
         android:id="@+id/imageProfileItem"
-        android:layout_width="@dimen/_35sdp"
-        android:layout_height="@dimen/_35sdp"
-        android:background="@drawable/background_image"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:riv_oval="true" />
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/background_image_chat"
+        android:text="BA"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="@dimen/_14sdp"/>
 
     <View
         android:id="@+id/viewSupporterChat"

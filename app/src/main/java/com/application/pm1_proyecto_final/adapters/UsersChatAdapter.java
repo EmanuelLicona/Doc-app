@@ -66,7 +66,7 @@ public class UsersChatAdapter extends  RecyclerView.Adapter<UsersChatAdapter.Use
             String nameUser = user.getName()+" "+user.getLastname();
             binding.textNameUserChat.setText(nameUser);
             binding.textEmailChat.setText(user.getEmail());
-            binding.imageProfileItem.setImageBitmap(ResourceUtil.decodeImage(user.getImage()));
+            binding.imageProfileItem.setText(ResourceUtil.letterIcon(user.getName(), user.getLastname()));
             binding.getRoot().setOnClickListener(v -> userListener.onUserClicked(user));
         }
 

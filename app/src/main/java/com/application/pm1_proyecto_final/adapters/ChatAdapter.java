@@ -1,5 +1,4 @@
 package com.application.pm1_proyecto_final.adapters;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -10,22 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.models.Chat;
+import com.application.pm1_proyecto_final.utils.ResourceUtil;
 
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<Chat> chatList;
-    private final Bitmap receiverProfileImage;
     private final String senderId;
+    private final String nameUser;
 
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<Chat> chatList, Bitmap receiverProfileImage, String senderId) {
+    public ChatAdapter(List<Chat> chatList, String senderId, String nameUser) {
         this.chatList = chatList;
-        this.receiverProfileImage = receiverProfileImage;
         this.senderId = senderId;
+        this.nameUser = nameUser;
     }
 
     @NonNull
@@ -55,7 +55,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (getItemViewType(position) == VIEW_TYPE_SENT) {
             ((SentMessageViewHolder) holder).setData(chatList.get(position));
         } else {
-            ((ReceivedMessageViewHolder) holder).setData(chatList.get(position), receiverProfileImage);
+            ((ReceivedMessageViewHolder) holder).setData(chatList.get(position), nameUser);
         }
     }
 
@@ -96,12 +96,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             binding = itemContainerReceivedMessageBinding;
         }
 
-        void setData(Chat chatMessage, Bitmap receiverProfileImage) {
+        void setData(Chat chatMessage, String nameUser) {
             binding.textMessage.setText(chatMessage.getMessage());
             binding.textDateTimeMessageReceived.setText(chatMessage.getDateTime());
-            binding.imageProfileChatReceived.setImageBitmap(receiverProfileImage);
+            String[] infoUser = nameUser.split(" ");
+            binding.imageProfileChatReceived.setText(ResourceUtil.letterIcon(infoUser[0], infoUser[1]));
         }
-
     }
 
 }
