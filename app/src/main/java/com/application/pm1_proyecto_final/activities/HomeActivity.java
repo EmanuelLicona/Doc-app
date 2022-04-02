@@ -60,6 +60,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     BottomNavigationView bottomNavigation;
     MenuItem menuI;
+    UsersProvider usersProvider;
 
     User userLog;
 
@@ -76,6 +77,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_home);
 
         preferencesManager = new PreferencesManager(getApplicationContext());
+        usersProvider = new UsersProvider();
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -243,5 +245,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        usersProvider.updateAvailability(0, preferencesManager.getString(Constants.KEY_USER_ID), getApplicationContext());
+    }
 }

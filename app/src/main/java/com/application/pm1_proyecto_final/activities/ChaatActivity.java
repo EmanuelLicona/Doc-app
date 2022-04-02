@@ -77,14 +77,21 @@ public class ChaatActivity extends BaseActivity {
     }
 
     private void sendMessage() {
+        String messageSend = binding.inputMessage.getText().toString().trim();
+        if (messageSend.isEmpty()) {
+            Toast.makeText(this, "Ingresa el mensaje.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        binding.inputMessage.setText(null);
+
         HashMap<String, Object> message = new HashMap<>();
         message.put(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID));
         message.put(Constants.KEY_RECEIVER_ID, receiverUser.getId());
-        message.put(Constants.KEY_MESSAGE, binding.inputMessage.getText().toString().trim());
+        message.put(Constants.KEY_MESSAGE, messageSend);
         message.put(Constants.KEY_TIMESTAMP, new Date());
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message);
         if (conversationId != null) {
-            updateConversion(binding.inputMessage.getText().toString());
+            updateConversion(messageSend);
         } else {
             HashMap<String, Object> conversion = new HashMap<>();
             conversion.put(Constants.KEY_SENDER_ID, preferencesManager.getString(Constants.KEY_USER_ID));
@@ -93,14 +100,14 @@ public class ChaatActivity extends BaseActivity {
             conversion.put(Constants.KEY_RECEIVER_ID, receiverUser.getId());
             conversion.put(Constants.KEY_RECEIVER_NAME, receiverUser.getName() +" "+receiverUser.getLastname());
             conversion.put(Constants.KEY_RECEIVER_IMAGE, receiverUser.getImage());
-            conversion.put(Constants.KEY_LAST_MESSAGE, binding.inputMessage.getText().toString());
+            conversion.put(Constants.KEY_LAST_MESSAGE, messageSend);
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
-        listenAvailabilityOfReceiver(true);
+        listenAvailabilityOfReceiver(true, messageSend);
     }
 
-    private void listenAvailabilityOfReceiver(boolean sendNotification) {
+    private void listenAvailabilityOfReceiver(boolean sendNotification, String messageSend) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(ChaatActivity.this);
         }
@@ -114,7 +121,7 @@ public class ChaatActivity extends BaseActivity {
                     isReceiverAvailable = Integer.parseInt(response.getJSONObject("data").getString(Constants.KEY_AVAILABILITY)) == 1;
 
                     if (!isReceiverAvailable && sendNotification) {
-                        sendNotification(binding.inputMessage.getText().toString(), user.getIdFirebase());
+                        sendNotification(messageSend, user.getIdFirebase());
                         isOnlineUser(isReceiverAvailable);
                     } else {
                         isOnlineUser(isReceiverAvailable);
@@ -123,7 +130,6 @@ public class ChaatActivity extends BaseActivity {
                 } catch (JSONException e) {
                     Toast.makeText(ChaatActivity.this, "Se produjo un error al cargar el usuario", Toast.LENGTH_LONG).show();
                 }
-                binding.inputMessage.setText(null);
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
@@ -288,6 +294,6 @@ public class ChaatActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        listenAvailabilityOfReceiver(false);
+        listenAvailabilityOfReceiver(false, "");
     }
 }
