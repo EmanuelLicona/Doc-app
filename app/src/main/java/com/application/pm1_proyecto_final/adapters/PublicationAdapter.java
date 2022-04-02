@@ -10,12 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.listeners.Chatlistener;
+import com.application.pm1_proyecto_final.models.Like;
 import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.User;
+import com.application.pm1_proyecto_final.providers.LikeProvider;
 import com.application.pm1_proyecto_final.providers.PublicationProvider;
 import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
@@ -24,14 +27,18 @@ import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 
 public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, PublicationAdapter.ViewHolder> {
     Context context;
@@ -39,12 +46,14 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
     PublicationProvider publicationProvider;
     PreferencesManager preferencesManager;
     private Chatlistener chatListener;
+    LikeProvider likeProvider;
 
     public PublicationAdapter(@NonNull FirestoreRecyclerOptions<Publication> options, Context context, ArrayList<User> userArrayList, Chatlistener chatListener) {
         super(options);
         this.context = context;
         this.userList = userArrayList;
         publicationProvider = new PublicationProvider();
+        likeProvider = new LikeProvider();
         preferencesManager = new PreferencesManager(context);
         this.chatListener = chatListener;
     }
@@ -100,6 +109,65 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
             @Override
             public void onClick(View view) {
                 chatListener.onClickPublicationDetail(publication, publicationId);
+            }
+        });
+
+        holder.imageViewLikes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Like like = new Like();
+                like.setIdUser(preferencesManager.getString(Constants.KEY_USER_ID));
+                like.setIdPublication(publicationId);
+                like.setTimestamp(new Date().getTime());
+                like(like, holder);
+            }
+        });
+
+        getNumbersOfLikes(publicationId, holder);
+        existLike(publicationId, preferencesManager.getString(Constants.KEY_USER_ID), holder);
+    }
+
+    private void getNumbersOfLikes(String idPublication, final ViewHolder holder) {
+        likeProvider.getAllLikeByPublication(idPublication).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                int numberLikes = value.size();
+                String message = numberLikes+" Me gustas";
+                if (numberLikes >= 0 && numberLikes <= 9) {
+                    message = numberLikes+" Me gusta";
+                }
+                holder.textViewLikes.setText(message);
+            }
+        });
+    }
+
+    private void like(final Like like, final ViewHolder holder) {
+        likeProvider.getLikeByPostAndUser(like.getIdPublication(), like.getIdUser()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                int amountDocuments = queryDocumentSnapshots.size();
+                if (amountDocuments > 0) {
+                    String idLike = queryDocumentSnapshots.getDocuments().get(0).getId();
+                    holder.imageViewLikes.setImageResource(R.drawable.icon_like_grey);
+                    likeProvider.delete(idLike);
+                } else {
+                    holder.imageViewLikes.setImageResource(R.drawable.icon_like_blue);
+                    likeProvider.create(like);
+                }
+            }
+        });
+    }
+
+    private void existLike(String idPublication, String idUser, final ViewHolder holder) {
+        likeProvider.getLikeByPostAndUser(idPublication, idUser).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                int amountDocuments = queryDocumentSnapshots.size();
+                if (amountDocuments > 0) {
+                    holder.imageViewLikes.setImageResource(R.drawable.icon_like_blue);
+                } else {
+                    holder.imageViewLikes.setImageResource(R.drawable.icon_like_grey);
+                }
             }
         });
     }
@@ -196,11 +264,13 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
     public class ViewHolder extends RecyclerView.ViewHolder {
         RoundedImageView imageProfile;
         ImageView imageViewPost;
+        ImageView imageViewLikes;
         TextView txtNameUserPost;
         TextView txtMyPublication;
         TextView txtTitleViewPublication;
         TextView txtDescriptionPost;
         TextView textDateTimeSend;
+        TextView textViewLikes;
         View viewHolder;
 
         public ViewHolder(View view) {
@@ -209,8 +279,10 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
 
             imageProfile = view.findViewById(R.id.imageProfileSend);
             imageViewPost = view.findViewById(R.id.imageViewPost);
+            imageViewLikes = view.findViewById(R.id.imageViewLike);
             txtNameUserPost = view.findViewById(R.id.txtNameUserPost);
             txtMyPublication = view.findViewById(R.id.txtMyPublication);
+            textViewLikes = view.findViewById(R.id.textViewLikes);
             txtTitleViewPublication = view.findViewById(R.id.txtTitleViewPublication);
             txtDescriptionPost = view.findViewById(R.id.txtDescriptionPost);
             textDateTimeSend = view.findViewById(R.id.textDateTimeSend);
