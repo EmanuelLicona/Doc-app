@@ -113,7 +113,7 @@ public class ChaatActivity extends BaseActivity {
                     isReceiverAvailable = Integer.parseInt(response.getJSONObject("data").getString(Constants.KEY_AVAILABILITY)) == 1;
 
                     if (!isReceiverAvailable && sendNotification) {
-                        sendNotification(binding.inputMessage.getText().toString(), receiverUser.getIdFirebase());
+                        sendNotification(binding.inputMessage.getText().toString(), user.getIdFirebase());
                         isOnlineUser(isReceiverAvailable);
                     } else {
                         isOnlineUser(isReceiverAvailable);
