@@ -45,7 +45,7 @@ public class EditPasswordActivity extends AppCompatActivity {
     PreferencesManager preferencesManager;
 
     String nameUser = "", email = "", password = "", code1 = "", code2 = "", code3 = "", code4 = "", code5 = "", code6 = "";
-    String birthDate = "", name = "", lastname = "", numberAccount = "", phone = "",  address = "", course = "", mImageProfile = "", mImageCover = "";
+    String name = "", lastname = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,14 +131,6 @@ public class EditPasswordActivity extends AppCompatActivity {
                 try {
                     name = response.getJSONObject("data").getString("name");
                     lastname = response.getJSONObject("data").getString("lastname");
-                    phone = response.getJSONObject("data").getString("phone");
-                    course = response.getJSONObject("data").getString("carrera");
-                    birthDate = response.getJSONObject("data").getString("birthDate");
-                    address = response.getJSONObject("data").getString("address");
-                    numberAccount = response.getJSONObject("data").getString("numberAccount");
-                    mImageProfile = response.getJSONObject("data").getString("image");
-                    mImageCover = response.getJSONObject("data").getString("imageCover");
-
                 } catch (JSONException e) {
                     ResourceUtil.showAlert("Advertencia", "Se produjo un error al cargar el usuario.", EditPasswordActivity.this, "error");
                     e.printStackTrace();
@@ -171,17 +163,6 @@ public class EditPasswordActivity extends AppCompatActivity {
                 User user = new User();
                 user.setPassword(password);
                 user.setId(preferencesManager.getString(Constants.KEY_USER_ID));
-                user.setName(name);
-                user.setLastname(lastname);
-                user.setPhone(phone);
-                user.setNumberAccount(numberAccount);
-                user.setAddress(address);
-                user.setCarrera(course);
-                user.setBirthDate(birthDate);
-                user.setStatus("ACTIVO");
-                user.setImage(mImageProfile);
-                user.setImageCover(mImageCover);
-                user.setEmail(email);
                 updatePasswordUser(user);
 
             } else {
@@ -197,26 +178,13 @@ public class EditPasswordActivity extends AppCompatActivity {
     private void updatePasswordUser(User user) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         HashMap<String, String> params = new HashMap<>();
-        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
-        params.put("name", user.getName());
-        params.put("lastname", user.getLastname());
-        params.put("numberAccount", user.getNumberAccount());
-        params.put("phone", user.getPhone());
-        params.put("status", "ACTIVO");
-        params.put("address", user.getAddress());
-        params.put("birthDate", user.getBirthDate());
-        params.put("carrera", user.getCarrera());
-        params.put("image", user.getImage());
-        params.put("imageCover", user.getImageCover());
-        params.put("email", user.getEmail());
         params.put("password", user.getPassword());
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER+user.getId(), new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                codeGenerated = null;
-                password = "";
-                finish();
+                cleanInputs();
+                ResourceUtil.showAlert("Confirmación", "Contraseña Actualizada",EditPasswordActivity.this, "success");
             }
         }, new Response.ErrorListener() {
             @Override
@@ -228,7 +196,23 @@ public class EditPasswordActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
+    private void cleanInputs() {
+        codeGenerated = null;
+        password = "";
+        txtCode1.setText("");
+        txtCode2.setText("");
+        txtCode3.setText("");
+        txtCode4.setText("");
+        txtCode5.setText("");
+        txtCode6.setText("");
+        txtEmailSend.setText("");
+    }
+
     private void sendEmail(String email, String nameUser) {
+        if (txtEmailSend.getText().toString().isEmpty()) {
+            ResourceUtil.showAlert("Advertencia", "Correo electrónico vacio.", this, "error");
+
+        }
         codeGenerated = ResourceUtil.createCodeRandom(6);
         password = ResourceUtil.createCodeRandom(9);
         String message = "Cambio de contraseña solicitado. \n" +

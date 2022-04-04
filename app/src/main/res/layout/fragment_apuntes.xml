@@ -8,7 +8,6 @@
     android:layout_marginTop="50dp"
     tools:context=".Fragments.FrangmentApuntes">
 
-
     <EditText
         android:id="@+id/textSearchNote"
         android:layout_width="match_parent"

@@ -169,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         pDialog.dismiss();
                         ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
-                        Toast.makeText(MainActivity.this, "ENTRANDO", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (JSONException e) {
