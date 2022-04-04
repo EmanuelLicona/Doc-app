@@ -50,7 +50,7 @@ public class FragmentPerfil extends Fragment {
 
     LinearLayout linearLayoutEditProfile, linearLayoutEditPassword;
     View view;
-    TextView txtUsername, txtPhone, txtEmail, txtPostNumber, txtCarrera;
+    TextView txtUsername, txtPhone, txtEmail, textNumberAccount, txtCarrera;
     ImageView imageViewCover;
     CircleImageView circleImageProfile;
     String nameUser = "";
@@ -75,7 +75,7 @@ public class FragmentPerfil extends Fragment {
         txtEmail = view.findViewById(R.id.textViewEmail);
         txtUsername = view.findViewById(R.id.textViewUsername);
         txtPhone = view.findViewById(R.id.textViewPhone);
-        txtPostNumber = view.findViewById(R.id.textViewPostNumber);
+        textNumberAccount = view.findViewById(R.id.textNumberAccount);
         txtCarrera = view.findViewById(R.id.textViewCarrera);
 
         preferencesManager = new PreferencesManager(getContext());
@@ -190,6 +190,9 @@ public class FragmentPerfil extends Fragment {
                     }
                     if (!user.getPhone().isEmpty()) {
                         txtPhone.setText(user.getPhone());
+                    }
+                    if (!user.getNumberAccount().isEmpty()) {
+                        textNumberAccount.setText(user.getNumberAccount());
                     }
                     if (!user.getEmail().isEmpty()) {
                         txtEmail.setText(user.getEmail());
