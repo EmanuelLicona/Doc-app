@@ -171,7 +171,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, fragment);
-//        transaction.addToBackStack(null);
+        transaction.addToBackStack(null);
         transaction.commit();
     }
 

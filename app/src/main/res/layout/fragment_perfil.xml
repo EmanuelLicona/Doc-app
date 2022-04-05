@@ -86,7 +86,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/textViewPostNumber"
+                        android:id="@+id/textNumberAccount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
@@ -97,7 +97,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PUBLICACIONES"
+                        android:text="N° Cuenta"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:textSize="13dp" />

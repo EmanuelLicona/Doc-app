@@ -50,7 +50,7 @@ public class FragmentPerfil extends Fragment {
 
     LinearLayout linearLayoutEditProfile, linearLayoutEditPassword;
     View view;
-    TextView txtUsername, txtPhone, txtEmail, txtPostNumber, txtCarrera;
+    TextView txtUsername, txtPhone, txtEmail, textNumberAccount, txtCarrera;
     ImageView imageViewCover;
     CircleImageView circleImageProfile;
     String nameUser = "";
@@ -75,7 +75,7 @@ public class FragmentPerfil extends Fragment {
         txtEmail = view.findViewById(R.id.textViewEmail);
         txtUsername = view.findViewById(R.id.textViewUsername);
         txtPhone = view.findViewById(R.id.textViewPhone);
-        txtPostNumber = view.findViewById(R.id.textViewPostNumber);
+        textNumberAccount = view.findViewById(R.id.textNumberAccount);
         txtCarrera = view.findViewById(R.id.textViewCarrera);
 
         preferencesManager = new PreferencesManager(getContext());
@@ -129,20 +129,7 @@ public class FragmentPerfil extends Fragment {
     private void cancelAccount() {
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
         HashMap<String, String> params = new HashMap<>();
-        params.put("idFirebase", user.getIdFirebase());
-        params.put("id", user.getId());
-        params.put("name", user.getName());
-        params.put("lastname", user.getLastname());
-        params.put("numberAccount", user.getNumberAccount());
-        params.put("phone", user.getPhone());
         params.put("status", "INACTIVO");
-        params.put("address", user.getAddress());
-        params.put("birthDate", user.getBirthDate());
-        params.put("carrera", user.getCarrera());
-        params.put("image", user.getImage());
-        params.put("imageCover", user.getImageCover());
-        params.put("email", user.getEmail());
-        params.put("password", user.getPassword());
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER+user.getId(), new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
@@ -190,6 +177,9 @@ public class FragmentPerfil extends Fragment {
                     }
                     if (!user.getPhone().isEmpty()) {
                         txtPhone.setText(user.getPhone());
+                    }
+                    if (!user.getNumberAccount().isEmpty()) {
+                        textNumberAccount.setText(user.getNumberAccount());
                     }
                     if (!user.getEmail().isEmpty()) {
                         txtEmail.setText(user.getEmail());
