@@ -101,6 +101,8 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
 
     String token;
 
+    boolean leave = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -768,10 +770,12 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
                         ResourceUtil.showAlert("Mensaje", "Has salido el grupo", InfoGroupActivity.this, "success");
 
                         FirebaseMessaging.getInstance().unsubscribeFromTopic(reseiverGroup.getId());
+
+                        leave = true;
 //                        finish();
 
                     }else {
-                        ResourceUtil.showAlert("Advertencia", "Se produjo un error ", InfoGroupActivity.this, "error");
+                        ResourceUtil.showAlert("Advertencia", "No se a producido ningun cambio ", InfoGroupActivity.this, "error");
                     }
 
                 } catch (JSONException e) {
@@ -900,6 +904,11 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
 
 
     public void showAlertMessageLeave(String title, String response, Context context) {
+
+        if(leave){
+            ResourceUtil.showAlert("Advertencia", "Ya has salido del grupo .",InfoGroupActivity.this, "error");
+            return;
+        }
 
         new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
                 .setTitleText(title)

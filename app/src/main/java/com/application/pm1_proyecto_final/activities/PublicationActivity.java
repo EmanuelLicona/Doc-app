@@ -35,11 +35,13 @@ import com.application.pm1_proyecto_final.adapters.PublicationAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.listeners.Chatlistener;
+import com.application.pm1_proyecto_final.models.GroupUser;
 import com.application.pm1_proyecto_final.models.Publication;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.providers.GroupsProvider;
 import com.application.pm1_proyecto_final.providers.PublicationProvider;
+import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -54,6 +56,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -75,6 +78,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     AlertDialog.Builder pBuilderSelector;
     CharSequence options[];
     private static final int REQUEST_PERMISSION_STORAGE = 300;
+
+    String statusUserLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +115,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(PublicationActivity.this);
         chatRecyclerView.setLayoutManager(linearLayoutManager);
+        statusUserLog = "";
     }
 
     private void getAllPublication() {
@@ -144,6 +150,8 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         super.onResume();
 
         getGroupReturn();
+
+        statusUserGroup(preferencesManager.getString(Constants.KEY_USER_ID));
     }
 
     private void getAllUsers() {
@@ -187,12 +195,25 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
                 ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
                 return;
             }
+
+            if (statusUserLog.equals(GroupUser.STATUS_LEFT)) {
+                ResourceUtil.showAlert("Advertencia", "Usted a salido del grupo", this, "error");
+                return;
+            }
+
             moveToInfo();
 
         });
+
         btnNewFile.setOnClickListener(v -> {
             if (reseiverGroup.getStatus().equals(Group.STATUS_INACTIVE)) {
                 ResourceUtil.showAlert("Advertencia", "Este grupo a sido eliminado", this, "error");
+                return;
+            }
+
+
+            if (statusUserLog.equals(GroupUser.STATUS_LEFT)) {
+                ResourceUtil.showAlert("Advertencia", "Usted a salido del grupo", this, "error");
                 return;
             }
             sendMessage();
@@ -363,6 +384,49 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         } else {
             progressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void statusUserGroup(String user) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user_id", user);
+        params.put("group_id", reseiverGroup.getId());
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, GroupApiMethods.POST_STATUS_USER_GROUP, new JSONObject(params), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    String resposeData = response.getString("data");
+
+
+
+                    if(!resposeData.equals("[]")){
+
+                        JSONArray array = response.getJSONArray("data");
+                        JSONObject jsonObject = array.getJSONObject(0);
+
+                        statusUserLog = jsonObject.getString("status");
+
+                    }
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el status", PublicationActivity.this, "error");
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al validar el status.",PublicationActivity.this, "error");
+                error.printStackTrace();
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+
     }
 
 }
