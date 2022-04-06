@@ -56,8 +56,6 @@ public class CommentAdapter extends FirestoreRecyclerAdapter<Comment, CommentAda
 
         if (!infoUser[0].isEmpty() && !infoUser[0].equals("IMAGE")) {
             holder.imageProfile.setImageBitmap(ResourceUtil.decodeImage(infoUser[0]));
-        } else {
-            holder.imageProfile.setImageResource(R.drawable.ic_user);
         }
 
         holder.viewHolder.setOnLongClickListener(new View.OnLongClickListener() {

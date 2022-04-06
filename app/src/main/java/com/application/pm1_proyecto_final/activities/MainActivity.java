@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         if (user.getStatus().equals("INACTIVO")) {
             RequestQueue request = Volley.newRequestQueue(MainActivity.this);
             HashMap<String, String> params = new HashMap<>();
-            params.put("idFirebase", user.getIdFirebase());
+//            params.put("idFirebase", user.getIdFirebase());
             params.put("id", user.getId());
             params.put("name", user.getName());
             params.put("lastname", user.getLastname());
