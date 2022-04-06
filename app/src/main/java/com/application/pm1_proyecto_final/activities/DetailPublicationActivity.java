@@ -182,11 +182,12 @@ public class DetailPublicationActivity extends AppCompatActivity {
         mPublicationId = getIntent().getStringExtra("publicationId");
 
         try{
-            binding.circleImageProfile.setImageBitmap(ResourceUtil.decodeImage(publicationReceiver.getImage()));
+            if (!publicationReceiver.getImage().isEmpty() && !publicationReceiver.getImage().equals("IMAGE")) {
+                binding.circleImageProfile.setImageBitmap(ResourceUtil.decodeImage(publicationReceiver.getImage()));
+            }
         }catch (Exception e){
             binding.circleImageProfile.setImageBitmap(null);
         }
-
 
         viewImageByTypeFile(publicationReceiver.getType().split("/"), publicationReceiver);
 

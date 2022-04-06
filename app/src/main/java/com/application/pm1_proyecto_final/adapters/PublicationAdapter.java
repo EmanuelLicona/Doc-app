@@ -75,8 +75,6 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
 
             if (!infoUser[0].isEmpty() && !infoUser[0].equals("IMAGE")) {
                 holder.imageProfile.setImageBitmap(ResourceUtil.decodeImage(publication.getImage()));
-            } else {
-                holder.imageProfile.setImageResource(R.drawable.ic_user);
             }
 
             holder.txtNameUserPost.setText(publication.getNameUserPublication());

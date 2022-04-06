@@ -394,6 +394,8 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
             response  = "Debes seleccionar la carrera que está cursando, es obligatorio.";
         } else if (birthDate.isEmpty()) {
             response  = "Debes ingresar tu fecha de nacimiento, es obligatorio.";
+        } else if (address.isEmpty()) {
+            response  = "Debes ingresar tu dirección, es obligatorio.";
         } else if (!ResourceUtil.validateDateBirth(birthDate)) {
             response  = "Debes ser mayor de 15 años para poder registrarte.";
         } else {

@@ -25,12 +25,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
-import com.application.pm1_proyecto_final.activities.CompleteProfileActivity;
 import com.application.pm1_proyecto_final.activities.EditPasswordActivity;
 import com.application.pm1_proyecto_final.activities.EditProfileActivity;
-import com.application.pm1_proyecto_final.activities.HomeActivity;
 import com.application.pm1_proyecto_final.activities.MainActivity;
-import com.application.pm1_proyecto_final.activities.RecoverPassword;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.models.User;
 import com.application.pm1_proyecto_final.utils.Constants;
@@ -42,7 +39,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -57,7 +53,6 @@ public class FragmentPerfil extends Fragment {
     PreferencesManager preferencesManager;
     Button btnCancelAccount;
     User user;
-
 
     public FragmentPerfil() {
     }

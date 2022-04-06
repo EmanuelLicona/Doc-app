@@ -187,16 +187,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         HashMap<String, String> params = new HashMap<>();
 
-
-
         try {
             String token = tokenPreference.getString(Constants.KEY_FCM_TOKEN);
             params.put("idFirebase", token);
         }catch (Exception e){
             params.put("idFirebase", ResourceUtil.createCodeRandom(6));
         }
-
-
 
         params.put("name", name);
         params.put("lastname", lastname);

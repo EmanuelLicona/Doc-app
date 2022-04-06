@@ -4,121 +4,107 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.UserProfileActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:backgroundTint="@color/colorPrimary">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            android:layout_height="200dp"
+            android:background="@color/black" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/imageViewCover"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/img_fondo_profile"
+            android:scaleType="centerCrop"
+            android:alpha="0.8"
+            app:layout_collapseMode="parallax"
+            android:transitionName="@string/transitionname_picture"/>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@color/black" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circleImageProfile"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:src="@drawable/ic_person"
+            app:civ_circle_background_color="@color/colorGrayLight"
+            android:layout_marginTop="130dp"
+            app:civ_border_color="@color/white"
+            app:civ_border_width="5dp"/>
 
-                <ImageView
-                    android:id="@+id/imageViewCover"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:src="@drawable/img_fondo_profile"
-                    android:scaleType="centerCrop"
-                    android:alpha="0.8"
-                    app:layout_collapseMode="parallax"
-                    android:transitionName="@string/transitionname_picture"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="right"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="150dp"
+            android:gravity="center">
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/circleImageProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:src="@drawable/ic_person"
-                    app:civ_circle_background_color="@color/colorGrayLight"
-                    android:layout_marginTop="130dp"
-                    app:civ_border_color="@color/white"
-                    app:civ_border_width="5dp"/>
+            <TextView
+                android:id="@+id/textViewPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="94852379"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="15dp" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_gravity="center|right"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="5dp"
-                    android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TELEFONO"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="13dp" />
 
-                    <TextView
-                        android:id="@+id/textViewPhone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="94852379"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textSize="15dp" />
+        </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TELEFONO"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textSize="13dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="280dp"
+            android:gravity="center">
 
-                </LinearLayout>
+            <TextView
+                android:id="@+id/textViewUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NOMBRE DEL PERFIL"
+                android:textColor="@color/colorDarkBlue"
+                android:textStyle="bold"
+                android:textSize="20dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_gravity="bottom"
-                    android:gravity="center">
+            <TextView
+                android:id="@+id/textViewCarrera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Carrera Universitaria"
+                android:textColor="@color/colorDarkBlue"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"
+                android:textSize="18dp" />
 
-                    <TextView
-                        android:id="@+id/textViewUsername"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NOMBRE DEL PERFIL"
-                        android:textColor="@color/colorDarkBlue"
-                        android:textStyle="bold"
-                        android:textSize="20dp" />
+            <TextView
+                android:id="@+id/textViewEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="correo.correo16@correo.com"
+                android:textColor="@color/colorDarkBlue"
+                android:textStyle="bold"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="16dp"/>
 
-                    <TextView
-                        android:id="@+id/textViewCarrera"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Carrera Universitaria"
-                        android:textColor="@color/colorDarkBlue"
-                        android:textStyle="bold"
-                        android:layout_marginTop="4dp"
-                        android:textSize="18dp" />
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/textViewEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="correo.correo16@correo.com"
-                        android:textColor="@color/colorDarkBlue"
-                        android:textStyle="bold"
-                        android:layout_marginTop="1dp"
-                        android:layout_marginBottom="5dp"
-                        android:textSize="16dp"/>
-
-                </LinearLayout>
-
-            </FrameLayout>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
+    </FrameLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/btnBackShowProfile"

@@ -36,7 +36,7 @@ import java.util.List;
 
 public class FragmentMain extends Fragment implements ConversationListener {
 
-    TextView textView;
+    TextView textMessageChatRecent;
     FloatingActionButton btnAddNewConversation;
     PreferencesManager preferencesManager;
     private List<Chat> conversations;
@@ -64,6 +64,7 @@ public class FragmentMain extends Fragment implements ConversationListener {
         recyclerView = view.findViewById(R.id.conversationsRecyclerView);
         btnAddNewConversation = view.findViewById(R.id.btnAddNewConversation);
         progressBar = view.findViewById(R.id.progressBarRecentMessage);
+        textMessageChatRecent = view.findViewById(R.id.textMessageChatRecent);
 
         conversations = new ArrayList<>();
         conversationsAdapter = new RecentConversationsAdapter(conversations, this);
@@ -123,6 +124,7 @@ public class FragmentMain extends Fragment implements ConversationListener {
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
         }
+        existConversationsRecent();
     };
 
     private void setListeners() {
@@ -134,12 +136,20 @@ public class FragmentMain extends Fragment implements ConversationListener {
         });
     }
 
-    public void openFragment(Fragment fragment) {
+    private void openFragment(Fragment fragment) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    private void existConversationsRecent() {
+        if (conversations.size() > 0) {
+            textMessageChatRecent.setVisibility(View.GONE);
+        } else {
+            textMessageChatRecent.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

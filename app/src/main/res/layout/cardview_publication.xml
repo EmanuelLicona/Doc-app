@@ -24,6 +24,7 @@
                 android:layout_height="27dp"
                 android:layout_marginRight="7dp"
                 android:scaleType="centerCrop"
+                android:src="@drawable/ic_user"
                 app:riv_oval="true"/>
 
             <TextView
