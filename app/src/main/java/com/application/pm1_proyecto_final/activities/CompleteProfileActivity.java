@@ -28,6 +28,7 @@ import com.application.pm1_proyecto_final.utils.Constants;
 import com.application.pm1_proyecto_final.utils.JavaMailAPI;
 import com.application.pm1_proyecto_final.utils.PreferencesManager;
 import com.application.pm1_proyecto_final.utils.ResourceUtil;
+import com.application.pm1_proyecto_final.utils.TokenPreference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,10 +49,15 @@ public class CompleteProfileActivity extends AppCompatActivity {
     TextView txtChangeEmail, btnSendCode;
     boolean submittedCode = false;
 
+    private TokenPreference tokenPreference;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_profile);
+
+        tokenPreference = new TokenPreference(getApplicationContext());
 
         btnCodeVerify = (Button) findViewById(R.id.btnCodeVerify);
         txtEmail = (EditText) findViewById(R.id.txtEmail);
@@ -180,7 +186,18 @@ public class CompleteProfileActivity extends AppCompatActivity {
         pDialog.show();
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         HashMap<String, String> params = new HashMap<>();
-        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+
+
+
+        try {
+            String token = tokenPreference.getString(Constants.KEY_FCM_TOKEN);
+            params.put("idFirebase", token);
+        }catch (Exception e){
+            params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+        }
+
+
+
         params.put("name", name);
         params.put("lastname", lastname);
         params.put("numberAccount", numberAccount);

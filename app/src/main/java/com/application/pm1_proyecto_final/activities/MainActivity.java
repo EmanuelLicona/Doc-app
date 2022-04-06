@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray userJson = response.getJSONArray("data");
 
                     JSONObject dataUser = userJson.getJSONObject(0);
+
                     user.setId(dataUser.getString("id"));
                     user.setIdFirebase(dataUser.getString("idFirebase"));
                     user.setName(dataUser.getString("name"));
