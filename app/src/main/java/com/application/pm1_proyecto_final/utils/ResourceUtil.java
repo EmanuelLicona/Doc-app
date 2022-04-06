@@ -28,7 +28,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class ResourceUtil {
 
     public static final String EMAIL = "grupomovil7321@gmail.com";
-    public static final String PASSWORD = "Movilgrupo7321";
+    public static final String PASSWORD = "grupo_movil2022_2";
 
     public static void showAlert(String title, String response, Context context, String action) {
         if (action.equals("success")) {
