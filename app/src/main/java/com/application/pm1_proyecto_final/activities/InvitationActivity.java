@@ -266,7 +266,11 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
                     if(!resposeData.equals("[]")){
 
-                        ResourceUtil.showAlert("Mensaje", "Invitacion contestada correctamente", InvitationActivity.this, "success");
+                        if (status.equals(GroupUser.STATUS_NO_ACCEPT)) {
+                            ResourceUtil.showAlert("Mensaje", "Invitación rechazada", InvitationActivity.this, "success");
+                        } else if (status.equals(GroupUser.STATUS_ACCEPT)) {
+                            ResourceUtil.showAlert("Mensaje", "Invitación contestada correctamente", InvitationActivity.this, "success");
+                        }
 
                     }else {
                         ResourceUtil.showAlert("Advertencia", "Se produjo un error al contestar la invitacion", InvitationActivity.this, "error");

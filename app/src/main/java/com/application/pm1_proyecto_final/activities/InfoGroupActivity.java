@@ -299,26 +299,13 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
             if(text.getText().toString().isEmpty()){
                 ResourceUtil.showAlert("Advertencia", "Por favor escribe un nombre", InfoGroupActivity.this, "error");
 
-            }else if (text.getText().toString().length() < 0){
+            }else if (text.getText().toString().length() < 3){
 
                 ResourceUtil.showAlert("Advertencia", "Por favor escribe mas de dos letras", InfoGroupActivity.this, "error");
             }else{
                 findUsersForName(text.getText().toString(), listView);
             }
 
-
-//            if(text.getText().toString().isEmpty()){
-//
-//                ResourceUtil.showAlert("Advertencia", "Por favor escribe un correo", InfoGroupActivity.this, "error");
-//            }else if(!Patterns.EMAIL_ADDRESS.matcher(text.getText().toString()).matches()){
-//
-//                ResourceUtil.showAlert("Advertencia", "Por favor escribe un correo valido", InfoGroupActivity.this, "error");
-//
-//            }else{
-//                searhEmail(text.getText().toString());
-//
-//                dialog.dismiss();
-//            }
         });
 
 
