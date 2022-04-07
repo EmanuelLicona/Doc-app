@@ -22,7 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,10 +36,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.application.pm1_proyecto_final.R;
 import com.application.pm1_proyecto_final.adapters.GroupAdapter;
+import com.application.pm1_proyecto_final.adapters.UserAddGroupAdapter;
 import com.application.pm1_proyecto_final.adapters.UsersGroupAdapter;
 import com.application.pm1_proyecto_final.api.GroupApiMethods;
 import com.application.pm1_proyecto_final.api.UserApiMethods;
 import com.application.pm1_proyecto_final.listeners.UserGroupListener;
+import com.application.pm1_proyecto_final.listeners.UserListener;
 import com.application.pm1_proyecto_final.models.Group;
 import com.application.pm1_proyecto_final.models.GroupUser;
 import com.application.pm1_proyecto_final.models.User;
@@ -72,7 +76,7 @@ import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class InfoGroupActivity extends AppCompatActivity implements UserGroupListener {
+public class InfoGroupActivity extends AppCompatActivity implements UserGroupListener, UserListener {
 
     Group reseiverGroup;
 
@@ -284,26 +288,105 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
 
         dialog.show();
 
-        EditText text =(EditText) view.findViewById(R.id.textEmailDialog);
+        EditText text =(EditText) view.findViewById(R.id.textNameDialog);
 
-        Button btnAdd = (Button) view.findViewById(R.id.btnAddMemberDialog);
+        ImageButton btnAdd = (ImageButton) view.findViewById(R.id.btnFindUserDialog);
+
+        ListView listView = (ListView) view.findViewById(R.id.listViewUsersDialog);
 
         btnAdd.setOnClickListener(v -> {
+
             if(text.getText().toString().isEmpty()){
+                ResourceUtil.showAlert("Advertencia", "Por favor escribe un nombre", InfoGroupActivity.this, "error");
 
-                ResourceUtil.showAlert("Advertencia", "Por favor escribe un correo", InfoGroupActivity.this, "error");
-            }else if(!Patterns.EMAIL_ADDRESS.matcher(text.getText().toString()).matches()){
+            }else if (text.getText().toString().length() < 0){
 
-                ResourceUtil.showAlert("Advertencia", "Por favor escribe un correo valido", InfoGroupActivity.this, "error");
-
+                ResourceUtil.showAlert("Advertencia", "Por favor escribe mas de dos letras", InfoGroupActivity.this, "error");
             }else{
-                searhEmail(text.getText().toString());
-
-                dialog.dismiss();
+                findUsersForName(text.getText().toString(), listView);
             }
+
+
+//            if(text.getText().toString().isEmpty()){
+//
+//                ResourceUtil.showAlert("Advertencia", "Por favor escribe un correo", InfoGroupActivity.this, "error");
+//            }else if(!Patterns.EMAIL_ADDRESS.matcher(text.getText().toString()).matches()){
+//
+//                ResourceUtil.showAlert("Advertencia", "Por favor escribe un correo valido", InfoGroupActivity.this, "error");
+//
+//            }else{
+//                searhEmail(text.getText().toString());
+//
+//                dialog.dismiss();
+//            }
         });
 
 
+    }
+
+    private void findUsersForName(String name, ListView listView){
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                UserApiMethods.GET_USER_ADD_GROUP+name,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject  jsonObject = null;
+
+                            User usertemp = null;
+
+                            ArrayList<User> arrayList = new ArrayList<>();
+
+
+                            if(response.getString("res").equals("true")) {
+//                                t = response.getJSONObject("data").getString("name");
+
+
+//                                JSONArray array = response.getJSONObject("data").getJSONArray("users");
+                                JSONArray array = response.getJSONArray("data");
+
+                                for (int i = 0; i < array.length(); i++) {
+                                    jsonObject = new JSONObject(array.get(i).toString());
+                                    usertemp = new User();
+                                    usertemp.setId(jsonObject.getString("id"));
+                                    usertemp.setName(jsonObject.getString("name"));
+                                    usertemp.setLastname(jsonObject.getString("lastname"));
+                                    usertemp.setImage(jsonObject.getString("image"));
+                                    usertemp.setEmail(jsonObject.getString("email"));
+                                    arrayList.add(usertemp);
+
+                                }
+
+                                if(arrayList.size()>0){
+                                    UserAddGroupAdapter userAddGroupAdapter = new UserAddGroupAdapter(getApplicationContext(), arrayList, InfoGroupActivity.this);
+
+                                    listView.setAdapter(userAddGroupAdapter);
+
+                                }else{
+                                    ResourceUtil.showAlert("Advertencia", "No hay usuarios con ese nombre.",InfoGroupActivity.this, "error");
+                                }
+                            }
+                        } catch (JSONException e) {
+                            ResourceUtil.showAlert("Advertencia", "Se produjo un error al leer los datos.",InfoGroupActivity.this, "error");
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al enviar notificacion.",InfoGroupActivity.this, "error");
+                error.printStackTrace();
+
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
     }
 
     private void dialogEditGroup(){
@@ -470,23 +553,15 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
 
                         JSONObject jsonObject = array.getJSONObject(0);
 
-
                         usertemp = new User();
                         usertemp.setId(jsonObject.getString("id"));
                         usertemp.setName(jsonObject.getString("name"));
                         usertemp.setLastname(jsonObject.getString("lastname"));
                         usertemp.setNumberAccount(jsonObject.getString("numberAccount"));
-//                                    usertemp.setPhone(jsonObject.getString("phone"));
                         usertemp.setStatus(jsonObject.getString("status"));
                         usertemp.setImage(jsonObject.getString("image"));
-//                                    usertemp.setAddress(jsonObject.getString("address"));
-//                                    usertemp.setBirthDate(jsonObject.getString("birthDate"));
-//                                    usertemp.setCarrera(jsonObject.getString("carrera"));
+
                         usertemp.setEmail(jsonObject.getString("email"));
-//                                    usertemp.setPassword(jsonObject.getString("password"));
-
-
-//                        Toast.makeText(InfoGroupActivity.this, usertemp.getId(), Toast.LENGTH_SHORT).show();
                         statusInvitation(usertemp);
                     }
                 } catch (JSONException e) {
@@ -921,7 +996,6 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
                 .show();
     }
 
-
     public void showAlertMessageClose(String title, String response, Context context) {
 
         new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
@@ -943,6 +1017,19 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
                 .setConfirmText("NO")
                 .setCancelButton("SI",v->{
                     expelUser(user.getId(), reseiverGroup.getId(), GroupUser.STATUS_LEFT);
+                    v.dismiss();
+                })
+                .show();
+    }
+
+    public void showAlertAddUser(String title, String response, Context context, User user) {
+
+        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(title)
+                .setContentText(response)
+                .setConfirmText("NO")
+                .setCancelButton("SI",v->{
+                    searhEmail(user.getEmail());
                     v.dismiss();
                 })
                 .show();
@@ -1008,4 +1095,12 @@ public class InfoGroupActivity extends AppCompatActivity implements UserGroupLis
             }
         }
     }
+
+    @Override
+    public void onUserClicked(User user) {
+//        Toast.makeText(this, user.toString(), Toast.LENGTH_SHORT).show();
+
+        showAlertAddUser("Mensaje", "¿Desea agregar al usuario con correo "+user.getEmail()+ " ?", InfoGroupActivity.this, user);
+    }
+
 }
