@@ -225,7 +225,7 @@ public class DetailPublicationActivity extends AppCompatActivity {
             binding.imagePublicationDetail.setImageResource(R.drawable.java_image);
         } else if(extensionFile[1].equals("zip")) {
             binding.imagePublicationDetail.setImageResource(R.drawable.zip_image);
-        } else if(extensionFile[1].equals("x-rar-compressed")) {
+        } else if(extensionFile[1].equals("rar")) {
             binding.imagePublicationDetail.setImageResource(R.drawable.winrar_image);
         } else if(extensionFile[1].equals("html")) {
             binding.imagePublicationDetail.setImageResource(R.drawable.html_image);

@@ -121,7 +121,7 @@ public class ResourceUtil {
             typeFile = "js";
         } else if (type.equals("java-vm")) {
             typeFile = "class";
-        } else if (type.equals("x-rar-compressed")) {
+        } else if (type.equals("rar")) {
             typeFile = "rar";
         } else {
             typeFile = type;

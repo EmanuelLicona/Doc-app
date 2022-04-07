@@ -214,6 +214,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_UPLOAD_FILE) {
             dataPublication = data.getData();
             type = getContentResolver().getType(dataPublication);
+            Toast.makeText(this, "Type: "+type, Toast.LENGTH_SHORT).show();
             extension = ResourceUtil.getTypeFile(type.split("/")[1]);
             /*
                 application/pdf
@@ -254,7 +255,7 @@ public class CreatePublicationActivity extends AppCompatActivity {
             imageViewPublication.setImageResource(R.drawable.java);
         } else if (extensionFile[1].equals("zip")) {
             imageViewPublication.setImageResource(R.drawable.zip);
-        } else if (extensionFile[1].equals("x-rar-compressed")) {
+        } else if (extensionFile[1].equals("rar")) {
             imageViewPublication.setImageResource(R.drawable.rar);
         } else if (extensionFile[1].equals("html")) {
             imageViewPublication.setImageResource(R.drawable.html);

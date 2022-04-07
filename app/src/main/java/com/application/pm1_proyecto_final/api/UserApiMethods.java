@@ -29,5 +29,6 @@ public class UserApiMethods {
     public static final String DELETE_USER = URL + "api/users/";
     public static final String EXIST_EMAIL = URL + "api/userEmail/";
     public static final String USERS_FRIENDS = URL + "api/usuariosAmigos/";
+    public static final String EXIST_EMAIL_AND_ACCOUNT = URL + "api/userEmailCuenta/";
 
 }

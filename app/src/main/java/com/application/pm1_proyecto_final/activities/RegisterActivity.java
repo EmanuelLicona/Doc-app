@@ -243,14 +243,17 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         } else {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL + email, null, new Response.Listener<JSONObject>() {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL_AND_ACCOUNT + email+"/"+numberAccount , null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        String existEmail = response.getString("data");
+                        String existEmail = response.getString("correo");
+                        String existNumberAccount = response.getString("cuenta");
 
                         if (!existEmail.equals("[]")) {
                             ResourceUtil.showAlert("Advertencia", "El correo ingresado ya pertenece a otro usuario.", RegisterActivity.this, "error");
+                        } else if (!existNumberAccount.equals("[]")) {
+                            ResourceUtil.showAlert("Advertencia", "El numero de cuenta ya pertenece a otro usuario.", RegisterActivity.this, "error");
                         } else {
                             String nameUser = name + " " + lastname;
                             if (codeGenerated.isEmpty()) {

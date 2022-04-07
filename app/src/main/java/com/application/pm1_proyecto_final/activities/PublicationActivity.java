@@ -80,6 +80,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     private static final int REQUEST_PERMISSION_STORAGE = 300;
 
     String statusUserLog;
+    String namePublication = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -268,6 +269,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
         try {
             String typeFile = publication.getType();
             String extensionFile = typeFile.split("/")[1];
+            namePublication = publication.getTitle();
 
             if (ResourceUtil.viewOrDownloadFile(extensionFile).equals("download")) {
                 downloadFile(publication);
@@ -286,6 +288,7 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
     private void downloadFile(Publication publication) {
         pathUri = publication.getPath();
         typeFile = ResourceUtil.getTypeFile(publication.getType().split("/")[1]);
+        namePublication = publication.getTitle();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -307,7 +310,12 @@ public class PublicationActivity extends AppCompatActivity implements Chatlisten
             Toast.makeText(this, "Descargando el archivo", Toast.LENGTH_SHORT).show();
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(pathUri));
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-            request.setTitle("Descargar");
+            if (!namePublication.isEmpty()) {
+                request.setTitle("Descargar "+namePublication);
+            } else {
+                request.setTitle("Descargar");
+            }
+
             request.setDescription("Descargando archivo....");
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

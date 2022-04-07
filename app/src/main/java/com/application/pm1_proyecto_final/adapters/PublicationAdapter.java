@@ -205,7 +205,7 @@ public class PublicationAdapter extends FirestoreRecyclerAdapter<Publication, Pu
             holder.imageViewPost.setImageResource(R.drawable.java_image);
         } else if(extensionFile[1].equals("zip")) {
             holder.imageViewPost.setImageResource(R.drawable.zip_image);
-        } else if(extensionFile[1].equals("x-rar-compressed")) {
+        } else if(extensionFile[1].equals("rar")) {
             holder.imageViewPost.setImageResource(R.drawable.winrar_image);
         } else if(extensionFile[1].equals("html")) {
             holder.imageViewPost.setImageResource(R.drawable.html_image);
