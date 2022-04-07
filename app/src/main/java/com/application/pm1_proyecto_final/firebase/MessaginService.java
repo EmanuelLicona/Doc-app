@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -33,6 +34,8 @@ public class MessaginService extends FirebaseMessagingService {
 
        tokenPreference = new TokenPreference(getApplicationContext());
        tokenPreference.putString(Constants.KEY_FCM_TOKEN, token);
+
+        Log.d("FCM", "onNewToken: "+token);
 
     }
 
