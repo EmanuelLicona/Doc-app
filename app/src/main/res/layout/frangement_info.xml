@@ -40,7 +40,7 @@
             android:id="@+id/textView"
             android:layout_width="85dp"
             android:layout_height="31dp"
-            android:text="Version 1.0"
+            android:text="Version 1.0.0"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -54,7 +54,7 @@
             android:id="@+id/textView2"
             android:layout_width="330dp"
             android:layout_height="63dp"
-            android:text="Aplicación creada por el grupo 7 de la clase de
+            android:text="Aplicación creada por el grupo 5 de la clase de
             programación móvil I de la Universidad Tecnológica de Honduras (UTH)"
 
             android:textAlignment="center"
