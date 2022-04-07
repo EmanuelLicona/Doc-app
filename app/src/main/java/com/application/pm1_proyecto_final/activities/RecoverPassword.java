@@ -175,7 +175,7 @@ public class RecoverPassword extends AppCompatActivity {
     private void updatePassword() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         HashMap<String, String> params = new HashMap<>();
-        params.put("idFirebase", user.getIdFirebase());
+//        params.put("idFirebase", user.getIdFirebase());
         params.put("name", user.getName());
         params.put("lastname", user.getLastname());
         params.put("numberAccount", user.getNumberAccount());

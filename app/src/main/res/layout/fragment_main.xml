@@ -29,6 +29,17 @@
         android:backgroundTint="@color/color_green"
         android:layout_gravity="center"/>
 
+    <TextView
+        android:id="@+id/textMessageChatRecent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="No hay chats recientes"
+        android:textColor="@color/color_gray"
+        android:textSize="18sp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddNewConversation"
         android:layout_width="wrap_content"
@@ -37,6 +48,8 @@
         android:layout_margin="20dp"
         android:backgroundTint="@color/color_green"
         android:src="@drawable/ic_add">
+
+
 
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 

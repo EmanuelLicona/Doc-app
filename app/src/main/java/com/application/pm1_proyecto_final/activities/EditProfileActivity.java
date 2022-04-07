@@ -198,7 +198,7 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         HashMap<String, String> params = new HashMap<>();
-        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
+//        params.put("idFirebase", ResourceUtil.createCodeRandom(6));
         params.put("name", user.getName());
         params.put("lastname", user.getLastname());
         params.put("numberAccount", user.getNumberAccount());

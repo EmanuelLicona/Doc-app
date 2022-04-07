@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         preferencesManager = new PreferencesManager(getApplicationContext());
-        tokenPreference = new TokenPreference(getApplicationContext());
+
 
         pDialog = ResourceUtil.showAlertLoading(MainActivity.this);
 
@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray userJson = response.getJSONArray("data");
 
                     JSONObject dataUser = userJson.getJSONObject(0);
+
                     user.setId(dataUser.getString("id"));
                     user.setIdFirebase(dataUser.getString("idFirebase"));
                     user.setName(dataUser.getString("name"));
@@ -169,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         pDialog.dismiss();
                         ResourceUtil.showAlert("Advertencia", "Correo electrónico y/o password incorrectos", MainActivity.this, "error");
-                        Toast.makeText(MainActivity.this, "ENTRANDO", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (JSONException e) {
@@ -194,25 +194,18 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         HashMap<String, String> params = new HashMap<>();
 
+        tokenPreference = new TokenPreference(getApplicationContext());
+
         String token = tokenPreference.getString(Constants.KEY_FCM_TOKEN);
 
         token = token.trim();
 
         preferencesManager.putString(Constants.KEY_FCM_TOKEN, token);
 
+//        Toast.makeText(this, "id: "+user.getId() + "\nToken: "+ token, Toast.LENGTH_SHORT).show();
+
         params.put("idFirebase", token);
-        params.put("name", user.getName());
-        params.put("lastname", user.getLastname());
-        params.put("numberAccount", user.getNumberAccount());
-        params.put("phone", user.getPhone());
-        params.put("status", "ACTIVO");
-        params.put("address", user.getAddress());
-        params.put("birthDate", user.getBirthDate());
-        params.put("carrera", user.getCarrera());
-        params.put("image", user.getImage());
-        params.put("imageCover", user.getImageCover());
-        params.put("email", user.getEmail());
-        params.put("password", user.getPassword());
+
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.PUT,
@@ -225,8 +218,8 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Error al actualizar fcmToken: "+ error.getMessage(), Toast.LENGTH_LONG).show();
-                Log.e("volleyError", "onErrorResponse: ", error);
+//                Toast.makeText(MainActivity.this, "Error al actualizar fcmToken: "+ error.getMessage(), Toast.LENGTH_LONG).show();
+                Log.d("volleyError", "onErrorResponse: ", error);
             }
         });
         requestQueue.add(jsonObjectRequest);
@@ -288,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
         if (user.getStatus().equals("INACTIVO")) {
             RequestQueue request = Volley.newRequestQueue(MainActivity.this);
             HashMap<String, String> params = new HashMap<>();
-            params.put("idFirebase", user.getIdFirebase());
+//            params.put("idFirebase", user.getIdFirebase());
             params.put("id", user.getId());
             params.put("name", user.getName());
             params.put("lastname", user.getLastname());

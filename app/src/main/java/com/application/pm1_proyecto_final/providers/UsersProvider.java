@@ -1,6 +1,7 @@
 package com.application.pm1_proyecto_final.providers;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -53,12 +54,12 @@ public class UsersProvider {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, UserApiMethods.PUT_USER + idUser, new JSONObject(params), new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-//                Toast.makeText(context, "Availability Actualizada.", Toast.LENGTH_SHORT).show();
+
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(context, "Error al actualizar availability user.", Toast.LENGTH_SHORT).show();
+                    Log.d("ERROR_AVAILABILITY", "Error al actualizar availability user.");
                 }
             });
             requestQueue.add(jsonObjectRequest);
