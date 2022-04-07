@@ -22,6 +22,7 @@ public class UserApiMethods {
     public static final String URL = "https://dennisdomain.com/api_rest/";
 
     public static final String GET_USER = URL + "api/users";
+    public static final String GET_USER_ADD_GROUP = URL + "api/buscarUsuarioAddGrupo/";
     public static final String GET_USER_ID = URL + "api/users/";
     public static final String POST_USER = URL + "api/users";
     public static final String PUT_USER = URL + "api/users/";
