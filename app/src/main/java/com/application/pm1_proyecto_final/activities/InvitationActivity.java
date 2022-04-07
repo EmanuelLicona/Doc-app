@@ -64,6 +64,7 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
     ProgressBar progressBar;
 
     TextView textViewMessage;
+    InvitationAdapter adapterInvitation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +79,7 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
     }
 
 
-    private void init(){
+    private void init() {
 
         preferencesManager = new PreferencesManager(getApplicationContext());
 
@@ -92,38 +93,37 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         textViewMessage = (TextView) findViewById(R.id.textMessageInvitation);
 
 
-
     }
 
-    private void setListeners(){
+    private void setListeners() {
         btnBack.setOnClickListener(v -> onBackPressed());
     }
 
 
-    private void getInvitationsUser(){
+    private void getInvitationsUser() {
 
         loading(true);
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                (GroupApiMethods.GET_USER_INVITATION+preferencesManager.getString(Constants.KEY_USER_ID)),
+                (GroupApiMethods.GET_USER_INVITATION + preferencesManager.getString(Constants.KEY_USER_ID)),
                 null,
-                new com.android.volley.Response.Listener<JSONObject>(){
+                new com.android.volley.Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
 
 
                         try {
 
-                            JSONObject  jsonObject = null;
+                            JSONObject jsonObject = null;
 
                             GroupUser groupTemp = null;
 
-                           listUsersGroupsTemp = new ArrayList<>();
+                            listUsersGroupsTemp = new ArrayList<>();
 
 
-                            if(response.getString("res").equals("true")){
+                            if (response.getString("res").equals("true")) {
 //                                t = response.getJSONObject("data").getString("name");
 
 
@@ -148,28 +148,28 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
 
                                 }
 
-                                if(listUsersGroupsTemp.size() == 0){
+                                if (listUsersGroupsTemp.size() == 0) {
                                     textViewMessage.setVisibility(View.VISIBLE);
-                                }else{
+                                } else {
                                     textViewMessage.setVisibility(View.GONE);
                                 }
 
-                                    InvitationAdapter adapterInvitation = new InvitationAdapter(getApplicationContext(), listUsersGroupsTemp, InvitationActivity.this);
+                                adapterInvitation = new InvitationAdapter(getApplicationContext(), listUsersGroupsTemp, InvitationActivity.this);
 
-                                    listView.setAdapter(adapterInvitation);
+                                listView.setAdapter(adapterInvitation);
 
-                                    loading(false);
+                                loading(false);
 
 //                                }else{
 //                                    Toast.makeText(getApplicationContext(), "Advertencia: No se encuentran datos", Toast.LENGTH_SHORT).show();
 //                                }
 
-                            }else{
-                                Toast.makeText(getApplicationContext(), "Error: "+response.getString("msg"), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Error: " + response.getString("msg"), Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {
-                            Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -177,7 +177,7 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
                 new com.android.volley.Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "Error: "+error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -187,24 +187,26 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         requestQueue.add(request);
 
 
-
     }
 
-    private void dialogInvitation(GroupUser groupUser){
+    AlertDialog.Builder builder;
+    View view;
+    AlertDialog dialog;
+    private void dialogInvitation(GroupUser groupUser) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(InvitationActivity.this);
+        builder = new AlertDialog.Builder(InvitationActivity.this);
 
         LayoutInflater inflater = getLayoutInflater();
 
-        View view = inflater.inflate(R.layout.dialog_invitation_group, null);
+        view = inflater.inflate(R.layout.dialog_invitation_group, null);
 
         builder.setView(view);
 
-        AlertDialog dialog = builder.create();
+        dialog = builder.create();
 
         dialog.show();
 
-        TextView text =(TextView) view.findViewById(R.id.txtTitleGroupDialogInvitation);
+        TextView text = (TextView) view.findViewById(R.id.txtTitleGroupDialogInvitation);
 
         text.setText(groupUser.getNameGroup());
 
@@ -222,7 +224,6 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         });
 
 
-
     }
 
     private void NoAgreeInvitation(GroupUser groupUser, AlertDialog dialog) {
@@ -230,8 +231,6 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         updateInvitation(groupUser.getIdUser(), groupUser.getIdGroup(), GroupUser.STATUS_NO_ACCEPT);
 
         dialog.dismiss();
-
-        getInvitationsUser();
     }
 
     private void AgreeInvitation(GroupUser groupUser, AlertDialog dialog) {
@@ -241,8 +240,6 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
         FirebaseMessaging.getInstance().unsubscribeFromTopic(groupUser.getIdGroup());
 
         dialog.dismiss();
-
-        getInvitationsUser();
     }
 
 
@@ -264,19 +261,20 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
                 try {
                     String resposeData = response.getString("data");
 
-                    if(!resposeData.equals("[]")){
+                    if (!resposeData.equals("[]")) {
 
                         if (status.equals(GroupUser.STATUS_NO_ACCEPT)) {
                             ResourceUtil.showAlert("Mensaje", "Invitación rechazada", InvitationActivity.this, "success");
                         } else if (status.equals(GroupUser.STATUS_ACCEPT)) {
                             ResourceUtil.showAlert("Mensaje", "Invitación contestada correctamente", InvitationActivity.this, "success");
                         }
-
-                    }else {
+                        getInvitationsUser();
+                    } else {
                         ResourceUtil.showAlert("Advertencia", "Se produjo un error al contestar la invitacion", InvitationActivity.this, "error");
                     }
 
                 } catch (JSONException e) {
+                    getInvitationsUser();
                     ResourceUtil.showAlert("Advertencia", "Se produjo un error al contestar la invitacion", InvitationActivity.this, "error");
                     e.printStackTrace();
                 }
@@ -286,21 +284,22 @@ public class InvitationActivity extends AppCompatActivity implements Invitationl
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.",InvitationActivity.this, "error");
+                ResourceUtil.showAlert("Advertencia", "Se produjo un error al registrar el grupo.", InvitationActivity.this, "error");
                 error.printStackTrace();
 
             }
         });
 
         requestQueue.add(jsonObjectRequest);
+
     }
 
 
     private void loading(boolean isLoading) {
 
-        if(isLoading){
+        if (isLoading) {
             progressBar.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             progressBar.setVisibility(View.GONE);
         }
     }
