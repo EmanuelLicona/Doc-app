@@ -214,7 +214,6 @@ public class CreatePublicationActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_UPLOAD_FILE) {
             dataPublication = data.getData();
             type = getContentResolver().getType(dataPublication);
-            Toast.makeText(this, "Type: "+type, Toast.LENGTH_SHORT).show();
             extension = ResourceUtil.getTypeFile(type.split("/")[1]);
             /*
                 application/pdf
