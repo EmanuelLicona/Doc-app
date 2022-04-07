@@ -158,11 +158,43 @@ public class EditProfileActivity extends AppCompatActivity implements DatePicker
     private void clickEditProfile() {
         String response = validateFields();
         if (response.equals("OK")) {
-            pDialog.show();
-            prepareUpdate();
+            if (!numberAccountCurrent.equals(numberAccount)) {
+                existNumberAccount();
+            } else {
+                pDialog.show();
+                prepareUpdate();
+            }
         }else {
             ResourceUtil.showAlert("Advertencia", response, this, "error");
         }
+    }
+
+    private void existNumberAccount() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, UserApiMethods.EXIST_EMAIL_AND_ACCOUNT +"email@email.com/"+numberAccount , null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String existNumberAccount = response.getString("cuenta");
+
+                    if (!existNumberAccount.equals("[]")) {
+                        ResourceUtil.showAlert("Advertencia", "El numero de cuenta ya pertenece a otro usuario.", EditProfileActivity.this, "error");
+                    } else {
+                        pDialog.show();
+                        prepareUpdate();
+                    }
+                } catch (JSONException e) {
+                    ResourceUtil.showAlert("Advertencia", "Se produjo un error al editar el perfil", EditProfileActivity.this, "error");
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", "Error: " + error.getMessage());
+            }
+        });
+        requestQueue.add(request);
     }
 
     private void prepareUpdate() {
